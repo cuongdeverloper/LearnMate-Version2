@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useToast from "../../hooks/useToast";
 import { Check, Menu, TimerIcon } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
@@ -43,7 +42,6 @@ const StudentQuizTake = () => {
     selectedCourse,
     selectedQuiz,
     quizDetails,
-    submitting,
     loading,
     error,
   } = useSelector((state) => state.courses);
@@ -56,16 +54,12 @@ const StudentQuizTake = () => {
     if (!quizDetails) return;
 
     const now = new Date();
-    const openTime = quizDetails.openTime
-      ? new Date(quizDetails.openTime)
-      : null;
-    const closeTime = quizDetails.closeTime
-      ? new Date(quizDetails.closeTime)
-      : null;
+    const openTime = quizDetails.openTime ? new Date(quizDetails.openTime) : null;
+    const closeTime = quizDetails.closeTime ? new Date(quizDetails.closeTime) : null;
 
     if (openTime && now < openTime) {
       toast.warning("Quiz has not opened yet!");
-      navigate(`/user/my-courses/${selectedCourse}`); // hoặc một trang thông báo riêng
+      navigate(`/user/my-courses/${selectedCourse}`);
       return;
     }
 
@@ -74,7 +68,7 @@ const StudentQuizTake = () => {
       navigate(`/user/my-courses/${selectedCourse}`);
       return;
     }
-  }, [quizDetails, navigate]);
+  }, [quizDetails, navigate, selectedCourse]);
 
   const storageKey = `quiz-${id}-state`;
   const [state, setState] = useState(() => {
@@ -89,7 +83,6 @@ const StudentQuizTake = () => {
   });
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
 
   const timerRef = useRef(null);
 
@@ -120,11 +113,11 @@ const StudentQuizTake = () => {
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
     };
-  }, [state.timer]);
+  }, [state.timer, handleSubmit]);
 
   const currentQuestion = useMemo(
     () => quizDetails?.questions[state.currentIndex],
-    [state.currentIndex]
+    [state.currentIndex, quizDetails?.questions]
   );
 
   const answeredCount = Object.values(state.answers).filter(Boolean).length;
@@ -133,10 +126,10 @@ const StudentQuizTake = () => {
     setState((s) => ({ ...s, answers: { ...s.answers, [qid]: value } }));
 
     try {
-    } catch (e) {}
+    } catch (e) { }
   };
 
-  const handleSubmit = async (fromAuto = false) => {
+  const handleSubmit = useCallback(async (fromAuto = false) => {
     if (!fromAuto) {
       setConfirmOpen(true);
       return;
@@ -157,13 +150,13 @@ const StudentQuizTake = () => {
     } catch (e) {
       toast.error(e.message);
     }
-  };
+  }, [state, quizDetails, selectedQuiz, dispatch, navigate, error, storageKey]);
 
   if (loading || !quizDetails) {
     return <div className="p-6 text-center">Loading quiz details...</div>;
   }
   return (
-    
+
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <div className="sticky top-16 z-30 border-b bg-gray-50/95 backdrop-blur">
@@ -196,8 +189,8 @@ const StudentQuizTake = () => {
                   state.timer <= 60
                     ? "bg-red-50 text-red-700 animate-pulse"
                     : state.timer <= 300
-                    ? "bg-yellow-50 text-yellow-700"
-                    : "bg-emerald-50 text-emerald-700"
+                      ? "bg-yellow-50 text-yellow-700"
+                      : "bg-emerald-50 text-emerald-700"
                 )}
               >
                 <TimerIcon className="h-4 w-4" />
@@ -230,7 +223,7 @@ const StudentQuizTake = () => {
                     className={cn(
                       "flex items-center gap-3 rounded-md border p-3",
                       state.answers[currentQuestion?._id] === id &&
-                        "border-primary bg-blue-500/5 text-primary"
+                      "border-primary bg-blue-500/5 text-primary"
                     )}
                   >
                     <RadioGroupItem

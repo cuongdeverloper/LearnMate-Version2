@@ -21,11 +21,9 @@ export default function PaymentPage() {
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [withdrawalHistory, setWithdrawalHistory] = useState([]);
     const [financialFlowHistory, setFinancialFlowHistory] = useState([]);
-    // State mới để lựa chọn API cho lịch sử dòng tiền
-    const [useCombinedFinancialFlow, setUseCombinedFinancialFlow] = useState(true); // true = /me/financial-flowhistory (FinancialHistory model), false = /me/financial-flow (tự tổng hợp)
+    const [useCombinedFinancialFlow, setUseCombinedFinancialFlow] = useState(true);
 
-
-    const fetchPaymentData = async () => {
+    const fetchPaymentData = useCallback(async () => {
         if (!userId) {
             setError("Không có userId để lấy dữ liệu. Vui lòng đăng nhập lại.");
             return;
@@ -61,10 +59,10 @@ export default function PaymentPage() {
             const withdrawalData = await withdrawalRes.json();
 
             // Fetch Financial Flow History - Dựa trên state `useCombinedFinancialFlow`
-            let financialFlowEndpoint = useCombinedFinancialFlow ? 
-                                        `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flowhistory` : 
-                                        `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flow`;      
-            
+            let financialFlowEndpoint = useCombinedFinancialFlow ?
+                `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flowhistory` :
+                `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flow`;
+
             const financialFlowRes = await fetch(financialFlowEndpoint, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -84,11 +82,11 @@ export default function PaymentPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId, token, useCombinedFinancialFlow]);
 
     useEffect(() => {
         fetchPaymentData();
-    }, [userId, token, useCombinedFinancialFlow]); // Thêm useCombinedFinancialFlow vào dependency để fetch lại khi chuyển đổi
+    }, [fetchPaymentData]);
 
     const handleTopUp = async () => {
         const amount = Number(amountToTopUp);
@@ -258,19 +256,19 @@ export default function PaymentPage() {
                 </button>
             </section>
 
-            <hr/>
+            <hr />
 
             <section className="payment-page__history">
                 <h3>Lịch sử dòng tiền</h3>
                 <div className="payment-page__history-toggle">
-                    <button 
+                    <button
                         className={useCombinedFinancialFlow ? 'active' : ''}
                         onClick={() => setUseCombinedFinancialFlow(true)}
                         disabled={loading}
                     >
                         Lịch sử từ FinancialHistory Model
                     </button>
-                    <button 
+                    <button
                         className={!useCombinedFinancialFlow ? 'active' : ''}
                         onClick={() => setUseCombinedFinancialFlow(false)}
                         disabled={loading}
@@ -313,7 +311,7 @@ export default function PaymentPage() {
                 )}
             </section>
 
-            <hr/>
+            <hr />
 
             {/* Các phần lịch sử riêng lẻ (nạp, rút) có thể giữ lại hoặc ẩn đi */}
             <section className="payment-page__history">
@@ -344,7 +342,7 @@ export default function PaymentPage() {
                 )}
             </section>
 
-            <hr/>
+            <hr />
 
             <section className="payment-page__history">
                 <h3>Lịch sử rút tiền (Chi tiết)</h3>

@@ -14,16 +14,12 @@ import "./TutorCreateQuiz.scss";
 
 const TutorCreateQuiz = () => {
   const [subjects, setSubjects] = useState([]);
-  const [bookings, setBookings] = useState([]);
   const [questionStorage, setQuestionStorage] = useState([]);
   const [topics, setTopics] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-  const [quizStorages, setQuizStorages] = useState([]);
   const [isCustomTopic, setIsCustomTopic] = useState(false);
-  const [quizTopics, setQuizTopics] = useState([]);
-  const [selectedQuizTopic, setSelectedQuizTopic] = useState("");
   const [quizTitle, setQuizTitle] = useState("");
   const [quizTopic, setQuizTopic] = useState("");
   const [file, setFile] = useState(null);
@@ -40,11 +36,6 @@ const TutorCreateQuiz = () => {
           getQuizStorage(),
         ]);
         setSubjects(subRes.subjects || []);
-        setBookings(bookRes.bookings || []);
-        setQuizStorages(quizStorageRes.quizzes || []);
-        setQuizTopics(
-          quizStorageRes.topics.map((t) => ({ label: t, value: t }))
-        );
       } catch (error) {
         console.error(error);
       }
@@ -111,7 +102,6 @@ const TutorCreateQuiz = () => {
       });
       if (res?.success) {
         toast.success("Tạo QuizStorage thành công!");
-        setQuizStorages((prev) => [...prev, res.quizStorage]);
         setSelectedQuestions([]);
         setQuizTitle("");
         setQuizTopic("");

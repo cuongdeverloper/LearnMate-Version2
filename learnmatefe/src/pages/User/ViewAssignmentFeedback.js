@@ -52,7 +52,6 @@ const getFileName = (url = "") => {
 
 const ViewAssignmentFeedback = () => {
   const navigate = useNavigate();
-  const { id: assignmentId } = useParams();
   const dispatch = useDispatch();
 
   const {
@@ -62,13 +61,11 @@ const ViewAssignmentFeedback = () => {
     selectedAssignment,
 
     submitting,
-    loading,
-    error,
   } = useSelector((state) => state.courses);
 
   useEffect(() => {
-    dispatch(fetchAssignments(selectedCourse));
-  }, [dispatch, selectedAssignment, submitting]);
+  dispatch(fetchAssignments(selectedCourse));
+}, [dispatch, selectedCourse, selectedAssignment, submitting]);
 
   const assignment = assignments.find((a) => a._id === selectedAssignment);
 

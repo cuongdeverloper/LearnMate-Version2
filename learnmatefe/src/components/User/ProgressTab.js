@@ -10,8 +10,11 @@ const ProgressTab = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+  if (selectedCourse) {
     dispatch(fetchProgress(selectedCourse));
-  }, [dispatch]);
+  }
+}, [dispatch, selectedCourse]);
+
 
   const progressItems = [
     {

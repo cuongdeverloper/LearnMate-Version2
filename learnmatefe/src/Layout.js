@@ -17,7 +17,6 @@ import ProtectedRoute from "./ProtectRoutes";
 import Header from "./components/Layout/Header/Header";
 import Footer from "./components/Layout/Footer/Footer";
 import TutorProfilePage from "./pages/Tutor/TutorProfilePage";
-import MyCourses from "./pages/User/AllCoursesSchedule";
 import Profile from "./pages/Profile/Profile";
 import AuthCallback from "./components/Auth/AuthCallback";
 import EnterOTPRegister from "./components/Auth/Sign up/OTP/EnterOTPRegister";

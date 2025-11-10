@@ -1,11 +1,10 @@
-// src/pages/SavedTutorsPage.js
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../Service/AxiosCustomize";
 import { useSelector } from "react-redux";
 import { FaStar, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "../../scss/SavedTutorsPage.scss"; // đổi scss riêng
+import "../../scss/SavedTutorsPage.scss"; 
 
 export default function SavedTutorsPage() {
   const [savedTutors, setSavedTutors] = useState([]);
@@ -27,7 +26,7 @@ export default function SavedTutorsPage() {
       toast.error("Không thể tải danh sách. Vui lòng thử lại.");
       setSavedTutors([]);
     }
-  }, [accessToken, navigate]);
+  }, [accessToken]);
 
   useEffect(() => {
     fetchSavedTutors();

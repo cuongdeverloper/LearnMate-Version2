@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Badge as Status } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
-import { format } from "date-fns";
 import { Card } from "../../components/ui/Card";
 import { ArrowLeft, Clock, FileText, Info, Trophy } from "lucide-react";
 import { Separator } from "../../components/ui/Separator";
@@ -29,7 +28,7 @@ const statusFor = (now, start, end) => {
 const StudentQuizOverview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { quizDetails, selectedCourse } = useSelector((state) => state.courses);
@@ -37,8 +36,8 @@ const StudentQuizOverview = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchQuizDetailsById(id));
-  }, [id]);
+  dispatch(fetchQuizDetailsById(id));
+}, [dispatch, id]);
 
   const state = useMemo(() => {
     if (!quizDetails) return null;

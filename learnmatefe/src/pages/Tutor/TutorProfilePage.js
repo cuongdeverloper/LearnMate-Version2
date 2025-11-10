@@ -1,4 +1,3 @@
-// src/pages/TutorProfilePage.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../Service/AxiosCustomize";
@@ -16,11 +15,7 @@ export default function TutorProfilePage() {
   const [tutor, setTutor] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTutor();
-  }, [tutorId]);
-
-  const fetchTutor = async () => {
+  const fetchTutor = useCallback(async () => {
     try {
       const res = await axios.get(`/api/learner/tutors/${tutorId}`);
       setTutor(res.tutor);
@@ -29,7 +24,11 @@ export default function TutorProfilePage() {
       toast.error("Không thể tải thông tin gia sư.");
       navigate("/tutor");
     }
-  };
+  }, [tutorId, navigate]);
+
+  useEffect(() => {
+    fetchTutor();
+  }, [fetchTutor]);
 
   if (!tutor) {
     return <div className="loading">Đang tải thông tin gia sư...</div>;

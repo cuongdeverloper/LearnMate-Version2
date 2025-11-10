@@ -1,4 +1,3 @@
-// BookingPage.js
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../Service/AxiosCustomize";
@@ -96,7 +95,6 @@ export default function BookingPage() {
     "Cần Thơ",
   ];
 
-  const userId = useSelector((state) => state.user.account.id);
   const token = useSelector((state) => state.user.account.access_token);
   const navigate = useNavigate();
 
@@ -165,40 +163,30 @@ export default function BookingPage() {
     }
   }, [tutorId]);
 
-  // Lấy lịch trống tuần hiện tại (chỉ tuần gốc, không chuyển tuần)
-  const fetchAvailabilities = async () => {
-    if (!tutorId || !weekStart) return;
-    try {
-      const params = { weekStart: weekStart.toISOString().split("T")[0] };
-      const res = await axios.get(`/api/tutor/${tutorId}/availability`, {
-        params,
-      });
+const fetchAvailabilities = useCallback(async () => {
+  if (!tutorId || !weekStart) return;
+  try {
+    const params = { weekStart: weekStart.toISOString().split("T")[0] };
+    const res = await axios.get(`/api/tutor/${tutorId}/availability`, {
+      params,
+    });
 
-      const data = res?.data ?? res;
-      setAvailabilities(data.availabilities || []);
-      setSchedules(data.schedules || []);
-      setSelectedSlots([]);
-    } catch {
-      toast.error("Lỗi khi tải lịch trống");
-      setAvailabilities([]);
-      setSchedules([]);
-    }
-  };
+    const data = res?.data ?? res;
+    setAvailabilities(data.availabilities || []);
+    setSchedules(data.schedules || []);
+    setSelectedSlots([]);
+  } catch {
+    toast.error("Lỗi khi tải lịch trống");
+    setAvailabilities([]);
+    setSchedules([]);
+  }
+}, [tutorId, weekStart]);
 
-  useEffect(() => {
-    fetchAvailabilities();
-  }, [tutorId, weekStart]);
+useEffect(() => {
+  fetchAvailabilities();
+}, [fetchAvailabilities]);
 
-  const getWeekDays = () => {
-    const days = [];
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(today);
-      day.setDate(today.getDate() + ((i - today.getDay() + 7) % 7));
-      days.push(day);
-    }
-    return days;
-  };
+
 
   const toggleSlot = (slotId) =>
     setSelectedSlots((prev) =>
@@ -233,7 +221,6 @@ export default function BookingPage() {
         return;
       }
 
-      const address = `${addressDetail}, ${province}`.trim();
 
       const res = await axios.post(
         `/api/learner/bookings/${tutorId}`,

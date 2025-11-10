@@ -1,6 +1,5 @@
-import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/Dialog";
-import { Calendar, FileText, MapPin } from "lucide-react";
+import { Calendar} from "lucide-react";
 import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";

@@ -17,7 +17,6 @@ const badgeVariants = cva(
         active: "bg-emerald-600 text-white hover:bg-emerald-700",
         overdue: "bg-red-600 text-white hover:bg-red-700",
         completed: "bg-gray-500 text-white hover:bg-gray-600",
-        outline: "text-foreground",
       },
     },
     defaultVariants: {

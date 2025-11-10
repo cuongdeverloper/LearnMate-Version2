@@ -14,7 +14,7 @@ const TutorBookingList = () => {
 
   const tutorId = useSelector((state) => state.user.account.id);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
   try {
     const res = await fetchPendingBookings(tutorId);
     const bookingList = Array.isArray(res.bookings) ? res.bookings : [];
@@ -23,7 +23,7 @@ const TutorBookingList = () => {
     console.error("Lỗi khi load bookings:", error);
     setBookings([]);
   }
-};
+}, [tutorId]);
 
 
   const handleResponse = async (id, action, learnerId) => {
@@ -37,17 +37,6 @@ const TutorBookingList = () => {
     }
   };
 
-  const handleCancel = async (id) => {
-    const reason = prompt("Lý do hủy buổi học:");
-    if (!reason) return;
-    try {
-      const res = await cancelBooking(id, reason);
-      toast.success(res.data?.message || "Đã hủy buổi học thành công");
-      loadBookings();
-    } catch (error) {
-      toast.error(error.message || "Không thể hủy buổi học");
-    }
-  };
 const getStatusColor = (status) => {
   switch(status){
     case "pending": return "bg-yellow-100 text-yellow-800";
@@ -69,9 +58,9 @@ const getStatusColor = (status) => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    loadBookings();
-  }, [tutorId]);
+useEffect(() => {
+  loadBookings();
+}, [loadBookings]);
 
   return (
     <div className="booking-page">

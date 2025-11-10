@@ -1,21 +1,20 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaShoppingBag, FaComments, FaChalkboardTeacher } from "react-icons/fa";
+import { FaShoppingBag, FaChalkboardTeacher } from "react-icons/fa";
 import axios from "../../../Service/AxiosCustomize";
 import "./Header.scss";
 import {
   getTutorActiveStatus,
   updateTutorActiveStatus,
 } from "../../../Service/ApiService/ApiTutor";
-import { Button } from "antd";
 
 const Header = () => {
   const navigate = useNavigate();
   const accessToken = useSelector((state) => state.user.account.access_token);
   const role = useSelector((state) => state.user.account.role);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [savedTutorIds, setSavedTutorIds] = useState([]);
+  const [savedTutorIds] = useState([]);
   const dropdownRef = useRef(null);
   const [isActive, setIsActive] = useState(false);
 

@@ -1,7 +1,5 @@
-// src/pages/profile/Profile.js
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { toast } from "react-toastify";
@@ -14,20 +12,19 @@ import {
   ApiGetAllSubjects,
   ApiUpdateTutor,
 } from "../../Service/ApiService/ApiTutor";
-import  ChangePasswordForm  from "./ChangePasswordForm"; // Nếu file riêng, giữ import
+import  ChangePasswordForm  from "./ChangePasswordForm"; 
 import "./Profile.scss";
 
 const animatedComponents = makeAnimated();
 
 const Profile = () => {
   const navigate = useNavigate();
-  const access_token = useSelector((s) => s.user.account?.access_token);
 
   const [profile, setProfile] = useState(null);
   const [tutorData, setTutorData] = useState(null);
   const [allSubjects, setAllSubjects] = useState([]);
   const [isSocial, setIsSocial] = useState(false);
-  const [mode, setMode] = useState("view"); // view | editUser | editTutor | changePassword
+  const [mode, setMode] = useState("view"); 
 
   const [formUser, setFormUser] = useState({});
   const [formTutor, setFormTutor] = useState({});

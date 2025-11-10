@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../../scss/MyCourses.scss"; // Assuming this SCSS handles tab styling
+import "../../scss/MyCourses.scss"; 
 import {
   finishBooking,
   getMaterialsByBookingId,
@@ -10,7 +10,7 @@ import {
   reportBooking,
   requestChangeSchedule,
   getMyChangeRequests,
-  handlePayMonthly, // Make sure this is correctly imported
+  handlePayMonthly, 
 } from "../../Service/ApiService/ApiBooking";
 import {
   getMyWeeklySchedules,
@@ -19,7 +19,6 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-// Component Modal xác nhận tùy chỉnh (unchanged)
 const ConfirmationModal = ({ title, message, onConfirm, onCancel }) => {
   return (
     <div className="confirmation-modal-overlay">
@@ -243,8 +242,7 @@ function AllCoursesSchedule() {
   const [allWeeklySchedules, setAllWeeklySchedules] = useState([]);
   const [weekStart, setWeekStart] = useState(getWeekStart());
   const token = useSelector((state) => state.user.account.access_token);
-  const [loadingBookings, setLoadingBookings] = useState(true);
-  const [errorBookings, setErrorBookings] = useState(null);
+  const [setErrorBookings] = useState(null);
   const [loadingSchedules, setLoadingSchedules] = useState(true);
   const [errorSchedules, setErrorSchedules] = useState(null);
   const [showChangeScheduleModal, setShowChangeScheduleModal] = useState(false);

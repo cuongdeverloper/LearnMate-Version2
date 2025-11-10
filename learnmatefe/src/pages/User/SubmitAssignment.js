@@ -44,13 +44,11 @@ const SubmitAssignment = () => {
     selectedAssignment,
 
     submitting,
-    loading,
-    error,
   } = useSelector((state) => state.courses);
 
   useEffect(() => {
-    dispatch(fetchAssignments(selectedCourse));
-  }, [dispatch, selectedAssignment, submitting]);
+  dispatch(fetchAssignments(selectedCourse));
+}, [dispatch, selectedCourse, selectedAssignment, submitting]);
 
   const assignment = assignments.find((a) => a._id === selectedAssignment);
 

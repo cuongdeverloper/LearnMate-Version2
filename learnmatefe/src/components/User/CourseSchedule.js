@@ -57,13 +57,13 @@ const CourseSchedule = () => {
   const dispatch = useDispatch();
 
   const {
-    myCourses = [],
-    selectedCourse,
-    quizzes = [],
-    assignments = [],
-    schedule = [],
-    loading: error,
-  } = useSelector((state) => state.courses);
+  myCourses = [],
+  selectedCourse,
+  quizzes = [],
+  assignments = [],
+  schedule = [],
+} = useSelector((state) => state.courses);
+
 
   useEffect(() => {
     dispatch(fetchAssignments(selectedCourse));

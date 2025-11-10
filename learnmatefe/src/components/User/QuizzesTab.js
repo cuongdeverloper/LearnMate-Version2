@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Card } from "../ui/Card";
-import { CheckCircle2, Clock } from "lucide-react";
+import {  Clock } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import {
@@ -38,10 +38,9 @@ const formatDate = (date) =>
   });
 
 const QuizzesTab = () => {
-  const now = new Date();
   const dispatch = useDispatch();
 
-  const { selectedCourse, quizzes, submitting, loading, error } = useSelector(
+  const { selectedCourse, quizzes, submitting } = useSelector(
     (state) => state.courses
   );
 
@@ -81,7 +80,7 @@ const QuizzesTab = () => {
 
               const daysLeft = getDaysUntilDue(q.closeTime);
               const showOverdueWarning =
-                isOverdue(q.closeTime) && q.attempted == 0;
+                isOverdue(q.closeTime) && q.attempted === 0;
 
               return (
                 <TableRow key={q._id}>
@@ -94,7 +93,7 @@ const QuizzesTab = () => {
                     )}
                     {!showOverdueWarning &&
                       daysLeft > 0 &&
-                      q.attempted == 0 && (
+                      q.attempted === 0 && (
                         <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
@@ -171,7 +170,7 @@ const QuizzesTab = () => {
                         </Link>
                       </Button>
                     )}
-                    {(status == "Active" || status == "Completed") && (
+                    {(status === "Active" || status === "Completed") && (
                       <Button
                         asChild
                         variant="outline"

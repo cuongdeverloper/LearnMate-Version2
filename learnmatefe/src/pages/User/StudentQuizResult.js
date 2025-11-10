@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { cn } from "../../lib/utils";
@@ -41,7 +41,6 @@ const StudentQuizResult = () => {
   const {
     selectedCourse,
 
-    quizzes,
     selectedQuiz,
     quizDetails,
     quizResult,
@@ -50,25 +49,24 @@ const StudentQuizResult = () => {
 
     submitting,
     loading,
-    error,
   } = useSelector((state) => state.courses);
 
   useEffect(() => {
-    if (!quizResult?.questions) return;
+  if (!quizResult?.questions) return;
 
-    const questions = quizResult.questions.map((q) => ({
-      id: q._id,
-      text: q.text,
-      options: q.options,
-      correctAnswer: q.options[q.correctAnswer - 1],
-    }));
+  const questions = quizResult.questions.map((q) => ({
+    id: q._id,
+    text: q.text,
+    options: q.options,
+    correctAnswer: q.options[q.correctAnswer - 1],
+  }));
 
-    const getExplanations = async () => {
-      await dispatch(fetchQuizExplanations(questions));
-    };
+  const getExplanations = async () => {
+    await dispatch(fetchQuizExplanations(questions));
+  };
 
-    getExplanations();
-  }, [quizResult]);
+  getExplanations();
+}, [quizResult, dispatch]);
 
   const { id } = useParams();
 

@@ -28,7 +28,7 @@ const CardHeader = forwardRef(({ className, ...props }, ref) => {
 
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = forwardRef(({ className, ...props }, ref) => {
+const CardTitle = forwardRef(({ className, children, ...props }, ref) => {
   return (
     <h3
       ref={ref}
@@ -37,21 +37,27 @@ const CardTitle = forwardRef(({ className, ...props }, ref) => {
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </h3>
   );
 });
 
+
 CardTitle.displayName = "CardTitle";
 
-const CardDescription = forwardRef(({ className, ...props }, ref) => {
+const CardDescription = forwardRef(({ className, children, ...props }, ref) => {
   return (
     <p
       ref={ref}
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
-    />
+    >
+      {children}
+    </p>
   );
 });
+
 
 CardDescription.displayName = "CardDescription";
 

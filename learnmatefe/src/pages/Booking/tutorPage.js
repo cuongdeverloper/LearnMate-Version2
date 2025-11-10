@@ -1,11 +1,9 @@
-// src/pages/TutorListPage.js
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "../../Service/AxiosCustomize";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaStar } from "react-icons/fa";
-import { FaBookmark, FaShoppingBag } from "react-icons/fa";
-import { toast } from "react-toastify"; // Import toast
+import { toast } from "react-toastify"; 
 import "../../scss/TutorListPage.scss";
 
 const classSubjectsMap = {
@@ -39,49 +37,45 @@ export default function TutorListPage() {
   // Thay vì loggedInUser, chúng ta có thể lấy các thông tin cần thiết (như avatar) từ token nếu nó được lưu ở đó,
   // hoặc fetch từ API /me nếu cần. Hiện tại, để đơn giản, chúng ta sẽ dùng ảnh mặc định cho avatar.
 
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
   const [savedTutorIds, setSavedTutorIds] = useState([]);
 
   const navigate = useNavigate();
 
-  // Hàm để lấy danh sách gia sư đã lưu từ backend
-  const fetchSavedTutorIds = useCallback(async () => {
-    // // Chỉ kiểm tra sự tồn tại của accessToken
-    if (!accessToken) {
-      setSavedTutorIds([]);
-      return;
+ const fetchSavedTutorIds = useCallback(async () => {
+  if (!accessToken) {
+    setSavedTutorIds([]);
+    return;
+  }
+  try {
+    const res = await axios.get(`/api/learner/saved-tutors`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    setSavedTutorIds((res || []).map((tutor) => tutor?._id));
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách gia sư đã lưu:", error);
+    if (error.response && error.response.status === 401) {
+      toast.error(
+        "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại."
+      );
+      navigate("/login");
     }
-    try {
-      const res = await axios.get(`/api/learner/saved-tutors`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      // API trả về mảng các đối tượng tutor, ta chỉ cần ID của chúng
-      setSavedTutorIds((res || []).map((tutor) => tutor?._id));
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách gia sư đã lưu:", error);
-      if (error.response && error.response.status === 401) {
-        toast.error(
-          "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại."
-        ); // Thay thế alert
-        navigate("/login");
-      }
-      setSavedTutorIds([]);
-    }
-  }, [navigate]);
+    setSavedTutorIds([]);
+  }
+}, [accessToken, navigate]);
 
-  useEffect(() => {
-    fetchTutors();
-    // Chỉ gọi fetchSavedTutorIds nếu có accessToken
-    if (accessToken) {
-      fetchSavedTutorIds();
-    } else {
-      setSavedTutorIds([]); // Reset nếu không có token
-    }
-  }, [accessToken, fetchSavedTutorIds]);
+ useEffect(() => {
+  fetchTutors();
+  if (accessToken) {
+    fetchSavedTutorIds();
+  } else {
+    setSavedTutorIds([]);
+  }
+}, [accessToken, fetchSavedTutorIds, fetchTutors]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -96,33 +90,33 @@ export default function TutorListPage() {
     };
   }, []); // Bỏ dependency dropdownRef nếu không cần thiết, hoặc đảm bảo nó ổn định
 
-  const fetchTutors = async (filterParams = {}) => {
-    try {
-      const currentFilters = {
-        ...filterParams,
-        class: selectedClass,
-        subject: selectedSubject,
-      };
+  const fetchTutors = useCallback(async (filterParams = {}) => {
+  try {
+    const currentFilters = {
+      ...filterParams,
+      class: selectedClass,
+      subject: selectedSubject,
+    };
 
-      const cleanFilters = Object.fromEntries(
-        Object.entries(currentFilters).filter(
-          ([_, value]) => value !== "" && value !== null
-        )
-      );
+    const cleanFilters = Object.fromEntries(
+      Object.entries(currentFilters).filter(
+        ([_, value]) => value !== "" && value !== null
+      )
+    );
 
-      const res = await axios.get("/api/learner/tutors", {
-        params: cleanFilters,
-      });
+    const res = await axios.get("/api/learner/tutors", {
+      params: cleanFilters,
+    });
 
-      const activeTutors = (res.tutors || []).filter(
-        (tutor) => tutor.active === true
-      );
-      setTutors(activeTutors);
-    } catch (error) {
-      toast.error("Lấy danh sách tutor thất bại"); // Thay thế alert
-      console.error(error);
-    }
-  };
+    const activeTutors = (res.tutors || []).filter(
+      (tutor) => tutor.active === true
+    );
+    setTutors(activeTutors);
+  } catch (error) {
+    toast.error("Lấy danh sách tutor thất bại");
+    console.error(error);
+  }
+}, [selectedClass, selectedSubject, filters]);
 
   const handleClassSelect = (grade) => {
     if (selectedClass === grade) {
