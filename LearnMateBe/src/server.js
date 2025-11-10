@@ -17,7 +17,7 @@ const RouteBooking = require("./routes/BookingRoutes");
 const RouterAdmin = require("./routes/adminRoutes");
 const RouteMessage = require("./routes/messageRoutes");
 
-const quizRouter = require("./routes/quizRoutes");
+const quizRouter = require("./routes/QuizRoutes");
 const assignmentRouter = require("./routes/assignmentRoutes");
 const courseRouter = require("./routes/courseRoutes");
 const aiRouter = require("./routes/aiRoutes");
