@@ -26,7 +26,7 @@ const {
   getQuizDetailsById,
   updateQuizTime,
   getQuizzesByTutorWithStatus,
-} = require("../controller/quiz/quizController");
+} = require("../controller/quiz/QuizController");
 
 // =========================
 // 📘 QUIZ ROUTES
