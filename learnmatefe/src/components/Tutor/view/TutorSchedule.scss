@@ -1,0 +1,86 @@
+.tutor-schedule {
+  .btn-week {
+    background: #e0e7ff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    &:hover {
+      background: #c7d2fe;
+    }
+  }
+
+  .input-week {
+    border: 1px solid #ccc;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .btn-refresh {
+    background: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    &:hover {
+      background: #2563eb;
+    }
+  }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    th, td {
+      border: 1px solid #ddd;
+      vertical-align: top;
+      padding: 0.5rem;
+      min-width: 120px;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+      text-align: center;
+    }
+    td {
+      .no-schedule {
+        color: #9ca3af;
+        text-align: center;
+        font-size: 0.875rem;
+      }
+      .schedule-card {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        &:hover {
+          background: #fde68a;
+        }
+        .time {
+          font-weight: 600;
+        }
+        .subject {
+          color: #1f2937;
+        }
+        .learner {
+          color: #374151;
+        }
+        .address {
+          color: #6b7280;
+          font-size: 0.8rem;
+        }
+        .status {
+          font-size: 0.75rem;
+          margin-top: 2px;
+          text-transform: capitalize;
+          &.pending { color: #f59e0b; }
+          &.completed { color: #10b981; }
+          &.cancelled { color: #ef4444; }
+        }
+      }
+    }
+  }
+}

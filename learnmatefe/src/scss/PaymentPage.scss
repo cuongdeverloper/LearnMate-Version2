@@ -1,0 +1,470 @@
+.payment-page {
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f2f4f8;
+    min-height: 100vh;
+    padding: 30px;
+  
+    &__navbar {
+      background-color: #ffffff;
+      padding: 20px 30px;
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a202c;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+  
+    section {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px 30px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+    }
+  
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 18px;
+    }
+  
+    &__user-info p {
+      margin: 10px 0;
+      font-size: 16px;
+  
+      strong {
+        display: inline-block;
+        width: 150px;
+        color: #4a5568;
+      }
+    }
+  
+    &__balance {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #2b6cb0;
+  
+      span {
+        color: #3182ce;
+      }
+    }
+  
+    &__input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+  
+      input {
+        padding: 10px 16px;
+        font-size: 16px;
+        border: 1px solid #cbd5e0;
+        border-radius: 8px;
+        flex: 1;
+        min-width: 200px;
+  
+        &:focus {
+          outline: none;
+          border-color: #4299e1;
+          box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
+        }
+      }
+  
+      button {
+        padding: 10px 20px;
+        background-color: #2b6cb0;
+        color: white;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+        cursor: pointer;
+  
+        &:hover {
+          background-color: #2c5282;
+        }
+  
+        &:disabled {
+          background-color: #a0aec0;
+          cursor: not-allowed;
+        }
+      }
+    }
+  
+    &__topup-result {
+      margin-top: 16px;
+      font-weight: 500;
+      color: #38a169;
+    }
+  
+    &__history-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+  
+      th, td {
+        padding: 14px 18px;
+        text-align: center;
+        font-size: 15px;
+      }
+  
+      thead {
+        background-color: #edf2f7;
+  
+        th {
+          font-weight: 600;
+          color: #2d3748;
+        }
+      }
+  
+      tbody tr {
+        transition: background-color 0.2s;
+  
+        &:nth-child(even) {
+          background-color: #f7fafc;
+        }
+  
+        &:hover {
+          background-color: #ebf8ff;
+        }
+      }
+  
+      td {
+        color: #4a5568;
+      }
+    }
+  
+    &__loading {
+      font-size: 20px;
+      text-align: center;
+      padding: 100px 20px;
+      color: #2b6cb0;
+    }
+  }
+  .payment-page {
+    // ... (existing styles)
+
+    section {
+        // ... (existing styles)
+        padding: 24px 30px; // Ensure consistent padding
+    }
+
+    &__navbar {
+        // ... (existing styles)
+        margin-bottom: 30px;
+    }
+
+    &__user-info {
+        // ... (existing styles)
+    }
+
+    &__balance {
+        // ... (existing styles)
+    }
+
+    &__topup-form {
+        // ... (existing styles)
+        margin-bottom: 30px;
+    }
+
+    // NEW: Withdrawal Form
+    &__withdraw-form {
+        margin-bottom: 30px;
+
+        .payment-page__input-group,
+        .payment-page__bank-info-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px; // Khoảng cách giữa các nhóm input
+
+            input {
+                padding: 10px 16px;
+                font-size: 16px;
+                border: 1px solid #cbd5e0;
+                border-radius: 8px;
+                flex: 1;
+                min-width: 200px;
+
+                &:focus {
+                    outline: none;
+                    border-color: #4299e1;
+                    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
+                }
+            }
+        }
+        
+        .payment-page__bank-info-group {
+            flex-direction: column; // Stack inputs vertically for bank info
+            @media (min-width: 768px) {
+                flex-direction: row; // Arrange horizontally on larger screens
+            }
+        }
+
+
+        .payment-page__withdraw-button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #d6336c; // Màu hồng/đỏ cho nút rút tiền
+            color: white;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            margin-top: 10px;
+
+            &:hover {
+                background-color: #c0295d;
+            }
+
+            &:disabled {
+                background-color: #a0aec0;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    // NEW: Styles for financial flow history table
+    &__history {
+        margin-bottom: 30px;
+
+        p {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .payment-page__history-table {
+            // ... (existing table styles)
+
+            .text-success {
+                color: #28a745; // Màu xanh lá cây cho số tiền nạp
+                font-weight: 600;
+            }
+
+            .text-danger {
+                color: #dc3545; // Màu đỏ cho số tiền rút/chi tiêu
+                font-weight: 600;
+            }
+        }
+    }
+
+    // Error message style (if still using it)
+    &__error {
+        // ... (existing styles)
+        padding: 15px;
+        background-color: #ffe6e6;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 20px;
+
+        button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: #c82333;
+            }
+        }
+    }
+
+    // Toastify specific overrides (optional, but good for z-index)
+    .Toastify__toast-container {
+        z-index: 9999;
+    }
+}
+/* --- CSS cho nút chuyển đổi lịch sử dòng tiền --- */
+.payment-page__history-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px; // Khoảng cách giữa các nút
+
+  button {
+      padding: 10px 15px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #007bff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+          background-color: #e2f0ff;
+      }
+
+      &.active {
+          background-color: #007bff;
+          color: #fff;
+          border-color: #007bff;
+      }
+
+      &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+      }
+  }
+}
+
+/* --- CSS cho bảng lịch sử (cũng nên có để đẹp hơn) --- */
+.payment-page__history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 0.9em;
+
+  th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+  }
+
+  th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+      color: #333;
+  }
+
+  tr.even {
+      background-color: #f9f9f9;
+  }
+
+  tr.odd {
+      background-color: #fff;
+  }
+
+  tr:hover {
+      background-color: #f1f1f1;
+  }
+
+  .text-success {
+      color: green;
+      font-weight: bold;
+  }
+
+  .text-danger {
+      color: red;
+      font-weight: bold;
+  }
+}
+
+/* --- Các phần khác trong PaymentPage.scss (giữ nguyên hoặc điều chỉnh nếu cần) --- */
+.payment-page {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #f7f9fc;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: #333;
+
+  &__navbar {
+      background-color: #007bff;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      border-radius: 8px 8px 0 0;
+      margin: -25px -25px 25px -25px; // Kéo dài full width
+  }
+
+  &__loading, &__error {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1em;
+      color: #555;
+  }
+
+  &__user-info, &__topup-form, &__withdraw-form, &__history {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 25px;
+
+      h3 {
+          color: #0056b3;
+          margin-top: 0;
+          margin-bottom: 15px;
+          border-bottom: 2px solid #eee;
+          padding-bottom: 10px;
+      }
+
+      p {
+          margin-bottom: 8px;
+      }
+  }
+
+  &__balance {
+      font-size: 1.3em;
+      color: #28a745;
+      margin-top: 15px;
+
+      span {
+          font-weight: bold;
+          color: #007bff;
+      }
+  }
+
+  &__input-group, &__bank-info-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+
+      input {
+          flex: 1;
+          padding: 10px 12px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 1em;
+          min-width: 200px; // Đảm bảo input không quá nhỏ
+      }
+  }
+
+  button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+          background-color: #0056b3;
+      }
+
+      &:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+      }
+  }
+
+  &__withdraw-button {
+      background-color: #dc3545; // Màu đỏ cho nút rút tiền
+      &:hover {
+          background-color: #c82333;
+      }
+  }
+}

@@ -1,0 +1,217 @@
+.tutor-management {
+    .page-header {
+        margin-bottom: 24px;
+        text-align: center;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        h1 {
+            color: #1890ff;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+    }
+
+    .stats-row {
+        margin-bottom: 24px;
+
+        .ant-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+
+            &:hover {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    .applications-table-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+
+            h2 {
+                margin: 0;
+                color: #333;
+            }
+        }
+
+        .ant-table {
+            .ant-table-thead>tr>th {
+                background-color: #fafafa;
+                font-weight: 600;
+            }
+
+            .ant-table-tbody>tr:hover>td {
+                background-color: #f5f5f5;
+            }
+        }
+    }
+
+    .application-detail {
+        .applicant-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+
+            .ant-avatar {
+                margin-right: 16px;
+            }
+
+            .basic-info {
+                h3 {
+                    margin: 0 0 8px 0;
+                    color: #333;
+                }
+
+                p {
+                    margin: 0 0 8px 0;
+                    color: #666;
+                }
+
+                .ant-tag {
+                    margin-right: 8px;
+                }
+            }
+        }
+
+        .subjects-section,
+        .certificates-section,
+        .cv-section {
+            margin-top: 16px;
+
+            h4 {
+                color: #333;
+                margin-bottom: 8px;
+            }
+
+            .ant-tag {
+                margin-bottom: 4px;
+            }
+        }
+
+        .certificates-section {
+            .ant-list-item {
+                padding: 8px 0;
+            }
+        }
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+        padding: 16px;
+
+        .stats-row {
+            .ant-col {
+                margin-bottom: 16px;
+            }
+        }
+
+        .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .applicant-info {
+            flex-direction: column;
+            text-align: center;
+
+            .ant-avatar {
+                margin-right: 0;
+                margin-bottom: 16px;
+            }
+        }
+    }
+
+    // Action buttons styling
+    .ant-btn {
+        &.ant-btn-sm {
+            border-radius: 4px;
+        }
+
+        &.ant-btn-dangerous {
+            &:hover {
+                background-color: #ff7875;
+                border-color: #ff7875;
+            }
+        }
+    }
+
+    // Tags styling
+    .ant-tag {
+        border-radius: 4px;
+        font-weight: 500;
+
+        &.ant-tag-red {
+            background-color: #fff2f0;
+            border-color: #ffccc7;
+            color: #a8071a;
+        }
+
+        &.ant-tag-green {
+            background-color: #f6ffed;
+            border-color: #b7eb8f;
+            color: #389e0d;
+        }
+
+        &.ant-tag-blue {
+            background-color: #e6f7ff;
+            border-color: #91d5ff;
+            color: #0958d9;
+        }
+
+        &.ant-tag-orange {
+            background-color: #fff7e6;
+            border-color: #ffd591;
+            color: #d46b08;
+        }
+    }
+
+    // Modal styling
+    .ant-modal {
+        .ant-modal-header {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .ant-modal-content {
+            border-radius: 8px;
+        }
+    }
+
+    // Loading state
+    .ant-spin-container {
+        min-height: 400px;
+    }
+
+    // Descriptions styling
+    .ant-descriptions {
+        margin: 16px 0;
+
+        .ant-descriptions-item-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .ant-descriptions-item-content {
+            color: #666;
+        }
+    }
+}

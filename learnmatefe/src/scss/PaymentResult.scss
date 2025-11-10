@@ -1,0 +1,76 @@
+.payment-result-container {
+    max-width: 420px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .payment-result-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  
+    &.success {
+      color: #16a34a; // màu xanh lá
+    }
+    &.failure {
+      color: #dc2626; // màu đỏ
+    }
+  }
+  
+  .payment-message {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  
+    &.success-message {
+      color: #15803d;
+      p {
+        margin: 0.4rem 0;
+      }
+    }
+  
+    &.failure-message {
+      color: #b91c1c;
+      p {
+        margin: 0.4rem 0;
+      }
+    }
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.6rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.25s ease;
+  
+    &.btn-primary {
+      background-color: #2563eb; // xanh dương
+      color: white;
+  
+      &:hover {
+        background-color: #1e40af;
+      }
+    }
+  
+    &.btn-secondary {
+      background-color: #e5e7eb; // xám nhạt
+      color: #374151;
+  
+      &:hover {
+        background-color: #d1d5db;
+      }
+    }
+  }
+  

@@ -1,0 +1,605 @@
+// Variables for consistent theming (giữ nguyên để dễ quản lý)
+$primary-color: #007bff;
+$primary-dark: #0056b3;
+$secondary-color: #6c757d; // For outline buttons
+$accent-color: #28a745; // Book Now button
+$accent-dark: #218838;
+$info-color: #17a2b8; // Add to List button
+$info-dark: #138496;
+$text-dark: #2c3e50; // Darker text for headings
+$text-medium: #34495e; // Medium dark for general text
+$text-light: #7f8c8d; // Lighter text for descriptions
+$background-light: #f8f9fa;
+$background-card: #ffffff;
+$border-color: #e0e6ed;
+$shadow-light: rgba(0, 0, 0, 0.08);
+$shadow-medium: rgba(0, 0, 0, 0.15);
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background-light;
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: $primary-color;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .navbar-logo {
+      font-weight: 700;
+      font-size: 28px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+      &:hover {
+        color: #e9ecef;
+      }
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+
+      .cart-icon-wrapper {
+        position: relative;
+        margin-right: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        .cart-icon {
+          font-size: 28px;
+          color: white;
+          transition: color 0.3s ease;
+          &:hover {
+            color: #e9ecef;
+          }
+        }
+        .cart-count {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background-color: #ffc107;
+          color: $text-dark;
+          border-radius: 50%;
+          padding: 2px 7px;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 1;
+          min-width: 20px;
+          text-align: center;
+        }
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 15px;
+
+        &.btn-outline {
+          background-color: transparent;
+          border: 2px solid white;
+          color: white;
+          &:hover {
+            background-color: white;
+            color: $primary-color;
+          }
+        }
+        &.btn-primary {
+          background-color: white;
+          border: 2px solid white;
+          color: $primary-color;
+          &:hover {
+            background-color: darken(white, 5%);
+          }
+        }
+      }
+    }
+  }
+
+  .avatar-dropdown {
+    position: relative;
+    .avatar-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .dropdown-menu {
+      display:  block;
+      position: absolute;
+      right: 0;
+      top: 60px;
+      background: $background-card;
+      border: 1px solid $border-color;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      min-width: 180px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      border-radius: 8px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: fadeInDropdown 0.3s forwards;
+
+      li {
+        padding: 12px 18px;
+        cursor: pointer;
+        color: $text-medium;
+        font-size: 15px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        &:hover {
+          background-color: $primary-color;
+          color: white;
+        }
+      }
+    }
+    @keyframes fadeInDropdown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .page-header {
+    padding: 30px 24px;
+    text-align: center;
+    background-color: white;
+    border-bottom: 1px solid $border-color;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 38px;
+      color: $text-dark;
+      font-weight: 700;
+    }
+
+    .sub-title {
+      color: $text-light;
+      font-size: 18px;
+    }
+  }
+
+  .main-layout {
+    display: flex;
+    max-width: 1400px;
+    margin: 30px auto;
+    gap: 30px;
+    padding: 0 20px;
+
+    aside.sidebar-grade-subject {
+      width: 280px;
+      min-width: 250px;
+      background: $background-card;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px $shadow-light;
+      align-self: flex-start;
+
+      label {
+        font-weight: 700;
+        margin-bottom: 18px;
+        display: block;
+        font-size: 18px;
+        color: $text-dark;
+      }
+
+      .grade-options-vertical {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        > div {
+          margin-bottom: 5px;
+        }
+
+        .grade-btn {
+          width: 100%;
+          background-color: #f5f5f5;
+          border: 1px solid $border-color;
+          padding: 12px 18px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          text-align: left;
+          font-size: 16px;
+          color: $text-medium;
+          transition: all 0.3s ease;
+
+          &:hover:not(.selected) {
+            background-color: #e0e0e0;
+            border-color: #c5c5c5;
+          }
+          &.selected {
+            background-color: $primary-color;
+            color: white;
+            border-color: $primary-color;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+          }
+        }
+
+        .subject-options-vertical {
+          margin-left: 25px;
+          margin-top: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          border-left: 2px solid $primary-color;
+          padding-left: 15px;
+
+          .subject-btn {
+            background-color: #e9ecef;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            text-align: left;
+            color: $text-medium;
+            transition: all 0.3s ease;
+
+            &:hover:not(.selected) {
+              background-color: #d1d9e0;
+            }
+            &.selected {
+              background-color: $primary-dark;
+              color: white;
+              box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            }
+          }
+        }
+      }
+    }
+
+    main.main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+
+      .filter-section {
+        margin-bottom: 30px;
+
+        .filter-main {
+          background-color: $background-card;
+          padding: 25px;
+          border-radius: 12px;
+          box-shadow: 0 5px 15px $shadow-light;
+
+          .filter-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+
+            .filter-group {
+              display: flex;
+              flex-direction: column;
+              flex: 1 1 200px;
+
+              label {
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 15px;
+                color: $text-medium;
+              }
+
+              input {
+                padding: 10px 12px;
+                border: 1px solid $border-color;
+                border-radius: 8px;
+                font-size: 15px;
+                color: $text-dark;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                &:focus {
+                  outline: none;
+                  border-color: $primary-color;
+                  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+                }
+              }
+            }
+
+            .filter-btn-group {
+              align-self: flex-end;
+              flex: 0 0 auto;
+              min-width: 150px;
+              
+              .btn-filter {
+                width: 100%;
+                padding: 12px 25px;
+                background-color: $primary-color;
+                color: white;
+                font-weight: 600;
+                font-size: 16px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+
+                &:hover {
+                  background-color: $primary-dark;
+                  transform: translateY(-2px);
+                }
+                &:active {
+                  transform: translateY(0);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .tutor-list-section {
+        .no-result {
+          text-align: center;
+          font-size: 20px;
+          color: $text-light;
+          margin-top: 50px;
+          padding: 20px;
+          background-color: $background-card;
+          border-radius: 12px;
+          box-shadow: 0 2px 10px $shadow-light;
+        }
+
+        .tutor-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Tăng minmax nhẹ để card đỡ bị bóp */
+          gap: 20px;
+
+          .tutor-card {
+            background: $background-card;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px $shadow-light;
+            cursor: pointer;
+            padding: 15px;
+            display: flex;
+            flex-direction: row; // Bố cục ngang
+            align-items: flex-start; // Căn trên cùng để nội dung có không gian
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 6px 20px $shadow-medium;
+            }
+
+            .tutor-avatar {
+              width: 70px; /* Giảm kích thước avatar một chút */
+              height: 70px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 3px solid $primary-color;
+              box-shadow: 0 3px 10px rgba(0, 123, 255, 0.2);
+              margin-right: 15px; /* Giữ khoảng cách với info */
+              flex-shrink: 0;
+            }
+
+            .tutor-info {
+              flex-grow: 1;
+              width: calc(100% - 85px); /* Trừ đi avatar và margin-right để tính toán lại width */
+              display: flex;
+              flex-direction: column; /* Đảm bảo các phần tử bên trong xếp chồng */
+              justify-content: space-between; /* Đẩy các phần tử ra xa nhau */
+              height: 100%; /* Đảm bảo info chiếm đủ chiều cao */
+
+              h3 {
+                margin-top: 0;
+                margin-bottom: 5px;
+                font-size: 19px; /* Giảm nhẹ font size tên */
+                color: $text-dark;
+                font-weight: 700;
+              }
+
+              .rating {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 4px; /* Giảm gap */
+                color: #f7b924;
+                margin-bottom: 6px; /* Giảm margin */
+
+                .star-icon {
+                  font-size: 15px; /* Giảm kích thước sao */
+                  color: #f7b924;
+                }
+                span {
+                  font-size: 13px; /* Giảm font size */
+                  font-weight: 500;
+                  color: $text-medium;
+                }
+              }
+
+              p {
+                margin: 3px 0; /* Giảm margin giữa các dòng p */
+                font-size: 12.5px; /* Giảm font size */
+                color: $text-light;
+                strong {
+                  color: $text-medium;
+                }
+              }
+
+              .tutor-desc {
+                margin-top: 8px; /* Giảm margin */
+                font-style: italic;
+                color: $text-light;
+                font-size: 12.5px;
+                line-height: 1.4; /* Giảm line height */
+                max-height: 38px; /* Giảm chiều cao cố định, hiển thị ít dòng hơn */
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2; /* Giới hạn 2 dòng mô tả */
+                -webkit-box-orient: vertical;
+              }
+
+              .tutor-price {
+                margin-top: 8px; /* Giảm margin */
+                font-weight: 700;
+                font-size: 15px; /* Giảm font size giá */
+                color: $primary-color;
+              }
+
+              .tutor-actions {
+                display: flex;
+                gap: 8px; /* Giảm khoảng cách giữa các nút */
+                margin-top: 12px; /* Giảm margin-top */
+                width: 100%;
+                
+                .btn-add-to-list, .btn-book {
+                  flex-grow: 1;
+                  padding: 9px 12px; /* Giảm padding cho nút */
+                  border: none;
+                  border-radius: 5px; /* Giảm border-radius */
+                  cursor: pointer;
+                  font-size: 13px; /* Giảm font size nút */
+                  font-weight: 600;
+                  transition: background-color 0.3s ease, transform 0.2s ease;
+
+                  &:hover {
+                    transform: translateY(-1px);
+                  }
+                  &:active {
+                    transform: translateY(0);
+                  }
+                }
+
+                .btn-add-to-list {
+                  background-color: $info-color;
+                  color: white;
+                  &:hover {
+                    background-color: $info-dark;
+                  }
+                  &.added { // Style for saved state
+                    background-color: $secondary-color; // Gray color for 'added'
+                    &:hover {
+                      background-color: darken($secondary-color, 10%);
+                    }
+                  }
+                }
+
+                .btn-book {
+                  background-color: $accent-color;
+                  color: white;
+                  &:hover {
+                    background-color: $accent-dark;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .page-container .main-layout {
+    flex-direction: column;
+    padding: 0 15px;
+    gap: 20px;
+  }
+
+  .page-container .main-layout aside.sidebar-grade-subject {
+    width: 100%;
+    min-width: unset;
+    margin-bottom: 0;
+    order: 2;
+  }
+
+  .page-container .main-layout main.main-content {
+    width: 100%;
+    order: 1;
+  }
+
+  .page-container .main-layout .filter-section .filter-main .filter-row {
+    flex-direction: column;
+    gap: 15px;
+    .filter-group {
+      flex: 1 1 100%;
+    }
+    .filter-btn-group {
+      align-self: stretch;
+      .btn-filter {
+        width: 100%;
+      }
+    }
+  }
+
+  .page-container .navbar {
+    padding: 12px 20px;
+  }
+  .page-container .page-header h1 {
+    font-size: 32px;
+  }
+  .page-container .page-header .sub-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container .navbar {
+    flex-direction: column;
+    padding: 15px;
+    gap: 10px;
+  }
+  .page-container .navbar-logo {
+    margin-bottom: 10px;
+  }
+  .page-container .navbar-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    .btn {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+  .page-container .main-layout .tutor-list-section .tutor-list {
+    grid-template-columns: 1fr;
+    .tutor-card {
+      flex-direction: column;
+      text-align: center;
+      align-items: center; // Căn giữa avatar khi ở dạng cột
+      .tutor-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+      }
+      .tutor-info {
+        width: 100%; // Đảm bảo info chiếm đủ width
+        text-align: center; // Căn giữa text info
+      }
+      .rating {
+        justify-content: center;
+      }
+      .tutor-actions {
+        flex-direction: column;
+        .btn-add-to-list, .btn-book {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

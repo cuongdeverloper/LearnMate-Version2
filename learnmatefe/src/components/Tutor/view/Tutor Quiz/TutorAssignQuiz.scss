@@ -1,0 +1,93 @@
+.assign-quiz-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  h2 {
+    font-size: 1.75rem;
+    color: #4a4a4a;
+    margin-bottom: 1rem;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"] {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+  }
+
+  .booking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+
+    .booking-card {
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      strong {
+        font-size: 1rem;
+        color: #333;
+      }
+
+      span {
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      &:hover {
+        border-color: #6b5dfc;
+        background: #f0f0ff;
+      }
+
+      &.selected {
+        border-color: #6b5dfc;
+        background: #e0e0ff;
+      }
+    }
+  }
+
+  .btn-assign {
+    padding: 0.75rem 1.5rem;
+    background: #6b5dfc;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+
+    &:hover:not(.loading) {
+      background: #574edc;
+    }
+
+    &.loading {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+}

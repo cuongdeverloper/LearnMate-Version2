@@ -1,0 +1,232 @@
+.admin-overview {
+    .page-header {
+        margin-bottom: 32px;
+        text-align: center;
+        padding: 24px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        h1 {
+            color: #1890ff;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin: 0;
+        }
+    }
+
+    .stats-section {
+        margin-bottom: 32px;
+
+        h2 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .stat-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+
+            &:hover {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                transform: translateY(-2px);
+            }
+
+            .ant-card-body {
+                padding: 20px;
+            }
+
+            .ant-statistic {
+                .ant-statistic-title {
+                    font-weight: 500;
+                    color: #666;
+                    margin-bottom: 8px;
+                }
+
+                .ant-statistic-content {
+                    .ant-statistic-content-value {
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+
+                    .ant-statistic-content-prefix {
+                        margin-right: 8px;
+                        font-size: 20px;
+                    }
+                }
+            }
+
+            .progress-wrapper {
+                margin-top: 8px;
+                
+                .ant-progress-line {
+                    .ant-progress-bg {
+                        height: 4px;
+                        border-radius: 2px;
+                    }
+                }
+            }
+        }
+    }
+
+    .recent-section {
+        .recent-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 100%;
+
+            .ant-card-head {
+                border-bottom: 1px solid #f0f0f0;
+                
+                .ant-card-head-title {
+                    color: #333;
+                    font-weight: 600;
+                }
+            }
+
+            .ant-card-body {
+                padding: 16px;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .ant-list-item {
+                padding: 12px 0;
+                border-bottom: 1px solid #f5f5f5;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .ant-list-item-meta {
+                    .ant-list-item-meta-avatar {
+                        .ant-avatar {
+                            border: 2px solid #f0f0f0;
+                        }
+                    }
+
+                    .ant-list-item-meta-title {
+                        margin-bottom: 4px;
+                        font-weight: 500;
+
+                        .ant-tag {
+                            font-size: 10px;
+                            padding: 0 4px;
+                            border-radius: 2px;
+                        }
+                    }
+
+                    .ant-list-item-meta-description {
+                        color: #666;
+                        font-size: 13px;
+                    }
+                }
+            }
+
+            .ant-empty {
+                padding: 40px 0;
+            }
+        }
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 16px;
+            margin-bottom: 24px;
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+
+        .stats-section {
+            margin-bottom: 24px;
+
+            h2 {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .stat-card {
+                .ant-card-body {
+                    padding: 16px;
+                }
+
+                .ant-statistic {
+                    .ant-statistic-content {
+                        .ant-statistic-content-value {
+                            font-size: 20px;
+                        }
+
+                        .ant-statistic-content-prefix {
+                            font-size: 16px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .recent-section {
+            .recent-card {
+                .ant-card-body {
+                    max-height: 300px;
+                }
+
+                .ant-list-item {
+                    padding: 8px 0;
+
+                    .ant-list-item-meta {
+                        .ant-list-item-meta-title {
+                            font-size: 14px;
+                        }
+
+                        .ant-list-item-meta-description {
+                            font-size: 12px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Loading states
+    .ant-card.ant-card-loading {
+        .ant-card-body {
+            min-height: 100px;
+        }
+    }
+
+    // Animation
+    .stat-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .recent-card {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}

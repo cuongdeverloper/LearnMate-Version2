@@ -1,0 +1,336 @@
+.booking-schedule-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+    .heading {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+  
+    .week-start-picker {
+      text-align: center;
+      margin-bottom: 20px;
+  
+      label {
+        font-weight: 600;
+        color: #34495e;
+  
+        input[type='date'] {
+          margin-left: 10px;
+          padding: 5px 10px;
+          border: 1.5px solid #bdc3c7;
+          border-radius: 4px;
+          transition: border-color 0.3s ease;
+  
+          &:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
+          }
+        }
+      }
+    }
+  
+    .schedule-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+  
+      thead {
+        background-color: #2980b9;
+        color: black;
+  
+        th {
+          padding: 10px 8px;
+          border: 1px solid #ddd;
+          text-align: center;
+          font-weight: 600;
+          vertical-align: middle;
+  
+          small {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: black;
+          }
+        }
+      }
+  
+      tbody {
+        tr {
+          &:nth-child(even) {
+            background-color: #f8f9fa;
+          }
+  
+          td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px 5px;
+            vertical-align: middle;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.25s ease, color 0.25s ease;
+  
+            &.time-slot {
+              cursor: default;
+              font-weight: 600;
+              background: #ecf0f1;
+              color: #2c3e50;
+            }
+  
+            &.slot-cell.available:hover {
+              background-color: #d1e7fd;
+              color: #1a73e8;
+            }
+  
+            &.slot-cell.selected {
+              background-color: #3498db;
+              color: white;
+              font-weight: 700;
+            }
+  
+            &.slot-cell.busy-other {
+              background-color: #e74c3c;
+              color: white;
+              cursor: not-allowed;
+            }
+  
+            &.slot-cell.busy-own {
+              background-color: #27ae60;
+              color: white;
+              font-weight: 600;
+              cursor: default;
+            }
+  
+            span {
+              display: inline-block;
+              vertical-align: middle;
+            }
+  
+            .delete-btn {
+              position: absolute;
+              top: 2px;
+              right: 4px;
+              background-color: rgba(255, 255, 255, 0.85);
+              border: none;
+              border-radius: 50%;
+              width: 18px;
+              height: 18px;
+              font-weight: bold;
+              color: #c0392b;
+              cursor: pointer;
+              line-height: 18px;
+              text-align: center;
+              padding: 0;
+              user-select: none;
+              transition: background-color 0.3s ease;
+  
+              &:hover {
+                background-color: #e74c3c;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  
+    .button-container {
+      margin-top: 20px;
+      text-align: center;
+  
+      button {
+        background-color: #2980b9;
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgb(41 128 185 / 0.4);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  
+        &:hover:not(:disabled) {
+          background-color: #1f5e8a;
+          box-shadow: 0 6px 14px rgb(31 94 138 / 0.6);
+        }
+  
+        &:disabled {
+          background-color: #7f8c8d;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+  .booking-schedule-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-family: Arial, sans-serif;
+
+  .heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    button {
+      padding: 8px 16px;
+      background-color: #f1f1f1;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #ddd;
+      }
+
+      &.active {
+        background-color: #007bff;
+        color: white;
+      }
+    }
+  }
+
+  .booking-selector {
+    margin-bottom: 16px;
+
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      min-width: 250px;
+    }
+  }
+
+  .booking-summary {
+    margin-bottom: 12px;
+    font-size: 15px;
+
+    strong {
+      color: #007bff;
+    }
+  }
+
+  .week-start-picker {
+    margin-bottom: 16px;
+
+    input {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  }
+
+  .schedule-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+
+    th, td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f8f8f8;
+      font-weight: bold;
+    }
+
+    .time-slot {
+      background-color: #f1f1f1;
+      font-weight: bold;
+    }
+
+    .slot-cell {
+      cursor: pointer;
+      position: relative;
+
+      &.available {
+        background-color: #ffffff;
+      }
+
+      &.selected {
+        background-color: #cce5ff;
+      }
+
+      &.busy-own {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      &.busy-other {
+        background-color: #f8d7da;
+        color: #721c24;
+        cursor: not-allowed;
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: transparent;
+        color: red;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          color: darkred;
+        }
+      }
+    }
+  }
+
+  .button-container {
+    text-align: right;
+
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #218838;
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+  

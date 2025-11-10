@@ -1,0 +1,253 @@
+.booking-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 40px 20px;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  color: #1e293b;
+}
+
+.booking-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    color: #2563eb;
+    font-size: 2rem;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  p {
+    color: #475569;
+    font-size: 1rem;
+  }
+}
+
+.booking-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+.booking-card-tutor {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+  }
+
+  button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: #1e40af;
+    }
+  }
+}
+
+.booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .status {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    width: fit-content;
+  }
+
+  .status.pending {
+    background: #fef9c3;
+    color: #b45309;
+  }
+
+  .status.approve {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status.cancelled,
+  .status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+
+
+.booking-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 90%;
+  padding: 24px;
+  outline: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.booking-modal h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.booking-modal .close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  float: right;
+}
+
+.booking-modal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  th {
+    background: #f3f4f6;
+    text-align: left;
+  }
+
+  tr:hover {
+    background: #f9fafb;
+  }
+}
+
+.booking-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+
+  button {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-size: 0.9rem;
+  }
+
+  .btn-accept {
+    background: #16a34a;
+    color: #fff;
+
+    &:hover {
+      background: #15803d;
+    }
+  }
+
+  .btn-reject {
+    background: #dc2626;
+    color: #fff;
+
+    &:hover {
+      background: #b91c1c;
+    }
+  }
+
+  .btn-close {
+    background: #e5e7eb;
+    color: #1f2937;
+
+    &:hover {
+      background: #d1d5db;
+    }
+  }
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  color: #64748b;
+  padding: 60px 20px;
+
+  img {
+    width: 100px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #475569;
+  }
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .booking-card-tutor {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .booking-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .booking-modal {
+    padding: 16px;
+  }
+}
+.booking-modal-overlay {
+  position: fixed; /* luôn full màn hình */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* đảm bảo full màn hình */
+  background-color: rgba(124, 123, 123, 0.85); /* overlay tối hẳn */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* modal xuất hiện từ top */
+  padding: 20px;
+  overflow-y: auto; /* scroll nếu modal cao hơn viewport */
+  z-index: 1000;
+}
+
+.booking-modal {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh; /* giới hạn chiều cao modal */
+  overflow-y: auto; /* scroll cho nội dung dài */
+  padding: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  outline: none;
+}

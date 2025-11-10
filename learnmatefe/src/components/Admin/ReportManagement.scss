@@ -1,0 +1,308 @@
+.report-management-container {
+    padding: 24px;
+    background: #f0f2f5;
+    min-height: 100vh;
+
+    .ant-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        transition: all 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+    }
+
+    .ant-table {
+        background: #fff;
+        border-radius: 8px;
+
+        .ant-table-thead>tr>th {
+            background-color: #fafafa;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .ant-table-tbody>tr {
+            &:hover>td {
+                background-color: #f0f9ff;
+            }
+
+            &.ant-table-row-selected>td {
+                background-color: #e6f7ff;
+            }
+
+            &>td {
+                border-bottom: 1px solid #f0f0f0;
+            }
+        }
+    }
+
+    .status-tag {
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .reason-stats {
+        margin-bottom: 16px;
+
+        .reason-stat-item {
+            text-align: center;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            transition: all 0.3s ease;
+
+            &:hover {
+                border-color: #1890ff;
+                box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .stat-number {
+                font-size: 20px;
+                font-weight: 600;
+                color: #1890ff;
+                margin-bottom: 4px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                color: #666;
+                margin: 0;
+            }
+        }
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+
+            .user-name {
+                font-weight: 500;
+                margin-bottom: 2px;
+            }
+
+            .user-email {
+                font-size: 12px;
+                color: #8c8c8c;
+            }
+        }
+    }
+
+    .report-details-drawer {
+        .ant-drawer-content {
+            background: #fff;
+        }
+
+        .ant-descriptions {
+            background: #fff;
+        }
+
+        .ant-descriptions-item-label {
+            font-weight: 600;
+            background-color: #fafafa;
+        }
+
+        .related-booking-card {
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            margin-top: 16px;
+            background: #fff;
+
+            .ant-card-head {
+                background-color: #fafafa;
+                border-bottom: 1px solid #d9d9d9;
+            }
+
+            &:hover {
+                border-color: #1890ff;
+                box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+            }
+        }
+    }
+
+    .filter-section {
+        margin-bottom: 16px;
+
+        .ant-card {
+            background: #fff;
+        }
+
+        .ant-col {
+            label {
+                display: block;
+                font-weight: 500;
+                margin-bottom: 4px;
+                color: #262626;
+            }
+        }
+    }
+
+    .statistics-cards {
+        margin-bottom: 24px;
+
+        .ant-card {
+            transition: all 0.3s ease;
+
+            &:hover {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                transform: translateY(-2px);
+            }
+        }
+
+        .ant-statistic {
+            .ant-statistic-title {
+                color: #666;
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .ant-statistic-content {
+                font-size: 24px;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .action-buttons {
+        .ant-btn {
+            border-radius: 6px;
+
+            &.ant-btn-primary {
+                box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+            }
+
+            &.ant-btn-link {
+                padding: 4px 8px;
+                height: auto;
+            }
+        }
+    }
+
+    .bulk-actions-alert {
+        .ant-alert-message {
+            font-weight: 600;
+        }
+
+        .ant-btn {
+            border-radius: 6px;
+        }
+    }
+
+    .update-modal {
+        .ant-modal-content {
+            background: #fff;
+        }
+
+        .ant-form-item-label>label {
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .ant-radio-group {
+            .ant-radio-wrapper {
+                display: block;
+                height: 40px;
+                line-height: 40px;
+                padding: 0 16px;
+                border: 1px solid #d9d9d9;
+                border-radius: 6px;
+                margin-bottom: 8px;
+                background: #fff;
+
+                &:hover {
+                    border-color: #1890ff;
+                }
+
+                &.ant-radio-wrapper-checked {
+                    border-color: #1890ff;
+                    background-color: #f0f9ff;
+                }
+            }
+        }
+    }
+
+    .report-tabs {
+        .ant-tabs-tab {
+            font-weight: 500;
+
+            &.ant-tabs-tab-active {
+                font-weight: 600;
+            }
+        }
+    }
+
+    .timeline-section {
+        .ant-timeline {
+            .ant-timeline-item {
+                &:not(:last-child) {
+                    padding-bottom: 20px;
+                }
+
+                .timeline-content {
+                    .timeline-title {
+                        font-weight: 600;
+                        color: #262626;
+                        margin-bottom: 4px;
+                    }
+
+                    .timeline-description {
+                        color: #8c8c8c;
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .report-management-container {
+        padding: 16px;
+
+        .ant-table {
+
+            .ant-table-thead>tr>th,
+            .ant-table-tbody>tr>td {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        .filter-section {
+            .ant-col {
+                margin-bottom: 16px;
+            }
+        }
+
+        .statistics-cards {
+            .ant-col {
+                margin-bottom: 16px;
+            }
+        }
+
+        .reason-stats {
+            .ant-col {
+                margin-bottom: 12px;
+            }
+        }
+
+        .action-buttons {
+            .ant-btn {
+                margin-bottom: 8px;
+                width: 100%;
+            }
+        }
+    }
+}

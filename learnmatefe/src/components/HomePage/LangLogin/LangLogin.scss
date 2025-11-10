@@ -1,0 +1,58 @@
+.lang-login {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* react-select styles */
+
+
+.react-select__control {
+  background-color: none;
+//   border: 1px solid #ccc;
+  border-radius: 10px;
+//   box-shadow: none;
+  padding: 2px 4px;
+}
+
+.react-select__single-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.option-item img {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+/* login button */
+.login-btn {
+  padding: 8px 16px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #333;
+}
+.custom-select {
+  width: 220px;
+  background: none !important;
+  border: none;
+  padding: 2px 4px;
+}
