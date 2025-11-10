@@ -110,20 +110,18 @@ const AdminDashboard = () => {
 
         try {
             setLoading(true);
-            let response;
-
             switch (actionType) {
                 case 'block':
                     if (!reason.trim()) {
                         message.error('Vui lòng nhập lý do khóa tài khoản');
                         return;
                     }
-                    response = await AdminService.blockUser(selectedUser._id, reason);
+                    await AdminService.blockUser(selectedUser._id, reason);
                     message.success('Đã khóa tài khoản thành công');
                     break;
 
                 case 'unblock':
-                    response = await AdminService.unblockUser(selectedUser._id);
+                    await AdminService.unblockUser(selectedUser._id);
                     message.success('Đã mở khóa tài khoản thành công');
                     break;
 
@@ -132,13 +130,14 @@ const AdminDashboard = () => {
                         message.error('Vui lòng nhập lý do xóa tài khoản');
                         return;
                     }
-                    response = await AdminService.deleteUser(selectedUser._id, reason);
+                    await AdminService.deleteUser(selectedUser._id, reason);
                     message.success('Đã xóa tài khoản thành công');
                     break;
 
                 default:
                     break;
             }
+
 
             fetchUsers(); // Refresh the list
             setModalVisible(false);

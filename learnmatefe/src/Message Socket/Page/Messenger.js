@@ -20,7 +20,7 @@ const Messenger = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [ setOnlineUsers] = useState([]);
+  // const [ setOnlineUsers] = useState([]);
   const socket = useRef();
   const scrollRef = useRef();
   const isAuthenticated = useSelector(user => user.user.isAuthenticated);
@@ -88,13 +88,13 @@ const Messenger = () => {
 
   useEffect(() => {
     socket.current.emit("addUser", user.account.id);
-    socket.current.on("getUsers", (users) => {
-      if (Array.isArray(user.followings)) {
-        setOnlineUsers(
-          user.followings.filter((f) => users.some((u) => u.userId === f))
-        );
-      }
-    });
+    // socket.current.on("getUsers", (users) => {
+    //   if (Array.isArray(user.followings)) {
+    //     setOnlineUsers(
+    //       user.followings.filter((f) => users.some((u) => u.userId === f))
+    //     );
+    //   }
+    // });
   }, [user]);
   const handleSubmit = async (e) => {
     e.preventDefault();

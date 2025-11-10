@@ -21,7 +21,7 @@ import {
   Avatar,
   Typography,
   Alert,
-  Tabs
+  
 } from 'antd';
 import {
   SearchOutlined,

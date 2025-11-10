@@ -100,18 +100,18 @@ const BookingManagement = () => {
   } finally {
     setLoading(false);
   }
-}, [pagination.current, pagination.pageSize, filters]);
+}, [pagination, filters]);
 
-  const fetchStatistics = async () => {
-    try {
-      const response = await AdminService.getBookingStats();
-      if (response.success) {
-        setStatistics(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching booking statistics:', error);
+  const fetchStatistics = useCallback(async () => {
+  try {
+    const response = await AdminService.getBookingStats();
+    if (response.success) {
+      setStatistics(response.data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching booking statistics:', error);
+  }
+}, []);
 
 useEffect(() => {
   fetchBookings();

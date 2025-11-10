@@ -169,24 +169,40 @@ const StudentHomePage = () => {
       </section>
 
       {/* TRỞ THÀNH GIA SƯ */}
+      {/* TRỞ THÀNH GIA SƯ */}
       <div className="div-become-tutor" data-aos="fade-up">
         <section className="become-tutor">
           <div className="become-left">
-            <img src="https://res.cloudinary.com/djeilqn5r/image/upload/v1752487669/Tutorat-a-Winnipeg-Tuteurs-a-Winnipeg-SOSprof-Tutoring-in-Winnipeg-Tutors-in-Winnipeg-SOSteacher-1024x932_w7wgdr.jpg" alt="Trở thành gia sư" />
+            <img
+              src="https://res.cloudinary.com/djeilqn5r/image/upload/v1752487669/Tutorat-a-Winnipeg-Tuteurs-a-Winnipeg-SOSprof-Tutoring-in-Winnipeg-Tutors-in-Winnipeg-SOSteacher-1024x932_w7wgdr.jpg"
+              alt="Trở thành gia sư"
+            />
           </div>
           <div className="become-right">
             <h2>Trở thành gia sư</h2>
-            <p>Kiếm tiền bằng cách chia sẻ kiến thức chuyên môn với học viên. Đăng ký ngay để bắt đầu dạy học trực tuyến cùng FindTutor.</p>
+            <p>
+              Kiếm tiền bằng cách chia sẻ kiến thức chuyên môn với học viên.
+              Đăng ký ngay để bắt đầu dạy học trực tuyến cùng FindTutor.
+            </p>
             <ul>
               <li>🌟 Tìm học viên mới</li>
               <li>🚀 Phát triển sự nghiệp</li>
               <li>💸 Nhận thanh toán an toàn</li>
             </ul>
-            <button className="btn-primary">Trở thành gia sư →</button>
-            <a href="#" onClick={(e) => e.preventDefault()}>Tìm hiểu cách hoạt động</a>
+            <button className="btn-primary" onClick={() => navigate('/tutor-application')}>
+              Trở thành gia sư →
+            </button>
+            <button
+              className="link-button"
+              onClick={() => navigate('/how-it-works')}
+            >
+              Tìm hiểu cách hoạt động
+            </button>
           </div>
         </section>
       </div>
+
+      {/* FOOTER */}
       <footer className="site-footer" data-aos="fade-up">
         <div className="footer-content">
           <div className="footer-logo">
@@ -197,30 +213,41 @@ const StudentHomePage = () => {
           <div className="footer-links">
             <h4>Về chúng tôi</h4>
             <ul>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Giới thiệu</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Cơ hội nghề nghiệp</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Blog</a></li>
+              <li><Link to="/about">Giới thiệu</Link></li>
+              <li><Link to="/careers">Cơ hội nghề nghiệp</Link></li>
+              <li><Link to="/blog">Blog</Link></li>
             </ul>
 
             <ul>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Trung tâm trợ giúp</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Liên hệ</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Câu hỏi thường gặp</a></li>
+              <li><Link to="/help-center">Trung tâm trợ giúp</Link></li>
+              <li><Link to="/contact">Liên hệ</Link></li>
+              <li><Link to="/faq">Câu hỏi thường gặp</Link></li>
             </ul>
 
             <div className="social-icons">
-              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-facebook-f"></i></a>
-              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-instagram"></i></a>
-              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-youtube"></i></a>
+              <a href="https://facebook.com" target="_blank" rel="noreferrer">
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noreferrer">
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer">
+                <i className="fab fa-youtube"></i>
+              </a>
             </div>
-
 
             <div className="app-links">
               <a href="https://play.google.com" target="_blank" rel="noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                  alt="Google Play"
+                />
               </a>
               <a href="https://www.apple.com/app-store/" target="_blank" rel="noreferrer">
-                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" />
+                <img
+                  src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                  alt="App Store"
+                />
               </a>
             </div>
           </div>

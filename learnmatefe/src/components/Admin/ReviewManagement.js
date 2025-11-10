@@ -38,7 +38,7 @@ import './ReviewManagement.scss';
 
 const { TextArea } = Input;
 const { Option } = Select;
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 const ReviewManagement = () => {
     const navigate = useNavigate();
