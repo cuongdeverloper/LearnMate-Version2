@@ -29,7 +29,7 @@ const {
   viewSubmission,
   viewGradeFeedback,
   gradeAssignment,
-} = require("../controller/assignment/assignmentController");
+} = require("../controller/assignment/AssignmentController");
 
 
 // ===================================================================
