@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
 import {
   ArrowLeft,
@@ -23,10 +22,9 @@ import CourseSchedule from "../../components/User/CourseSchedule";
 import { useSelector } from "react-redux";
 
 const CourseDetails = () => {
-  const { id: courseId } = useParams();
   const navigate = useNavigate();
 
-  const { myCourses, selectedCourse, loading, error } = useSelector(
+  const { myCourses, selectedCourse } = useSelector(
     (state) => state.courses
   );
 

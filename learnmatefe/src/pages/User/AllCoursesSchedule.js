@@ -242,6 +242,7 @@ function AllCoursesSchedule() {
   const [allWeeklySchedules, setAllWeeklySchedules] = useState([]);
   const [weekStart, setWeekStart] = useState(getWeekStart());
   const token = useSelector((state) => state.user.account.access_token);
+  const [setLoadingBookings] = useState(true);
   const [setErrorBookings] = useState(null);
   const [loadingSchedules, setLoadingSchedules] = useState(true);
   const [errorSchedules, setErrorSchedules] = useState(null);

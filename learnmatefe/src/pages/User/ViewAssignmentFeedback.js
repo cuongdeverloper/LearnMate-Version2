@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "../../components/ui/Button";
 import { ArrowLeft, CheckCircle2, Download, FileText } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/ui/Card";
 import { formatDate } from "../../lib/utils";
 
