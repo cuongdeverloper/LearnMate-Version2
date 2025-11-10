@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
     Table, 
     Button, 
@@ -16,20 +16,16 @@ import {
     Statistic,
     Select,
     Rate,
-    Descriptions,
     Typography,
-    Badge,
-    Divider
+
 } from 'antd';
 import { 
     UserOutlined, 
     EyeOutlined,
     EyeInvisibleOutlined,
     DeleteOutlined,
-    MessageOutlined,
     WarningOutlined,
     FlagOutlined,
-    LinkOutlined,
     ReloadOutlined,
     CommentOutlined,
     ArrowLeftOutlined
@@ -50,7 +46,7 @@ const ReviewManagement = () => {
     const [loading, setLoading] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
     const [actionModalVisible, setActionModalVisible] = useState(false);
-    const [actionType, setActionType] = useState('');
+    const [setActionType] = useState('');
     const [actionReason, setActionReason] = useState('');
     
     // User detail modal
@@ -75,9 +71,10 @@ const ReviewManagement = () => {
     });
 
     useEffect(() => {
-        fetchReviews();
-        fetchStats();
-    }, [currentPage, pageSize, statusFilter, searchFilter]);
+  fetchReviews();
+  fetchStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [currentPage, pageSize, statusFilter, searchFilter]);
 
     const fetchReviews = async () => {
         setLoading(true);
@@ -151,8 +148,6 @@ const ReviewManagement = () => {
 
     const handleMarkReview = async (review, type) => {
         try {
-            // Đánh dấu spam/vi phạm (backend sẽ tự động ẩn nếu cần)
-            const response = await AdminService.markReview(review._id, type);
             
             const isMarking = (type === 'spam' && !review.isSpam) || (type === 'offensive' && !review.isOffensive);
             const actionText = type === 'spam' ? 'spam' : 'vi phạm';

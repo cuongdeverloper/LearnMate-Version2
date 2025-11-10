@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   Card,
@@ -70,40 +70,37 @@ const BookingManagement = () => {
   const [bookingDetails, setBookingDetails] = useState(null);
   const [relatedReports, setRelatedReports] = useState([]);
 
-  useEffect(() => {
-    fetchBookings();
-    fetchStatistics();
-  }, [pagination.current, pagination.pageSize, filters]);
 
-  const fetchBookings = async () => {
-    setLoading(true);
-    try {
-      const params = {
-        page: pagination.current,
-        limit: pagination.pageSize,
-        status: filters.status !== 'all' ? filters.status : undefined,
-        tutorId: filters.tutorId || undefined,
-        learnerId: filters.learnerId || undefined,
-        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
-      };
 
-      const response = await AdminService.getBookings(params);
-      if (response.success) {
-        setBookings(response.data.bookings);
-        setPagination(prev => ({
-          ...prev,
-          total: response.data.total,
-          current: response.data.page,
-          pageSize: response.data.limit
-        }));
-      }
-    } catch (error) {
-      message.error('Không thể tải danh sách booking');
-    } finally {
-      setLoading(false);
+  const fetchBookings = useCallback(async () => {
+  setLoading(true);
+  try {
+    const params = {
+      page: pagination.current,
+      limit: pagination.pageSize,
+      status: filters.status !== 'all' ? filters.status : undefined,
+      tutorId: filters.tutorId || undefined,
+      learnerId: filters.learnerId || undefined,
+      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+    };
+
+    const response = await AdminService.getBookings(params);
+    if (response.success) {
+      setBookings(response.data.bookings);
+      setPagination(prev => ({
+        ...prev,
+        total: response.data.total,
+        current: response.data.page,
+        pageSize: response.data.limit
+      }));
     }
-  };
+  } catch (error) {
+    message.error('Không thể tải danh sách booking');
+  } finally {
+    setLoading(false);
+  }
+}, [pagination.current, pagination.pageSize, filters]);
 
   const fetchStatistics = async () => {
     try {
@@ -115,6 +112,11 @@ const BookingManagement = () => {
       console.error('Error fetching booking statistics:', error);
     }
   };
+
+useEffect(() => {
+  fetchBookings();
+  fetchStatistics();
+}, [fetchBookings, fetchStatistics]);
 
   const fetchBookingDetails = async (bookingId) => {
     try {

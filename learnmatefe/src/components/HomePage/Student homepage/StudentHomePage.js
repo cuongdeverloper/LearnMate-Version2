@@ -1,4 +1,3 @@
-import React from "react";
 import "./StudentHomePage.scss";
 import LangLogin from "../LangLogin/LangLogin";
 import { useNavigate, Link } from "react-router-dom";
@@ -6,20 +5,20 @@ import { doLogout } from "../../../redux/action/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie'
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 const StudentHomePage = () => {
   useEffect(() => {
-  AOS.init({
-    duration: 1000, 
-  });
-}, []);
+    AOS.init({
+      duration: 1000,
+    });
+  }, []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await dispatch(doLogout());
-  }
+  }, [dispatch]);
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
   const user = useSelector(state => state.user);
   const role = useSelector((state) => state.user.account.role);
@@ -34,32 +33,32 @@ const StudentHomePage = () => {
       return true;
     }
   };
-  const decodeTokenData = async () => {
+  const decodeTokenData = useCallback(async () => {
     try {
       const token = Cookies.get('accessToken');
-
       if (!token || isTokenExpired(token)) {
-        dispatch(doLogout());
-        navigate('/signin')
+        await dispatch(doLogout());
+        navigate('/signin');
       }
     } catch (error) {
       console.error('Error decoding token:', error);
-      dispatch(doLogout());
+      await dispatch(doLogout());
     }
-  };
+  }, [dispatch, navigate]);
+
   useEffect(() => {
     document.title = "LearnMate";
   }, [isAuthenticated]);
 
   useEffect(() => {
     decodeTokenData();
-  }, [dispatch])
+  }, [decodeTokenData]);
 
   useEffect(() => {
     if (!isAuthenticated) {
       logout();
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, logout]);
 
   return (
     <div className="home-container">
@@ -184,7 +183,7 @@ const StudentHomePage = () => {
               <li>💸 Nhận thanh toán an toàn</li>
             </ul>
             <button className="btn-primary">Trở thành gia sư →</button>
-            <a href="#">Tìm hiểu cách hoạt động</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>Tìm hiểu cách hoạt động</a>
           </div>
         </section>
       </div>
@@ -198,28 +197,23 @@ const StudentHomePage = () => {
           <div className="footer-links">
             <h4>Về chúng tôi</h4>
             <ul>
-              <li><a href="#">Giới thiệu</a></li>
-              <li><a href="#">Cơ hội nghề nghiệp</a></li>
-              <li><a href="#">Blog</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Giới thiệu</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Cơ hội nghề nghiệp</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Blog</a></li>
             </ul>
-          </div>
 
-          <div className="footer-links">
-            <h4>Hỗ trợ</h4>
             <ul>
-              <li><a href="#">Trung tâm trợ giúp</a></li>
-              <li><a href="#">Liên hệ</a></li>
-              <li><a href="#">Câu hỏi thường gặp</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Trung tâm trợ giúp</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Liên hệ</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Câu hỏi thường gặp</a></li>
             </ul>
-          </div>
 
-          <div className="footer-social">
-            <h4>Kết nối</h4>
             <div className="social-icons">
-              <a href="#"><i className="fab fa-facebook-f"></i></a>
-              <a href="#"><i className="fab fa-instagram"></i></a>
-              <a href="#"><i className="fab fa-youtube"></i></a>
+              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-facebook-f"></i></a>
+              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-instagram"></i></a>
+              <a href="#" onClick={(e) => e.preventDefault()}><i className="fab fa-youtube"></i></a>
             </div>
+
 
             <div className="app-links">
               <a href="https://play.google.com" target="_blank" rel="noreferrer">

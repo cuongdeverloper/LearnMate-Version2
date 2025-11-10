@@ -18,8 +18,6 @@ import {
   Row,
   Col,
   Statistic,
-  Checkbox,
-  Timeline,
   Avatar,
   Typography,
   Alert,
@@ -44,7 +42,6 @@ import './ReportManagement.scss';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
@@ -78,9 +75,11 @@ const ReportManagement = () => {
   const [relatedBooking, setRelatedBooking] = useState(null);
 
   useEffect(() => {
-    fetchReports();
-    fetchStatistics();
-  }, [pagination.current, pagination.pageSize, filters]);
+  fetchReports();
+  fetchStatistics();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [pagination.current, pagination.pageSize, filters]);
+
 
   const fetchReports = async () => {
     setLoading(true);

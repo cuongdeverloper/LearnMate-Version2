@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchPendingBookings, respondBooking, cancelBooking } from "../ApiTutor";
+import { useEffect, useState } from "react";
+import { fetchPendingBookings, respondBooking } from "../ApiTutor";
 import { useSelector } from "react-redux";
 import "./TutorBookingList.scss";
 import { toast } from "react-toastify";

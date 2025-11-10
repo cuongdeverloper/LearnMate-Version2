@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaGoogle, FaFacebook, FaUpload } from "react-icons/fa";
 import { ImSpinner9 } from "react-icons/im";
 import { toast } from "react-toastify";
@@ -32,12 +32,15 @@ const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [gender, setGender] = useState("");
   const [image, setImage] = useState(null);
-  const [role, setRole] = useState("student");
+  const [role] = useState("student");
   const [imagePreview, setImagePreview] = useState(null);
 
-  const validateLogin = () => setIsFormValid(email && password);
-  const validateRegister = () =>
-    setIsFormValidRegister(username && emailReg && passwordReg && phoneNumber && gender);
+  const validateLogin = useCallback(() => setIsFormValid(email && password), [email, password]);
+  const validateRegister = useCallback(
+    () => setIsFormValidRegister(username && emailReg && passwordReg && phoneNumber && gender),
+    [username, emailReg, passwordReg, phoneNumber, gender]
+  );
+
 
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
@@ -94,8 +97,14 @@ const SignIn = () => {
     if (isAuthenticated) navigate("/");
   }, [isAuthenticated, navigate]);
 
-  useEffect(() => validateLogin(), [email, password]);
-  useEffect(() => validateRegister(), [username, emailReg, passwordReg, phoneNumber, gender]);
+  useEffect(() => {
+    validateLogin();
+  }, [email, password, validateLogin]);
+
+  useEffect(() => {
+    validateRegister();
+  }, [username, emailReg, passwordReg, phoneNumber, gender, validateRegister]);
+
 
   return (
     <div className="signin-container">
@@ -151,7 +160,13 @@ const SignIn = () => {
               </button>
             </div>
 
-            <a onClick={() => navigate("/forgot-password")}>Forgot password?</a>
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="link-button"
+            >
+              Forgot password?
+            </button>
           </form>
         </div>
 

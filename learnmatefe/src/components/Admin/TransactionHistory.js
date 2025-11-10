@@ -13,7 +13,6 @@ import {
   Typography,
   Avatar,
   Tooltip,
-  Badge
 } from 'antd';
 import {
   SearchOutlined,
@@ -21,7 +20,6 @@ import {
   HistoryOutlined,
   UserOutlined,
   DownloadOutlined,
-  FilterOutlined
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import './TransactionHistory.scss';
@@ -47,8 +45,10 @@ const TransactionHistory = () => {
   });
 
   useEffect(() => {
-    fetchTransactions();
-  }, [pagination.current, pagination.pageSize, filters]);
+  fetchTransactions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [pagination.current, pagination.pageSize, filters]);
+
 
   const fetchTransactions = async () => {
     try {

@@ -1,4 +1,3 @@
-import { toast } from 'react-toastify';
 import axios from '../AxiosCustomize';
 import Cookies from 'js-cookie';
 export const finishBooking = async (bookingId) => {

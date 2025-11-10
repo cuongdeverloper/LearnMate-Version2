@@ -20,7 +20,7 @@ const Messenger = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [ setOnlineUsers] = useState([]);
   const socket = useRef();
   const scrollRef = useRef();
   const isAuthenticated = useSelector(user => user.user.isAuthenticated);
@@ -166,17 +166,17 @@ const Messenger = () => {
 
 
   useEffect(() => {
-    socket.current.on("messageSeen", ({ conversationId }) => {
-      if (currentChat && currentChat._id === conversationId) {
-        // Cập nhật trạng thái tất cả các tin nhắn là seen
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.sender._id === user.account.id ? { ...msg, seen: true } : msg
-          )
-        );
-      }
-    });
-  }, [currentChat]);
+  socket.current.on("messageSeen", ({ conversationId }) => {
+    if (currentChat && currentChat._id === conversationId) {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.sender._id === user.account.id ? { ...msg, seen: true } : msg
+        )
+      );
+    }
+  });
+}, [currentChat, user.account.id]);
+
 
   return (
     <>

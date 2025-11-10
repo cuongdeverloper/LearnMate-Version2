@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { 
-    Table, 
-    Button, 
-    Modal, 
-    Input, 
-    Tag, 
-    Space, 
-    message, 
-    Card, 
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+    Table,
+    Button,
+    Modal,
+    Input,
+    Tag,
+    Space,
+    message,
+    Card,
     Avatar,
     Popconfirm,
     Tooltip,
@@ -15,28 +15,25 @@ import {
     Col,
     Statistic
 } from 'antd';
-import { 
-    UserOutlined, 
-    LockOutlined, 
-    UnlockOutlined, 
+import {
+    UserOutlined,
+    LockOutlined,
+    UnlockOutlined,
     DeleteOutlined,
     EyeOutlined,
     TeamOutlined,
     UserAddOutlined,
     UserDeleteOutlined,
     ExclamationCircleOutlined,
-    FileTextOutlined
+
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import AdminService from '../../Service/ApiService/AdminService';
-import { useSelector } from 'react-redux'; // Add this import
 import moment from 'moment';
 import './AdminDashboard.scss';
 
 const { TextArea } = Input;
 
 const AdminDashboard = () => {
-    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -53,17 +50,11 @@ const AdminDashboard = () => {
         students: 0
     });
 
-    const user = useSelector(state => state.user?.account);
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
             const response = await AdminService.getAllUsers();
-            
+
             if (response && Array.isArray(response)) {
                 const userList = response;
                 setUsers(userList);
@@ -80,13 +71,17 @@ const AdminDashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
     const calculateStats = (userList = []) => { // Default parameter
         if (!Array.isArray(userList)) {
             userList = []; // Fallback nếu không phải array
         }
-        
+
         const stats = {
             totalUsers: userList.length,
             activeUsers: userList.filter(user => !user.isBlocked).length,
@@ -116,7 +111,7 @@ const AdminDashboard = () => {
         try {
             setLoading(true);
             let response;
-            
+
             switch (actionType) {
                 case 'block':
                     if (!reason.trim()) {
@@ -126,12 +121,12 @@ const AdminDashboard = () => {
                     response = await AdminService.blockUser(selectedUser._id, reason);
                     message.success('Đã khóa tài khoản thành công');
                     break;
-                
+
                 case 'unblock':
                     response = await AdminService.unblockUser(selectedUser._id);
                     message.success('Đã mở khóa tài khoản thành công');
                     break;
-                
+
                 case 'delete':
                     if (!reason.trim()) {
                         message.error('Vui lòng nhập lý do xóa tài khoản');
@@ -140,11 +135,11 @@ const AdminDashboard = () => {
                     response = await AdminService.deleteUser(selectedUser._id, reason);
                     message.success('Đã xóa tài khoản thành công');
                     break;
-                
+
                 default:
                     break;
             }
-            
+
             fetchUsers(); // Refresh the list
             setModalVisible(false);
         } catch (error) {
@@ -179,9 +174,9 @@ const AdminDashboard = () => {
             key: 'avatar',
             width: 80,
             render: (image, record) => (
-                <Avatar 
-                    src={image} 
-                    icon={<UserOutlined />} 
+                <Avatar
+                    src={image}
+                    icon={<UserOutlined />}
                     size={40}
                 />
             ),
@@ -247,20 +242,20 @@ const AdminDashboard = () => {
             render: (_, record) => (
                 <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button 
-                            type="default" 
+                        <Button
+                            type="default"
                             size="small"
                             icon={<EyeOutlined />}
                             onClick={() => handleViewDetails(record)}
                         />
                     </Tooltip>
-                    
+
                     {record.role !== 'admin' && (
                         <>
                             {record.isBlocked ? (
                                 <Tooltip title="Mở khóa">
-                                    <Button 
-                                        type="primary" 
+                                    <Button
+                                        type="primary"
                                         size="small"
                                         icon={<UnlockOutlined />}
                                         onClick={() => handleAction(record, 'unblock')}
@@ -268,8 +263,8 @@ const AdminDashboard = () => {
                                 </Tooltip>
                             ) : (
                                 <Tooltip title="Khóa tài khoản">
-                                    <Button 
-                                        type="default" 
+                                    <Button
+                                        type="default"
                                         danger
                                         size="small"
                                         icon={<LockOutlined />}
@@ -277,7 +272,7 @@ const AdminDashboard = () => {
                                     />
                                 </Tooltip>
                             )}
-                            
+
                             <Popconfirm
                                 title="Bạn có chắc muốn xóa tài khoản này?"
                                 description="Hành động này không thể hoàn tác!"
@@ -287,8 +282,8 @@ const AdminDashboard = () => {
                                 icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
                             >
                                 <Tooltip title="Xóa tài khoản">
-                                    <Button 
-                                        type="primary" 
+                                    <Button
+                                        type="primary"
                                         danger
                                         size="small"
                                         icon={<DeleteOutlined />}
@@ -387,8 +382,8 @@ const AdminDashboard = () => {
                         Làm mới
                     </Button>
                 </div>
-                
-                <Table 
+
+                <Table
                     columns={columns}
                     dataSource={users || []} // Đảm bảo dataSource không undefined
                     rowKey="_id"
@@ -398,7 +393,7 @@ const AdminDashboard = () => {
                         pageSize: 10,
                         showSizeChanger: true,
                         showQuickJumper: true,
-                        showTotal: (total, range) => 
+                        showTotal: (total, range) =>
                             `${range[0]}-${range[1]} của ${total} người dùng`,
                     }}
                     scroll={{ x: 1200 }}
@@ -418,7 +413,7 @@ const AdminDashboard = () => {
                 <p>
                     Bạn có chắc muốn {actionType === 'block' ? 'khóa' : actionType === 'unblock' ? 'mở khóa' : 'xóa'} tài khoản của <strong>{selectedUser?.username}</strong>?
                 </p>
-                
+
                 {(actionType === 'block' || actionType === 'delete') && (
                     <div style={{ marginTop: 16 }}>
                         <label>Lý do {actionType === 'block' ? 'khóa' : 'xóa'} tài khoản:</label>
@@ -448,9 +443,9 @@ const AdminDashboard = () => {
                 {selectedUser && (
                     <div className="user-detail">
                         <div className="user-avatar-section">
-                            <Avatar 
-                                src={selectedUser.image} 
-                                icon={<UserOutlined />} 
+                            <Avatar
+                                src={selectedUser.image}
+                                icon={<UserOutlined />}
                                 size={80}
                             />
                             <div className="user-basic-info">
@@ -463,7 +458,7 @@ const AdminDashboard = () => {
                                 </Tag>
                             </div>
                         </div>
-                        
+
                         <div className="user-details-grid">
                             <div className="detail-item">
                                 <strong>Email:</strong> {selectedUser.email}

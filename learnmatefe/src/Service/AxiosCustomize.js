@@ -1,6 +1,5 @@
 import axios from 'axios';
 import NProgress from 'nprogress';
-import { isTokenExpired } from './decodeJWT.js';
 import { store } from '../redux/store';
 
 

@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
     Card, 
     Row, 
     Col, 
     Statistic, 
     Progress,
-    Table,
     Tag,
     Avatar,
     List,
-    Timeline,
     Empty
 } from 'antd';
 import { 
@@ -19,10 +17,7 @@ import {
     CheckCircleOutlined,
     ClockCircleOutlined,
     CloseCircleOutlined,
-    RiseOutlined,
-    FallOutlined,
     BookOutlined,
-    DollarOutlined
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import moment from 'moment';

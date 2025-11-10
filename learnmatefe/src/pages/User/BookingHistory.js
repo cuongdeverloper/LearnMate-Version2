@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "../../Service/AxiosCustomize";
 import { useSelector } from "react-redux";
 import "../../scss/BookingHistory.scss";
@@ -41,11 +41,9 @@ const BookingHistoryPage = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
-  useEffect(() => {
-    fetchBookingHistory();
-  }, []);
+  
 
-  const fetchBookingHistory = async () => {
+  const fetchBookingHistory = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -63,7 +61,11 @@ const BookingHistoryPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, token]);
+
+ useEffect(() => {
+    fetchBookingHistory();
+  }, [fetchBookingHistory]);
 
   const confirmCancel = (bookingId) => {
     setSelectedBookingId(bookingId);

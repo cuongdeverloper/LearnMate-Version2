@@ -215,39 +215,7 @@ class AdminService {
 
     // ========== REVIEW MANAGEMENT FUNCTIONS ==========
     
-    // Get all reviews
-    static async getAllReviews(page = 1, limit = 10, status = '', search = '') {
-        try {
-            const token = Cookies.get("accessToken");
 
-            if (!token) {
-                console.error('No access token found');
-                window.open("/signin", "_blank");
-                return null;
-            }
-
-            const params = new URLSearchParams({
-                page: page.toString(),
-                limit: limit.toString(),
-                ...(status && { status }),
-                ...(search && { search })
-            });
-
-            const response = await axios.get(`/api/admin/reviews?${params}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching reviews - Full error:', error);
-            console.error('Error response:', error.response);
-            console.error('Error status:', error.response?.status);
-            console.error('Error data:', error.response?.data);
-            throw error;
-        }
-    }
 
     // Get review stats
     static async getReviewStats() {
@@ -272,80 +240,11 @@ class AdminService {
         }
     }
 
-    // Toggle hide review
-    static async toggleHideReview(reviewId) {
-        try {
-            const token = Cookies.get("accessToken");
+  
 
-            if (!token) {
-                window.open("/signin", "_blank");
-                return null;
-            }
+  
 
-            const response = await axios.patch(
-                `/api/admin/reviews/${reviewId}/toggle-hide`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            return true;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    // Delete review
-    static async deleteReview(reviewId, reason) {
-        try {
-            const token = Cookies.get("accessToken");
-
-            if (!token) {
-                window.open("/signin", "_blank");
-                return null;
-            }
-
-            const response = await axios.delete(
-                `/api/admin/reviews/${reviewId}`,
-                {
-                    data: { reason },
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            return true;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    // Mark review as spam/offensive
-    static async markReview(reviewId, type) {
-        try {
-            const token = Cookies.get("accessToken");
-
-            if (!token) {
-                window.open("/signin", "_blank");
-                return null;
-            }
-
-            const response = await axios.patch(
-                `/api/admin/reviews/${reviewId}/mark`,
-                { type },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            return true;
-        } catch (error) {
-            throw error;
-        }
-    }
+ 
 
     // Review Management APIs
     static async getAllReviews(page = 1, pageSize = 10, status = '', search = '') {

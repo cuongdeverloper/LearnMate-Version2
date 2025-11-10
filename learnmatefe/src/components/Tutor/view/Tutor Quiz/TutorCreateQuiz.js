@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -30,7 +30,7 @@ const TutorCreateQuiz = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [subRes, bookRes, quizStorageRes] = await Promise.all([
+        const [subRes] = await Promise.all([
           getSubjectsByTutor(),
           getBookingsByTutorId(userId),
           getQuizStorage(),

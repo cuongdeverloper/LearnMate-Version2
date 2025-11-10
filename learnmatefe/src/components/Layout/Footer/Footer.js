@@ -8,11 +8,20 @@ const Footer = () => {
       <div className="footer-container">
         <p>&copy; {new Date().getFullYear()} LearnMate. All rights reserved.</p>
         <div className="footer-links">
-          <a href="#">Điều khoản</a>
-          <a href="#">Chính sách bảo mật</a>
-          <a href="#">Liên hệ</a>
-          <a href="#">Facebook</a>
+          <button className="footer-link" onClick={() => alert("Điều khoản")}>
+            Điều khoản
+          </button>
+          <button className="footer-link" onClick={() => alert("Chính sách bảo mật")}>
+            Chính sách bảo mật
+          </button>
+          <button className="footer-link" onClick={() => alert("Liên hệ")}>
+            Liên hệ
+          </button>
+          <button className="footer-link" onClick={() => window.open("https://facebook.com", "_blank")}>
+            Facebook
+          </button>
         </div>
+
       </div>
     </footer>
   );

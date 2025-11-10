@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Table, 
-    Button, 
-    Modal, 
-    Input, 
-    Tag, 
-    Space, 
-    message, 
+import {
+    Table,
+    Button,
+    Modal,
+    Input,
+    Tag,
+    Space,
+    message,
     Card,
     Avatar,
-    Popconfirm,
     Tooltip,
     Row,
     Col,
     Statistic,
-    Image,
     Descriptions,
     List
 } from 'antd';
-import { 
-    UserOutlined, 
-    CheckOutlined, 
+import {
+    UserOutlined,
+    CheckOutlined,
     CloseOutlined,
     EyeOutlined,
     FileTextOutlined,
     BookOutlined,
-    DollarOutlined,
-    EnvironmentOutlined,
     ClockCircleOutlined,
     ArrowLeftOutlined
 } from '@ant-design/icons';
@@ -55,6 +51,7 @@ const TutorManagement = () => {
 
     useEffect(() => {
         fetchApplications();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchApplications = async () => {
@@ -62,7 +59,7 @@ const TutorManagement = () => {
         try {
             const response = await AdminService.getAllTutorApplications();
             console.log('Tutor applications API response:', response);
-            
+
             // Backend trả về format: { errorCode: 0, message: '...', data: [...] }
             let applicationList = [];
             if (!response) {
@@ -75,7 +72,7 @@ const TutorManagement = () => {
             } else {
                 applicationList = [];
             }
-            
+
             if (applicationList.length > 0) {
                 setApplications(applicationList);
                 calculateStats(applicationList);
@@ -97,7 +94,7 @@ const TutorManagement = () => {
         if (!Array.isArray(applicationList)) {
             applicationList = [];
         }
-        
+
         const stats = {
             total: applicationList.length,
             pending: applicationList.filter(app => app.status === 'pending').length,
@@ -113,7 +110,7 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.approveTutorApplication(selectedApplication._id);
-            
+
             // Backend trả về format: { errorCode: 0, message: '...' }
             if (response && response.errorCode === 0) {
                 message.success('Đã duyệt đơn đăng ký thành công');
@@ -128,7 +125,7 @@ const TutorManagement = () => {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi duyệt đơn';
             message.error(errorMessage);
             console.error('Approve error:', error);
-            
+
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -146,10 +143,10 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.rejectTutorApplication(
-                selectedApplication._id, 
+                selectedApplication._id,
                 rejectionReason
             );
-            
+
             // Backend trả về format: { errorCode: 0, message: '...' }
             if (response && response.errorCode === 0) {
                 message.success('Đã từ chối đơn đăng ký');
@@ -165,7 +162,7 @@ const TutorManagement = () => {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi từ chối đơn';
             message.error(errorMessage);
             console.error('Reject error:', error);
-            
+
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -212,9 +209,9 @@ const TutorManagement = () => {
             key: 'avatar',
             width: 80,
             render: (image, record) => (
-                <Avatar 
-                    src={image} 
-                    icon={<UserOutlined />} 
+                <Avatar
+                    src={image}
+                    icon={<UserOutlined />}
                     size={40}
                 />
             ),
@@ -280,28 +277,28 @@ const TutorManagement = () => {
             render: (_, record) => (
                 <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button 
-                            type="default" 
+                        <Button
+                            type="default"
                             size="small"
                             icon={<EyeOutlined />}
                             onClick={() => openDetailModal(record)}
                         />
                     </Tooltip>
-                    
+
                     {record.status === 'pending' && (
                         <>
                             <Tooltip title="Duyệt đơn">
-                                <Button 
-                                    type="primary" 
+                                <Button
+                                    type="primary"
                                     size="small"
                                     icon={<CheckOutlined />}
                                     onClick={() => openActionModal(record, 'approve')}
                                 />
                             </Tooltip>
-                            
+
                             <Tooltip title="Từ chối">
-                                <Button 
-                                    type="default" 
+                                <Button
+                                    type="default"
                                     danger
                                     size="small"
                                     icon={<CloseOutlined />}
@@ -318,9 +315,9 @@ const TutorManagement = () => {
     return (
         <div className="tutor-management">
             <div className="dashboard-header">
-                <Button 
-                    type="link" 
-                    icon={<ArrowLeftOutlined />} 
+                <Button
+                    type="link"
+                    icon={<ArrowLeftOutlined />}
                     onClick={() => navigate('/admin/dashboard')}
                     style={{ marginBottom: 16 }}
                 >
@@ -382,8 +379,8 @@ const TutorManagement = () => {
                         Làm mới
                     </Button>
                 </div>
-                
-                <Table 
+
+                <Table
                     columns={columns}
                     dataSource={applications || []}
                     rowKey="_id"
@@ -393,7 +390,7 @@ const TutorManagement = () => {
                         pageSize: 10,
                         showSizeChanger: true,
                         showQuickJumper: true,
-                        showTotal: (total, range) => 
+                        showTotal: (total, range) =>
                             `${range[0]}-${range[1]} của ${total} đơn đăng ký`,
                     }}
                     scroll={{ x: 1200 }}
@@ -415,9 +412,9 @@ const TutorManagement = () => {
                 {selectedApplication && (
                     <div className="application-detail">
                         <div className="applicant-info">
-                            <Avatar 
-                                src={selectedApplication.tutorId?.image} 
-                                icon={<UserOutlined />} 
+                            <Avatar
+                                src={selectedApplication.tutorId?.image}
+                                icon={<UserOutlined />}
                                 size={80}
                             />
                             <div className="basic-info">
@@ -480,8 +477,8 @@ const TutorManagement = () => {
                         {selectedApplication.cvFile && (
                             <div className="cv-section">
                                 <h4>CV:</h4>
-                                <Button 
-                                    type="link" 
+                                <Button
+                                    type="link"
                                     icon={<FileTextOutlined />}
                                     href={selectedApplication.cvFile}
                                     target="_blank"
@@ -508,7 +505,7 @@ const TutorManagement = () => {
                     Bạn có chắc muốn {actionType === 'approve' ? 'duyệt' : 'từ chối'} đơn đăng ký của{' '}
                     <strong>{selectedApplication?.tutorId?.username}</strong>?
                 </p>
-                
+
                 {actionType === 'reject' && (
                     <div style={{ marginTop: 16 }}>
                         <label>Lý do từ chối:</label>

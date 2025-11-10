@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -242,8 +242,6 @@ function AllCoursesSchedule() {
   const [allWeeklySchedules, setAllWeeklySchedules] = useState([]);
   const [weekStart, setWeekStart] = useState(getWeekStart());
   const token = useSelector((state) => state.user.account.access_token);
-  const [setLoadingBookings] = useState(true);
-  const [setErrorBookings] = useState(null);
   const [loadingSchedules, setLoadingSchedules] = useState(true);
   const [errorSchedules, setErrorSchedules] = useState(null);
   const [showChangeScheduleModal, setShowChangeScheduleModal] = useState(false);
@@ -322,11 +320,6 @@ function AllCoursesSchedule() {
       setLoadingChangeRequests(false);
     }
   };
-  useEffect(() => {
-    fetchChangeRequests();
-    fetchBookings();
-    fetchAllWeeklySchedules();
-  }, [token, weekStart]);
 
   const handleCloseChangeModal = () => {
     setShowChangeScheduleModal(false);
@@ -392,20 +385,16 @@ function AllCoursesSchedule() {
     }
   };
 
-  const fetchBookings = async () => {
-    setLoadingBookings(true);
-    setErrorBookings(null);
-    try {
-      const res = await getMyBookings();
-      setBookings(res.data);
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      toast.error("Không thể tải danh sách khóa học. Vui lòng thử lại.");
-      setErrorBookings("Không thể tải danh sách khóa học. Vui lòng thử lại.");
-    } finally {
-      setLoadingBookings(false);
-    }
-  };
+  const fetchBookings = useCallback(async () => {
+
+  try {
+    const res = await getMyBookings();
+    setBookings(res.data);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    toast.error("Không thể tải danh sách khóa học. Vui lòng thử lại.");
+  }
+}, [])
 
   // ✅ Hàm hoàn tất khóa học
   const handleFinishBooking = async (bookingId) => {
@@ -594,6 +583,12 @@ function AllCoursesSchedule() {
     nextWeek.setDate(weekStart.getDate() + 7);
     setWeekStart(nextWeek);
   };
+
+useEffect(() => {
+  fetchChangeRequests();
+  fetchBookings();
+  fetchAllWeeklySchedules();
+}, [token, weekStart, fetchBookings]);
 
   const renderFullWeekGrid = () => {
     const days = getWeekDays();

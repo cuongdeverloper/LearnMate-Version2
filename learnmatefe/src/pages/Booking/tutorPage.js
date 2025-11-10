@@ -3,7 +3,7 @@ import axios from "../../Service/AxiosCustomize";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaStar } from "react-icons/fa";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 import "../../scss/TutorListPage.scss";
 
 const classSubjectsMap = {
@@ -44,79 +44,81 @@ export default function TutorListPage() {
 
   const navigate = useNavigate();
 
- const fetchSavedTutorIds = useCallback(async () => {
-  if (!accessToken) {
-    setSavedTutorIds([]);
-    return;
-  }
-  try {
-    const res = await axios.get(`/api/learner/saved-tutors`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    setSavedTutorIds((res || []).map((tutor) => tutor?._id));
-  } catch (error) {
-    console.error("Lỗi khi lấy danh sách gia sư đã lưu:", error);
-    if (error.response && error.response.status === 401) {
-      toast.error(
-        "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại."
-      );
-      navigate("/login");
+  const fetchSavedTutorIds = useCallback(async () => {
+    if (!accessToken) {
+      setSavedTutorIds([]);
+      return;
     }
-    setSavedTutorIds([]);
-  }
-}, [accessToken, navigate]);
+    try {
+      const res = await axios.get(`/api/learner/saved-tutors`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setSavedTutorIds((res || []).map((tutor) => tutor?._id));
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách gia sư đã lưu:", error);
+      if (error.response && error.response.status === 401) {
+        toast.error(
+          "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại."
+        );
+        navigate("/login");
+      }
+      setSavedTutorIds([]);
+    }
+  }, [accessToken, navigate]);
+  const fetchTutors = useCallback(async (filterParams = {}) => {
+    try {
+      const currentFilters = {
+        ...filterParams,
+        class: selectedClass,
+        subject: selectedSubject,
+      };
 
- useEffect(() => {
-  fetchTutors();
-  if (accessToken) {
-    fetchSavedTutorIds();
-  } else {
-    setSavedTutorIds([]);
-  }
-}, [accessToken, fetchSavedTutorIds, fetchTutors]);
+      const cleanFilters = Object.fromEntries(
+        Object.entries(currentFilters).filter(
+          ([_, value]) => value !== "" && value !== null
+        )
+      );
+
+      const res = await axios.get("/api/learner/tutors", {
+        params: cleanFilters,
+      });
+
+      const activeTutors = (res.tutors || []).filter(
+        (tutor) => tutor.active === true
+      );
+      setTutors(activeTutors);
+    } catch (error) {
+      toast.error("Lấy danh sách tutor thất bại");
+      console.error(error);
+    }
+  }, [selectedClass, selectedSubject]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      // Đảm bảo click vào avatar không đóng dropdown
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []); // Bỏ dependency dropdownRef nếu không cần thiết, hoặc đảm bảo nó ổn định
+    fetchTutors();
+    if (accessToken) {
+      fetchSavedTutorIds();
+    } else {
+      setSavedTutorIds([]);
+    }
+  }, [accessToken, fetchSavedTutorIds, fetchTutors]);
 
-  const fetchTutors = useCallback(async (filterParams = {}) => {
-  try {
-    const currentFilters = {
-      ...filterParams,
-      class: selectedClass,
-      subject: selectedSubject,
-    };
-
-    const cleanFilters = Object.fromEntries(
-      Object.entries(currentFilters).filter(
-        ([_, value]) => value !== "" && value !== null
-      )
-    );
-
-    const res = await axios.get("/api/learner/tutors", {
-      params: cleanFilters,
-    });
-
-    const activeTutors = (res.tutors || []).filter(
-      (tutor) => tutor.active === true
-    );
-    setTutors(activeTutors);
-  } catch (error) {
-    toast.error("Lấy danh sách tutor thất bại");
-    console.error(error);
+  const handleClickOutside = useCallback((event) => {
+  if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    setShowDropdown(false);
   }
-}, [selectedClass, selectedSubject, filters]);
+}, [setShowDropdown]);
+
+useEffect(() => {
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [handleClickOutside]);
+
+
+
 
   const handleClassSelect = (grade) => {
     if (selectedClass === grade) {
@@ -202,8 +204,7 @@ export default function TutorListPage() {
         navigate("/login");
       } else {
         toast.error(
-          `Không thể cập nhật danh sách gia sư: ${
-            error.response?.data?.message || "Lỗi không xác định"
+          `Không thể cập nhật danh sách gia sư: ${error.response?.data?.message || "Lỗi không xác định"
           }`
         ); // Thay thế alert
       }
@@ -233,9 +234,8 @@ export default function TutorListPage() {
               {[...Array(12)].map((_, i) => (
                 <div key={i + 1}>
                   <button
-                    className={`grade-btn ${
-                      selectedClass === i + 1 ? "selected" : ""
-                    }`}
+                    className={`grade-btn ${selectedClass === i + 1 ? "selected" : ""
+                      }`}
                     onClick={() => handleClassSelect(i + 1)}
                   >
                     Lớp {i + 1}
@@ -245,9 +245,8 @@ export default function TutorListPage() {
                       {(classSubjectsMap[i + 1] || []).map((subj, idx) => (
                         <button
                           key={idx}
-                          className={`subject-btn ${
-                            selectedSubject === subj ? "selected" : ""
-                          }`}
+                          className={`subject-btn ${selectedSubject === subj ? "selected" : ""
+                            }`}
                           onClick={() => handleSubjectSelect(subj)}
                         >
                           {subj}
@@ -358,7 +357,7 @@ export default function TutorListPage() {
                         src={
                           tutor?.user?.image ||
                           "https://i.pravatar.cc/100?img=" +
-                            (Math.floor(Math.random() * 70) + 1)
+                          (Math.floor(Math.random() * 70) + 1)
                         }
                         alt={tutor.user?.username || "Gia sư"}
                       />
@@ -386,8 +385,8 @@ export default function TutorListPage() {
                           <strong>Môn dạy:</strong>{" "}
                           {tutor.subjects?.length
                             ? tutor.subjects
-                                .map((s) => `${s.name} lớp ${s.classLevel}`)
-                                .join(", ")
+                              .map((s) => `${s.name} lớp ${s.classLevel}`)
+                              .join(", ")
                             : "Đang cập nhật"}
                         </p>
                         <p>
@@ -405,9 +404,8 @@ export default function TutorListPage() {
                         </div>
                         <div className="tutor-actions">
                           <button
-                            className={`btn-add-to-list ${
-                              isSaved ? "added" : ""
-                            }`}
+                            className={`btn-add-to-list ${isSaved ? "added" : ""
+                              }`}
                             onClick={(e) => handleToggleSavedTutor(e, tutor)}
                           >
                             {isSaved ? "Đã lưu" : "Lưu vào danh sách"}

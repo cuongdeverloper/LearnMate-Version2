@@ -14,19 +14,15 @@ import {
   Modal,
   Form,
   message,
-  Tooltip,
   Avatar,
   Descriptions,
   Typography,
   Badge,
-  Divider
 } from 'antd';
 import {
   SearchOutlined,
-  FilterOutlined,
   EyeOutlined,
   CheckOutlined,
-  CloseOutlined,
   ReloadOutlined,
   DollarOutlined,
   BankOutlined,
@@ -68,6 +64,7 @@ const WithdrawalManagement = () => {
   useEffect(() => {
     fetchWithdrawals();
     fetchStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.current, pagination.pageSize, filters]);
 
   const fetchWithdrawals = async () => {

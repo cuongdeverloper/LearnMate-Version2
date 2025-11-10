@@ -34,9 +34,10 @@ const MaterialUploader = () => {
     }
   };
 
-  useEffect(() => {
-    loadBookings();
-  }, [tutorId]);
+ useEffect(() => {
+  loadBookings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [tutorId]);
 
   const fetchMaterials = async (id) => {
     try {
