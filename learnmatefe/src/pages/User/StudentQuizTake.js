@@ -38,7 +38,8 @@ const StudentQuizTake = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-const [state, setState] = useState(() => {
+  const storageKey = `quiz-${id}-state`;
+  const [state, setState] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     if (saved) return JSON.parse(saved);
     return {
@@ -59,7 +60,7 @@ const [state, setState] = useState(() => {
   useEffect(() => {
     if (id) dispatch(fetchQuizDetailsById(id));
   }, [dispatch, id]);
-const storageKey = `quiz-${id}-state`;
+
   useEffect(() => {
     if (!quizDetails) return;
 

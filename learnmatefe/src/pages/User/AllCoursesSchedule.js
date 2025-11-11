@@ -406,6 +406,7 @@ function AllCoursesSchedule() {
           "Khóa học đã hoàn tất, tiền đã được chuyển cho gia sư."
       );
       fetchBookings();
+      fetchAllWeeklySchedules();
     } else {
       toast.error(result.message || "Lỗi hoàn tất khóa học.");
     }
@@ -608,21 +609,17 @@ useEffect(() => {
             const dayMonthYear = `${day.getFullYear()}-${(day.getMonth() + 1)
               .toString()
               .padStart(2, "0")}-${day.getDate().toString().padStart(2, "0")}`;
-
+  
             const slotsForDay = allWeeklySchedules.filter((s) => {
               const sDate = new Date(s.date);
               const sDayMonthYear = `${sDate.getFullYear()}-${(
                 sDate.getMonth() + 1
               )
                 .toString()
-                .padStart(2, "0")}-${sDate
-                .getDate()
-                .toString()
-                .padStart(2, "0")}`;
-
+                .padStart(2, "0")}-${sDate.getDate().toString().padStart(2, "0")}`;
               return sDayMonthYear === dayMonthYear;
             });
-
+  
             return (
               <div key={index} className="grid-day-column">
                 {slotsForDay.length === 0 ? (
@@ -639,44 +636,38 @@ useEffect(() => {
                       `${sessionDatePart}T${slot.endTime}:00`
                     );
                     const now = new Date();
-
+  
                     const isSessionInCurrentWeek =
                       sessionStartTime >= weekStart &&
                       sessionStartTime < addDays(weekStart, 7);
-
-                    // Allow attendance button if session is in the past, or currently ongoing, or (for some flexibility) in the current displayed week
+  
                     const shouldShowAttendanceButton =
-                      sessionEndTime < now ||
-                      (sessionStartTime <= now && now <= sessionEndTime) ||
-                      isSessionInCurrentWeek;
-
+                      slot.status === "approved" &&
+                      (sessionEndTime < now || 
+                       (sessionStartTime <= now && now <= sessionEndTime) ||
+                       isSessionInCurrentWeek);
+  
+                    // Render slot
                     return (
                       <div
                         key={slot._id}
-                        className={`schedule-slot ${
-                          slot.attended ? "attended" : ""
-                        }`}
+                        className={`schedule-slot ${slot.attended ? "attended" : ""}`}
                       >
-                        <span className="time">
-                          {slot.startTime} - {slot.endTime}
-                        </span>
-
+                        <span className="time">{slot.startTime} - {slot.endTime}</span>
+  
                         {slot.bookingId?.tutorId?.user && (
                           <div className="tutor-name">
-                            <strong>Gia sư:</strong>{" "}
-                            {slot.bookingId.tutorId.user.username}
+                            <strong>Gia sư:</strong> {slot.bookingId.tutorId.user.username}
                           </div>
                         )}
-
+  
                         {slot.bookingId?.subjectId && (
                           <div className="subject-name">
-                            <strong>Môn học:</strong>{" "}
-                            {slot.bookingId.subjectId.name} -{" "}
-                            {slot.bookingId.subjectId.classLevel}
+                            <strong>Môn học:</strong> {slot.bookingId.subjectId.name} - {slot.bookingId.subjectId.classLevel}
                           </div>
                         )}
-
-                        {/* ✅ Hiển thị trạng thái */}
+  
+                        {/* Hiển thị trạng thái */}
                         <div className={`status-label ${slot.status}`}>
                           {slot.status === "approved"
                             ? "Đã duyệt"
@@ -686,31 +677,17 @@ useEffect(() => {
                             ? "Đã hoàn thành"
                             : ""}
                         </div>
-
-                        {/* ✅ Chỉ hiển thị nút điểm danh nếu lịch đã duyệt */}
-                        {slot.status === "approved" &&
-                          shouldShowAttendanceButton && (
-                            <button
-                              className={`attendance-button ${
-                                slot.attended
-                                  ? "attended-btn"
-                                  : "not-attended-btn"
-                              }`}
-                              onClick={() =>
-                                handleConfirmAttendanceClick(
-                                  slot._id,
-                                  slot.attended
-                                )
-                              }
-                              title={
-                                slot.attended
-                                  ? "Đã điểm danh"
-                                  : "Chưa điểm danh"
-                              }
-                            >
-                              {slot.attended ? "✓" : "✖"}
-                            </button>
-                          )}
+  
+                        {/* Nút điểm danh chỉ hiện khi status = approved */}
+                        {shouldShowAttendanceButton && (
+                          <button
+                            className={`attendance-button ${slot.attended ? "attended-btn" : "not-attended-btn"}`}
+                            onClick={() => handleConfirmAttendanceClick(slot._id, slot.attended)}
+                            title={slot.attended ? "Đã điểm danh" : "Chưa điểm danh"}
+                          >
+                            {slot.attended ? "✓" : "✖"}
+                          </button>
+                        )}
                       </div>
                     );
                   })
@@ -722,6 +699,7 @@ useEffect(() => {
       </div>
     );
   };
+  
 
   // Filter bookings based on activeTab
   const filteredBookings = bookings.filter((booking) => {
