@@ -47,7 +47,6 @@ const { Title, Text } = Typography;
 
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
-  const [setStatistics] = useState({});
   const [stats, setStats] = useState({
     totalReports: 0,
     pendingReports: 0,
@@ -82,7 +81,7 @@ const ReportManagement = () => {
   const [bookingDrawerVisible, setBookingDrawerVisible] = useState(false);
   const [relatedBooking, setRelatedBooking] = useState(null);
 
-  const calculateStatisticsFromReports = useCallback((reportsList) => {
+ const calculateStatisticsFromReports = useCallback((reportsList) => {
   const stats = {
     total: reportsList.length,
     pending: reportsList.filter(report => report.status === 'pending').length,
@@ -90,13 +89,13 @@ const ReportManagement = () => {
     rejected: reportsList.filter(report => ['rejected', 'dismissed'].includes(report.status)).length,
   };
 
-  setStatistics(stats);
   setStats({
     totalReports: stats.total,
     pendingReports: stats.pending,
     resolvedReports: stats.resolved,
     rejectedReports: stats.rejected,
   });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
   const fetchReports = useCallback(async () => {
@@ -134,32 +133,21 @@ const ReportManagement = () => {
 
 
 
-  const fetchStatistics = async () => {
-    try {
-      const response = await AdminService.getReportStats();
-      //console.log('Report Statistics API Response:', response);
-
-      if (response && response.success && response.data &&
-        (response.data.total > 0 || response.data.pending > 0 ||
-          response.data.resolved > 0 || response.data.rejected > 0)) {
-        //console.log('Using API Statistics (has data):', response.data);
-        setStatistics(response.data);
-        setStats({
-          totalReports: response.data.total || 0,
-          pendingReports: response.data.pending || 0,
-          resolvedReports: response.data.resolved || 0,
-          rejectedReports: response.data.rejected || 0
-        });
-      } else {
-        console.warn('API statistics empty or failed, keeping calculated statistics');
-        // Keep the statistics calculated from reports data
-      }
-    } catch (error) {
-      console.error('Error fetching report statistics:', error);
-      console.warn('Keeping statistics calculated from reports data');
-      // Keep the statistics calculated from reports data
+  const fetchStatistics = useCallback(async () => {
+  try {
+    const response = await AdminService.getReportStats();
+    if (response?.success && response?.data) {
+      setStats({
+        totalReports: response.data.total || 0,
+        pendingReports: response.data.pending || 0,
+        resolvedReports: response.data.resolved || 0,
+        rejectedReports: response.data.rejected || 0,
+      });
     }
-  };
+  } catch (error) {
+    console.error('Error fetching report statistics:', error);
+  }
+}, []);
 
   const fetchReportDetails = async (reportId) => {
     try {
