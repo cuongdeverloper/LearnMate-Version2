@@ -145,7 +145,7 @@ const fetchWithdrawals = useCallback(async () => {
     fetchStatistics();
   };
   loadData();
-}, [fetchWithdrawals, fetchStatistics, pagination.current, pagination.pageSize, filters]);
+}, [fetchWithdrawals, fetchStatistics, pagination, filters]);
 
 
   // Debug useEffect to track stats changes
