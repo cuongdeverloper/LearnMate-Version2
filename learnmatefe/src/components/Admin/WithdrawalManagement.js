@@ -34,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import './WithdrawalManagement.scss';
+import { useCallback } from 'react';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -124,7 +125,7 @@ const WithdrawalManagement = () => {
     fetchWithdrawals();
     fetchStatistics();
   }, [fetchWithdrawals, fetchStatistics]);
-  
+
   useEffect(() => {
     const loadData = async () => {
       // Load withdrawals first (this will calculate stats from real data)

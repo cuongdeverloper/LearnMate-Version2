@@ -5,6 +5,7 @@ import { useSocket } from "../../SocketContext";
 import * as notificationApi from "./ApiNotification";
 import { useSelector } from "react-redux";
 import "./NotificationBell.scss";
+import { useCallback } from "react";
 
 const NotificationBell = () => {
   const { socket } = useSocket();
