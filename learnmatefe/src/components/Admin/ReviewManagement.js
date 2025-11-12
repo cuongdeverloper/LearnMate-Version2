@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Table, 
-    Button, 
-    Modal, 
-    Input, 
-    Tag, 
-    Space, 
-    message, 
+import {
+    Table,
+    Button,
+    Modal,
+    Input,
+    Tag,
+    Space,
+    message,
     Card,
     Avatar,
     Popconfirm,
@@ -19,8 +19,8 @@ import {
     Typography,
     Badge,
 } from 'antd';
-import { 
-    UserOutlined, 
+import {
+    UserOutlined,
     EyeOutlined,
     EyeInvisibleOutlined,
     DeleteOutlined,
@@ -33,7 +33,6 @@ import {
     CheckCircleOutlined,
     FileTextOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import AdminService from '../../Service/ApiService/AdminService';
 import { format } from 'date-fns';
 import moment from 'moment';
@@ -50,18 +49,18 @@ const ReviewManagement = () => {
     const [actionModalVisible, setActionModalVisible] = useState(false);
     const [setActionType] = useState('');
     const [actionReason, setActionReason] = useState('');
-    
+
     // User detail modal
     const [selectedUser, setSelectedUser] = useState(null);
     const [userDetailModalVisible, setUserDetailModalVisible] = useState(false);
-    
+
     // Pagination & filtering
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [statusFilter, setStatusFilter] = useState('');
     const [searchFilter, setSearchFilter] = useState('');
-    
+
     // Stats
     const [stats, setStats] = useState({
         totalReviews: 0,
@@ -72,21 +71,18 @@ const ReviewManagement = () => {
         offensiveReviews: 0
     });
 
-    useEffect(() => {
-        fetchReviews();
-        fetchStats();
-    }, [currentPage, pageSize, statusFilter, searchFilter]);
 
-    const fetchReviews = async () => {
+
+    const fetchReviews = useCallback(async () => {
         setLoading(true);
         try {
             const response = await AdminService.getAllReviews(
-                currentPage, 
-                pageSize, 
-                statusFilter, 
+                currentPage,
+                pageSize,
+                statusFilter,
                 searchFilter
             );
-            
+
             if (response && response.data) {
                 setReviews(response.data.reviews);
                 setTotal(response.data.total);
@@ -103,7 +99,7 @@ const ReviewManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentPage, pageSize, statusFilter, searchFilter]);
 
     const fetchStats = async () => {
         try {
@@ -115,6 +111,11 @@ const ReviewManagement = () => {
             console.error('Error fetching stats:', error);
         }
     };
+
+    useEffect(() => {
+        fetchReviews();
+        fetchStats();
+    }, [fetchReviews]);
 
     const handleToggleHide = async (review) => {
         try {
@@ -149,18 +150,15 @@ const ReviewManagement = () => {
 
     const handleMarkReview = async (review, type) => {
         try {
-            // Đánh dấu spam/vi phạm (backend sẽ tự động ẩn nếu cần)
-            const response = await AdminService.markReview(review._id, type);
-            
             const isMarking = (type === 'spam' && !review.isSpam) || (type === 'offensive' && !review.isOffensive);
             const actionText = type === 'spam' ? 'spam' : 'vi phạm';
-            
+
             if (isMarking) {
                 message.success(`Đã đánh dấu ${actionText} và ẩn đánh giá`);
             } else {
                 message.success(`Đã bỏ đánh dấu ${actionText}`);
             }
-            
+
             fetchReviews();
             fetchStats();
         } catch (error) {
@@ -205,7 +203,7 @@ const ReviewManagement = () => {
 
     const getStatusTag = (review) => {
         const tags = [];
-        
+
         if (review.isDeleted) {
             tags.push(<Tag color="red" key="deleted">Đã xóa</Tag>);
         } else if (review.isHidden) {
@@ -213,15 +211,15 @@ const ReviewManagement = () => {
         } else {
             tags.push(<Tag color="green" key="active">Hiển thị</Tag>);
         }
-        
+
         if (review.isSpam) {
             tags.push(<Tag color="red" key="spam">Spam</Tag>);
         }
-        
+
         if (review.isOffensive) {
             tags.push(<Tag color="purple" key="offensive">Vi phạm</Tag>);
         }
-        
+
         return tags;
     };
 
@@ -233,9 +231,9 @@ const ReviewManagement = () => {
             width: 200,
             render: (user) => (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Avatar 
-                        src={user?.image} 
-                        icon={<UserOutlined />} 
+                    <Avatar
+                        src={user?.image}
+                        icon={<UserOutlined />}
                         size={32}
                     />
                     <div>
@@ -275,7 +273,7 @@ const ReviewManagement = () => {
             key: 'comment',
             width: 300,
             render: (comment) => (
-                <Paragraph 
+                <Paragraph
                     ellipsis={{ rows: 2, expandable: true, symbol: 'xem thêm' }}
                     style={{ margin: 0 }}
                 >
@@ -306,19 +304,19 @@ const ReviewManagement = () => {
                 <Space size="small" wrap>
                     {!record.isDeleted && (
                         <Tooltip title={record.isHidden ? "Hiển thị" : "Ẩn"}>
-                            <Button 
-                                type="default" 
+                            <Button
+                                type="default"
                                 size="small"
                                 icon={record.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                                 onClick={() => handleToggleHide(record)}
                             />
                         </Tooltip>
                     )}
-                    
+
                     {!record.isDeleted && (
                         <>
                             <Tooltip title={record.isSpam ? "Bỏ đánh dấu Spam" : "Đánh dấu Spam và ẩn"}>
-                                <Button 
+                                <Button
                                     type={record.isSpam ? "primary" : "default"}
                                     size="small"
                                     icon={<WarningOutlined />}
@@ -326,9 +324,9 @@ const ReviewManagement = () => {
                                     danger={record.isSpam}
                                 />
                             </Tooltip>
-                            
+
                             <Tooltip title={record.isOffensive ? "Bỏ đánh dấu Vi phạm" : "Đánh dấu Vi phạm và ẩn"}>
-                                <Button 
+                                <Button
                                     type={record.isOffensive ? "primary" : "default"}
                                     size="small"
                                     icon={<FlagOutlined />}
@@ -338,17 +336,17 @@ const ReviewManagement = () => {
                             </Tooltip>
                         </>
                     )}
-                    
+
                     <Tooltip title="Xem chi tiết người dùng">
-                        <Button 
-                            type="default" 
+                        <Button
+                            type="default"
                             size="small"
                             icon={<EyeOutlined />}
                             onClick={() => record.user && handleViewUserProfile(record.user)}
                             disabled={!record.user}
                         />
                     </Tooltip>
-                    
+
                     {!record.isDeleted && (
                         <Popconfirm
                             title="Bạn có chắc muốn xóa đánh giá này?"
@@ -358,8 +356,8 @@ const ReviewManagement = () => {
                             cancelText="Không"
                         >
                             <Tooltip title="Xóa đánh giá">
-                                <Button 
-                                    type="primary" 
+                                <Button
+                                    type="primary"
                                     danger
                                     size="small"
                                     icon={<DeleteOutlined />}
@@ -378,7 +376,7 @@ const ReviewManagement = () => {
             <div className="dashboard-header">
                 <div className="header-content">
                     <div className="welcome-section">
-                
+
                         <Title level={1} className="welcome-title">
                             <StarOutlined />
                             Quản lý đánh giá
@@ -526,8 +524,8 @@ const ReviewManagement = () => {
                         />
                     </Col>
                     <Col xs={24} sm={6} md={6}>
-                        <Button 
-                            type="primary" 
+                        <Button
+                            type="primary"
                             icon={<ReloadOutlined />}
                             onClick={() => {
                                 setStatusFilter('');
@@ -554,27 +552,27 @@ const ReviewManagement = () => {
                             Danh sách đánh giá
                         </Title>
                     </div>
-                
-                <Table 
-                    columns={columns}
-                    dataSource={reviews}
-                    rowKey="_id"
-                    loading={loading}
-                    pagination={{
-                        current: currentPage,
-                        pageSize: pageSize,
-                        total: total,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        showTotal: (total, range) => 
-                            `${range[0]}-${range[1]} của ${total} đánh giá`,
-                        onChange: (page, size) => {
-                            setCurrentPage(page);
-                            setPageSize(size);
-                        },
-                    }}
-                    scroll={{ x: 1400 }}
-                />
+
+                    <Table
+                        columns={columns}
+                        dataSource={reviews}
+                        rowKey="_id"
+                        loading={loading}
+                        pagination={{
+                            current: currentPage,
+                            pageSize: pageSize,
+                            total: total,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            showTotal: (total, range) =>
+                                `${range[0]}-${range[1]} của ${total} đánh giá`,
+                            onChange: (page, size) => {
+                                setCurrentPage(page);
+                                setPageSize(size);
+                            },
+                        }}
+                        scroll={{ x: 1400 }}
+                    />
                 </Card>
             </div>
 
@@ -591,7 +589,7 @@ const ReviewManagement = () => {
                 <p>
                     Bạn có chắc muốn xóa đánh giá của <strong>{selectedReview?.user?.username}</strong>?
                 </p>
-                
+
                 {selectedReview && (
                     <div style={{ marginBottom: 16, padding: 12, background: '#f5f5f5', borderRadius: 6 }}>
                         <Rate disabled value={selectedReview.rating} style={{ fontSize: 14 }} />
@@ -600,7 +598,7 @@ const ReviewManagement = () => {
                         </p>
                     </div>
                 )}
-                
+
                 <div>
                     <label style={{ fontWeight: 500 }}>Lý do xóa đánh giá:</label>
                     <TextArea
@@ -628,9 +626,9 @@ const ReviewManagement = () => {
                 {selectedUser && (
                     <div className="user-detail">
                         <div className="user-avatar-section">
-                            <Avatar 
-                                src={selectedUser.image} 
-                                icon={<UserOutlined />} 
+                            <Avatar
+                                src={selectedUser.image}
+                                icon={<UserOutlined />}
                                 size={80}
                             />
                             <div className="user-basic-info">
@@ -643,7 +641,7 @@ const ReviewManagement = () => {
                                 </Tag>
                             </div>
                         </div>
-                        
+
                         <div className="user-details-grid">
                             <div className="detail-item">
                                 <strong>Email:</strong> {selectedUser.email}

@@ -60,14 +60,14 @@ const ReportManagement = () => {
     pageSize: 10,
     total: 0
   });
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     status: 'all',
     targetType: 'all',
     dateRange: null
   });
-  
+
   // Modal states
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [bulkUpdateModalVisible, setBulkUpdateModalVisible] = useState(false);
@@ -75,23 +75,15 @@ const ReportManagement = () => {
   const [selectedReports, setSelectedReports] = useState([]);
   const [updateForm] = Form.useForm();
   const [bulkUpdateForm] = Form.useForm();
-  
+
   // Drawer states
   const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
   const [reportDetails, setReportDetails] = useState(null);
   const [bookingDrawerVisible, setBookingDrawerVisible] = useState(false);
   const [relatedBooking, setRelatedBooking] = useState(null);
 
-  useEffect(() => {
-    // Fetch reports first, then statistics
-    const loadData = async () => {
-      await fetchReports(); // This will also calculate statistics from reports
-      fetchStatistics(); // This will try to get statistics from API (optional)
-    };
-    loadData();
-  }, [pagination.current, pagination.pageSize, filters]);
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
       const params = {
@@ -113,8 +105,6 @@ const ReportManagement = () => {
           current: response.data.page,
           pageSize: response.data.limit
         }));
-        
-        // Calculate statistics from reports data as fallback
         calculateStatisticsFromReports(reportsList);
       }
     } catch (error) {
@@ -122,7 +112,9 @@ const ReportManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.current, pagination.pageSize, filters]);
+
+
 
   const calculateStatisticsFromReports = (reportsList) => {
     const stats = {
@@ -131,7 +123,7 @@ const ReportManagement = () => {
       resolved: reportsList.filter(report => report.status === 'resolved' || report.status === 'reviewed').length,
       rejected: reportsList.filter(report => report.status === 'rejected' || report.status === 'dismissed').length
     };
-    
+
     //console.log('Calculated statistics from reports:', stats);
     setStatistics(stats);
     setStats({
@@ -146,10 +138,10 @@ const ReportManagement = () => {
     try {
       const response = await AdminService.getReportStats();
       //console.log('Report Statistics API Response:', response);
-      
-      if (response && response.success && response.data && 
-          (response.data.total > 0 || response.data.pending > 0 || 
-           response.data.resolved > 0 || response.data.rejected > 0)) {
+
+      if (response && response.success && response.data &&
+        (response.data.total > 0 || response.data.pending > 0 ||
+          response.data.resolved > 0 || response.data.rejected > 0)) {
         //console.log('Using API Statistics (has data):', response.data);
         setStatistics(response.data);
         setStats({
@@ -181,6 +173,14 @@ const ReportManagement = () => {
     }
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchReports();
+      fetchStatistics();
+    };
+    loadData();
+  }, [fetchReports]);
+
   const fetchBookingDetails = async (bookingId) => {
     // Validate bookingId
     if (!bookingId) {
@@ -206,26 +206,26 @@ const ReportManagement = () => {
   const handleUpdateStatus = async (values) => {
     try {
       setUpdateModalVisible(false); // Close modal immediately to show loading state
-      
+
       // Show loading message
       const hideLoading = message.loading('Đang cập nhật trạng thái báo cáo...', 0);
-      
+
       const response = await AdminService.updateReportStatus(selectedReport._id, values);
-      
+
       hideLoading(); // Hide loading message
-      
+
       if (response && response.success) {
         message.success('Cập nhật trạng thái báo cáo thành công');
-        
+
         // Update local state immediately for better UX
-        setReports(prevReports => 
-          prevReports.map(report => 
-            report._id === selectedReport._id 
+        setReports(prevReports =>
+          prevReports.map(report =>
+            report._id === selectedReport._id
               ? { ...report, status: values.status, adminNotes: values.adminNotes }
               : report
           )
         );
-        
+
         // Refresh data in background
         fetchReports();
         fetchStatistics();
@@ -234,11 +234,11 @@ const ReportManagement = () => {
       }
     } catch (error) {
       console.error('Error updating report status:', error);
-      
+
       // Show detailed error message
       const errorMessage = error.response?.data?.message || error.message || 'Không thể cập nhật trạng thái báo cáo';
       message.error(`Lỗi: ${errorMessage}`, 5);
-      
+
       // Reopen modal with original values if error occurs
       updateForm.setFieldsValue({
         status: selectedReport.status,
@@ -251,21 +251,21 @@ const ReportManagement = () => {
   const handleBulkUpdate = async (values) => {
     try {
       setBulkUpdateModalVisible(false);
-      
+
       // Show loading message
       const hideLoading = message.loading(`Đang cập nhật ${selectedReports.length} báo cáo...`, 0);
-      
+
       const response = await AdminService.bulkUpdateReports({
         reportIds: selectedReports,
         ...values
       });
-      
+
       hideLoading(); // Hide loading message
-      
+
       if (response && response.success) {
         message.success(`Cập nhật ${selectedReports.length} báo cáo thành công`);
         setSelectedReports([]);
-        
+
         // Refresh data
         fetchReports();
         fetchStatistics();
@@ -274,11 +274,11 @@ const ReportManagement = () => {
       }
     } catch (error) {
       console.error('Error bulk updating reports:', error);
-      
+
       // Show detailed error message
       const errorMessage = error.response?.data?.message || error.message || 'Không thể cập nhật hàng loạt báo cáo';
       message.error(`Lỗi: ${errorMessage}`, 5);
-      
+
       // Reopen modal if error occurs
       setBulkUpdateModalVisible(true);
     }
@@ -349,9 +349,9 @@ const ReportManagement = () => {
       width: 200,
       render: (reporter) => (
         <Space>
-          <Avatar 
-            src={reporter?.image} 
-            icon={<UserOutlined />} 
+          <Avatar
+            src={reporter?.image}
+            icon={<UserOutlined />}
             size="small"
           />
           <div>
@@ -424,33 +424,6 @@ const ReportManagement = () => {
           )}
         </Space>
       )
-    }
-  ];
-
-  const statisticsCards = [
-    {
-      title: 'Tổng số báo cáo',
-      value: statistics.total || 0,
-      icon: <ExclamationCircleOutlined />,
-      color: '#1890ff'
-    },
-    {
-      title: 'Chờ xử lý',
-      value: statistics.pending || 0,
-      icon: <CalendarOutlined />,
-      color: '#faad14'
-    },
-    {
-      title: 'Đã xử lý',
-      value: statistics.resolved || 0,
-      icon: <CheckCircleOutlined />,
-      color: '#52c41a'
-    },
-    {
-      title: 'Đã bỏ qua',
-      value: statistics.rejected || 0,
-      icon: <CloseCircleOutlined />,
-      color: '#ff4d4f'
     }
   ];
 
@@ -673,7 +646,7 @@ const ReportManagement = () => {
             },
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => 
+            showTotal: (total, range) =>
               `${range[0]}-${range[1]} của ${total} báo cáo`
           }}
           scroll={{ x: 1400 }}
@@ -703,7 +676,7 @@ const ReportManagement = () => {
               <Radio value="dismissed">Bỏ qua</Radio>
             </Radio.Group>
           </Form.Item>
-          
+
           <Form.Item
             name="adminNotes"
             label="Ghi chú của admin"
@@ -714,7 +687,7 @@ const ReportManagement = () => {
               placeholder="Nhập ghi chú về quyết định xử lý..."
             />
           </Form.Item>
-          
+
           <Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" icon={<CheckCircleOutlined />}>
@@ -751,7 +724,7 @@ const ReportManagement = () => {
               <Radio value="dismissed">Bỏ qua</Radio>
             </Radio.Group>
           </Form.Item>
-          
+
           <Form.Item
             name="adminNotes"
             label="Ghi chú chung"
@@ -762,7 +735,7 @@ const ReportManagement = () => {
               placeholder="Nhập ghi chú chung cho tất cả báo cáo..."
             />
           </Form.Item>
-          
+
           <Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" icon={<CheckCircleOutlined />}>
@@ -790,7 +763,7 @@ const ReportManagement = () => {
               <Descriptions.Item label="Mã báo cáo">
                 <Text code>{reportDetails._id}</Text>
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Người báo cáo">
                 <Space>
                   <Avatar src={reportDetails.reporter?.image} icon={<UserOutlined />} />
@@ -800,35 +773,35 @@ const ReportManagement = () => {
                   </div>
                 </Space>
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Loại đối tượng">
                 <Tag color="blue">{getTargetTypeText(reportDetails.targetType)}</Tag>
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Lý do báo cáo">
                 {getReasonText(reportDetails.reason)}
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Mô tả chi tiết">
                 {reportDetails.description || 'Không có mô tả'}
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Trạng thái">
                 <Tag color={getStatusColor(reportDetails.status)}>
                   {getStatusText(reportDetails.status)}
                 </Tag>
               </Descriptions.Item>
-              
+
               <Descriptions.Item label="Ngày tạo">
                 {moment(reportDetails.createdAt).format('DD/MM/YYYY HH:mm')}
               </Descriptions.Item>
-              
+
               {reportDetails.reviewedAt && (
                 <Descriptions.Item label="Ngày xử lý">
                   {moment(reportDetails.reviewedAt).format('DD/MM/YYYY HH:mm')}
                 </Descriptions.Item>
               )}
-              
+
               {reportDetails.adminNotes && (
                 <Descriptions.Item label="Ghi chú admin">
                   {reportDetails.adminNotes}
@@ -845,8 +818,8 @@ const ReportManagement = () => {
                     icon={<FileTextOutlined />}
                     onClick={() => {
                       // Handle both cases: targetId as object or as string
-                      const bookingId = typeof reportDetails.targetId === 'object' 
-                        ? reportDetails.targetId._id 
+                      const bookingId = typeof reportDetails.targetId === 'object'
+                        ? reportDetails.targetId._id
                         : reportDetails.targetId;
                       //console.log('Booking ID:', bookingId);
                       fetchBookingDetails(bookingId);
@@ -855,7 +828,7 @@ const ReportManagement = () => {
                     Xem chi tiết Booking liên quan
                   </Button>
                 </div>
-                
+
                 {typeof reportDetails.targetId === 'object' ? (
                   <Card title="Thông tin Booking được báo cáo" size="small">
                     <Descriptions column={1} size="small">
@@ -874,29 +847,29 @@ const ReportManagement = () => {
                   </Card>
                 ) : (
                   <Card title="Thông tin Booking được báo cáo" size="small">
-                    <div style={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      alignItems: 'center', 
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                       padding: '20px',
                       background: 'linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%)',
                       borderRadius: '8px',
                       border: '1px dashed #d1d5db'
                     }}>
-                      <FileTextOutlined style={{ 
-                        fontSize: '32px', 
+                      <FileTextOutlined style={{
+                        fontSize: '32px',
                         color: '#3b82f6',
                         marginBottom: '12px'
                       }} />
-                      <div style={{ 
-                        fontSize: '16px', 
-                        fontWeight: '600', 
+                      <div style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
                         color: '#1f2937',
                         marginBottom: '8px'
                       }}>
                         Booking được báo cáo
                       </div>
-                      <div style={{ 
+                      <div style={{
                         fontSize: '14px',
                         color: '#6b7280',
                         background: '#fff',
@@ -908,8 +881,8 @@ const ReportManagement = () => {
                       }}>
                         ID: {reportDetails.targetId}
                       </div>
-                      <div style={{ 
-                        fontSize: '12px', 
+                      <div style={{
+                        fontSize: '12px',
                         color: '#9ca3af',
                         textAlign: 'center',
                         lineHeight: '1.5'
@@ -938,7 +911,7 @@ const ReportManagement = () => {
             <Descriptions.Item label="Mã Booking">
               <Text code>{relatedBooking._id}</Text>
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Học viên">
               <Space>
                 <Avatar src={relatedBooking.learnerId?.image} icon={<UserOutlined />} />
@@ -948,7 +921,7 @@ const ReportManagement = () => {
                 </div>
               </Space>
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Gia sư">
               <Space>
                 <Avatar src={relatedBooking.tutorId?.user?.image} icon={<UserOutlined />} />
@@ -958,24 +931,24 @@ const ReportManagement = () => {
                 </div>
               </Space>
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Môn học">
               {relatedBooking.subjectId?.name} - Lớp {relatedBooking.subjectId?.classLevel}
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Trạng thái">
               <Tag color={getStatusColor(relatedBooking.status)}>
                 {getStatusText(relatedBooking.status)}
               </Tag>
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Tổng tiền">
               {new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
                 currency: 'VND'
               }).format(relatedBooking.amount)}
             </Descriptions.Item>
-            
+
             <Descriptions.Item label="Ngày tạo">
               {moment(relatedBooking.createdAt).format('DD/MM/YYYY HH:mm')}
             </Descriptions.Item>

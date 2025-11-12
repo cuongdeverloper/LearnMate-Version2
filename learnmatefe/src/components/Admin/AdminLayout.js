@@ -13,7 +13,6 @@ import {
     DollarOutlined,
     HistoryOutlined,
     BellOutlined,
-    SearchOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';

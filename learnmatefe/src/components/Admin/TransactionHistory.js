@@ -62,16 +62,9 @@ const TransactionHistory = () => {
     successRate: allTransactions.length > 0 ? (allTransactions.filter(t => t.status === 'success').length / allTransactions.length * 100) : 0
   };
 
-  useEffect(() => {
-    fetchTransactions();
-    fetchAllTransactions(); // Fetch all transactions for statistics
-  }, [pagination.current, pagination.pageSize, filters]);
 
-  useEffect(() => {
-    fetchAllTransactions(); // Fetch all transactions when component mounts
-  }, []);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -82,7 +75,6 @@ const TransactionHistory = () => {
         startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
       };
-
       const response = await AdminService.getTransactionHistory(params);
       if (response && response.success) {
         setTransactions(response.data);
@@ -96,20 +88,18 @@ const TransactionHistory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.current, pagination.pageSize, filters]);
 
-  const fetchAllTransactions = async () => {
+  // fetchAllTransactions
+  const fetchAllTransactions = useCallback(async () => {
     try {
-      // Fetch all transactions without filtering for statistics
       const params = {
         page: 1,
-        limit: 10000, // Large number to get all transactions
-        // No type filter - get all types
+        limit: 10000,
         userId: filters.userId || undefined,
         startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
       };
-
       const response = await AdminService.getTransactionHistory(params);
       if (response && response.success) {
         setAllTransactions(response.data);
@@ -117,7 +107,16 @@ const TransactionHistory = () => {
     } catch (error) {
       console.error('Error fetching all transactions:', error);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchTransactions();
+    fetchAllTransactions();
+  }, [fetchTransactions, fetchAllTransactions]);
+
+  useEffect(() => {
+    fetchAllTransactions();
+  }, [fetchAllTransactions]);
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
@@ -181,8 +180,8 @@ const TransactionHistory = () => {
       width: 200,
       render: (_, record) => (
         <Space>
-          <Avatar 
-            src={record.userId?.image} 
+          <Avatar
+            src={record.userId?.image}
             icon={<UserOutlined />}
             size="small"
           />
@@ -212,9 +211,9 @@ const TransactionHistory = () => {
       key: 'amount',
       width: 150,
       render: (amount, record) => (
-        <Text 
-          strong 
-          style={{ 
+        <Text
+          strong
+          style={{
             color: record.balanceChange > 0 ? '#52c41a' : '#f5222d'
           }}
         >
@@ -228,9 +227,9 @@ const TransactionHistory = () => {
       key: 'balanceChange',
       width: 150,
       render: (balanceChange) => (
-        <Text 
-          strong 
-          style={{ 
+        <Text
+          strong
+          style={{
             color: balanceChange > 0 ? '#52c41a' : '#f5222d'
           }}
         >
@@ -292,7 +291,7 @@ const TransactionHistory = () => {
       <div className="dashboard-header">
         <div className="header-content">
           <div className="welcome-section">
-    
+
             <Title level={1} className="welcome-title">
               <TransactionOutlined />
               Lịch sử Giao dịch
@@ -577,7 +576,7 @@ const TransactionHistory = () => {
             ...pagination,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => 
+            showTotal: (total, range) =>
               `${range[0]}-${range[1]} của ${total} giao dịch`
           }}
           onChange={handleTableChange}
@@ -588,8 +587,8 @@ const TransactionHistory = () => {
       {/* Success Rate Card */}
       <Card style={{ marginTop: 24 }}>
         <Title level={4}>Thống kê tỷ lệ thành công</Title>
-        <Progress 
-          percent={statistics.successRate} 
+        <Progress
+          percent={statistics.successRate}
           strokeColor={{
             '0%': '#108ee9',
             '100%': '#87d068',

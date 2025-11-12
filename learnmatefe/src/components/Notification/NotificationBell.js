@@ -14,18 +14,17 @@ const NotificationBell = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     const res = await notificationApi.fetchNotifications(userId);
     if (res.errorCode === 0) {
       setNotifications(res.data.notifications);
       setUnreadCount(res.data.notifications.filter((n) => !n.isRead).length);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     loadNotifications();
-  }, []);
-
+  }, [loadNotifications]);
   // socket realtime
   useEffect(() => {
     if (!socket) return;
@@ -98,9 +97,8 @@ const NotificationBell = () => {
                 notifications.map((n) => (
                   <div
                     key={n._id}
-                    className={`notification-item ${
-                      n.isRead ? "" : "unread"
-                    }`}
+                    className={`notification-item ${n.isRead ? "" : "unread"
+                      }`}
                   >
                     <div
                       className="content"

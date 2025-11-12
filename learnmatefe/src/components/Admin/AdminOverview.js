@@ -74,8 +74,6 @@ const AdminOverview = () => {
         recentApplications: []
     });
 
-    // Colors for charts
-    const COLORS = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2'];
     
     // Sample data for demonstration - in real app, fetch from API
     const growthData = [

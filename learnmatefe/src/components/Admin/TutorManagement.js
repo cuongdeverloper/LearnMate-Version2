@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Table, 
-    Button, 
-    Modal, 
-    Input, 
-    Tag, 
-    Space, 
-    message, 
+import {
+    Table,
+    Button,
+    Modal,
+    Input,
+    Tag,
+    Space,
+    message,
     Card,
     Avatar,
     Tooltip,
@@ -18,9 +18,9 @@ import {
     Typography,
     Badge
 } from 'antd';
-import { 
-    UserOutlined, 
-    CheckOutlined, 
+import {
+    UserOutlined,
+    CheckOutlined,
     CloseOutlined,
     EyeOutlined,
     FileTextOutlined,
@@ -51,17 +51,10 @@ const TutorManagement = () => {
         rejected: 0
     });
 
-    useEffect(() => {
-        fetchApplications();
-    }, []);
-
-    const fetchApplications = async () => {
+    const fetchApplications = useCallback(async () => {
         setLoading(true);
         try {
             const response = await AdminService.getAllTutorApplications();
-            //console.log('Tutor applications API response:', response);
-            
-            // Handle both array and { data: [...] } formats
             let applicationList = [];
             if (!response) {
                 applicationList = [];
@@ -69,19 +62,12 @@ const TutorManagement = () => {
                 applicationList = response;
             } else if (response.data && Array.isArray(response.data)) {
                 applicationList = response.data;
-            } else {
-                applicationList = [];
             }
 
-            //console.log('Final applicationList:', applicationList);
-            //console.log('applicationList is array?', Array.isArray(applicationList));
-            
             if (applicationList.length > 0) {
                 setApplications(applicationList);
                 calculateStats(applicationList);
-                //console.log('Tutor applications loaded:', applicationList.length);
             } else {
-                console.error('No applications found');
                 setApplications([]);
                 message.error('Không có dữ liệu đơn đăng ký');
             }
@@ -92,13 +78,17 @@ const TutorManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchApplications();
+    }, [fetchApplications]);
 
     const calculateStats = (applicationList = []) => {
         if (!Array.isArray(applicationList)) {
             applicationList = [];
         }
-        
+
         const stats = {
             total: applicationList.length,
             pending: applicationList.filter(app => app.status === 'pending').length,
@@ -114,7 +104,7 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.approveTutorApplication(selectedApplication._id);
-            
+
             if (response) {
                 message.success('Đã duyệt đơn đăng ký thành công');
                 fetchApplications(); // Refresh the list
@@ -127,7 +117,7 @@ const TutorManagement = () => {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi duyệt đơn';
             message.error(errorMessage);
             console.error('Approve error:', error);
-            
+
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -145,10 +135,10 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.rejectTutorApplication(
-                selectedApplication._id, 
+                selectedApplication._id,
                 rejectionReason
             );
-            
+
             if (response) {
                 message.success('Đã từ chối đơn đăng ký');
                 fetchApplications(); // Refresh the list
@@ -163,7 +153,7 @@ const TutorManagement = () => {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi từ chối đơn';
             message.error(errorMessage);
             console.error('Reject error:', error);
-            
+
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -210,9 +200,9 @@ const TutorManagement = () => {
             key: 'avatar',
             width: 80,
             render: (image, record) => (
-                <Avatar 
-                    src={image} 
-                    icon={<UserOutlined />} 
+                <Avatar
+                    src={image}
+                    icon={<UserOutlined />}
                     size={40}
                 />
             ),
@@ -278,28 +268,28 @@ const TutorManagement = () => {
             render: (_, record) => (
                 <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button 
-                            type="default" 
+                        <Button
+                            type="default"
                             size="small"
                             icon={<EyeOutlined />}
                             onClick={() => openDetailModal(record)}
                         />
                     </Tooltip>
-                    
+
                     {record.status === 'pending' && (
                         <>
                             <Tooltip title="Duyệt đơn">
-                                <Button 
-                                    type="primary" 
+                                <Button
+                                    type="primary"
                                     size="small"
                                     icon={<CheckOutlined />}
                                     onClick={() => openActionModal(record, 'approve')}
                                 />
                             </Tooltip>
-                            
+
                             <Tooltip title="Từ chối">
-                                <Button 
-                                    type="default" 
+                                <Button
+                                    type="default"
                                     danger
                                     size="small"
                                     icon={<CloseOutlined />}
@@ -319,7 +309,7 @@ const TutorManagement = () => {
             <div className="dashboard-header">
                 <div className="header-content">
                     <div className="welcome-section">
-                        
+
                         <Title level={1} className="welcome-title">
                             <SafetyCertificateOutlined />
                             Quản lý đơn gia sư
@@ -418,31 +408,31 @@ const TutorManagement = () => {
                             <FileTextOutlined style={{ marginRight: 8, color: '#1890ff' }} />
                             Danh sách đơn đăng ký
                         </Title>
-                        <Button 
-                            type="primary" 
-                            onClick={fetchApplications} 
+                        <Button
+                            type="primary"
+                            onClick={fetchApplications}
                             loading={loading}
                             style={{ borderRadius: '8px' }}
                         >
                             Làm mới
                         </Button>
                     </div>
-                
-                <Table 
-                    columns={columns}
-                    dataSource={applications || []}
-                    rowKey="_id"
-                    loading={loading}
-                    pagination={{
-                        total: (applications || []).length,
-                        pageSize: 10,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        showTotal: (total, range) => 
-                            `${range[0]}-${range[1]} của ${total} đơn đăng ký`,
-                    }}
-                    scroll={{ x: 1200 }}
-                />
+
+                    <Table
+                        columns={columns}
+                        dataSource={applications || []}
+                        rowKey="_id"
+                        loading={loading}
+                        pagination={{
+                            total: (applications || []).length,
+                            pageSize: 10,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            showTotal: (total, range) =>
+                                `${range[0]}-${range[1]} của ${total} đơn đăng ký`,
+                        }}
+                        scroll={{ x: 1200 }}
+                    />
                 </Card>
             </div>
 
@@ -461,9 +451,9 @@ const TutorManagement = () => {
                 {selectedApplication && (
                     <div className="application-detail">
                         <div className="applicant-info">
-                            <Avatar 
-                                src={selectedApplication.tutorId?.image} 
-                                icon={<UserOutlined />} 
+                            <Avatar
+                                src={selectedApplication.tutorId?.image}
+                                icon={<UserOutlined />}
                                 size={80}
                             />
                             <div className="basic-info">
@@ -526,8 +516,8 @@ const TutorManagement = () => {
                         {selectedApplication.cvFile && (
                             <div className="cv-section">
                                 <h4>CV:</h4>
-                                <Button 
-                                    type="link" 
+                                <Button
+                                    type="link"
                                     icon={<FileTextOutlined />}
                                     href={selectedApplication.cvFile}
                                     target="_blank"
@@ -554,7 +544,7 @@ const TutorManagement = () => {
                     Bạn có chắc muốn {actionType === 'approve' ? 'duyệt' : 'từ chối'} đơn đăng ký của{' '}
                     <strong>{selectedApplication?.tutorId?.username}</strong>?
                 </p>
-                
+
                 {actionType === 'reject' && (
                     <div style={{ marginTop: 16 }}>
                         <label>Lý do từ chối:</label>
