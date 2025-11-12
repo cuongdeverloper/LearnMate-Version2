@@ -43,7 +43,6 @@ const { Title, Text } = Typography;
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
-  const [setStatistics] = useState({});
   const [stats, setStats] = useState({
     totalWithdrawals: 0,
     pendingWithdrawals: 0,
@@ -139,21 +138,15 @@ const fetchWithdrawals = useCallback(async () => {
     }
   }, []);
 
-  useEffect(() => {
-  fetchWithdrawals();
-  fetchStatistics();
-}, [fetchWithdrawals, fetchStatistics]);
-
 
   useEffect(() => {
-    const loadData = async () => {
-      // Load withdrawals first (this will calculate stats from real data)
-      await fetchWithdrawals();
-      // Then try to get API stats (only if they have better data)
-      fetchStatistics();
-    };
-    loadData();
-  }, [pagination.current, pagination.pageSize, filters]);
+  const loadData = async () => {
+    await fetchWithdrawals();
+    fetchStatistics();
+  };
+  loadData();
+}, [fetchWithdrawals, fetchStatistics, pagination.current, pagination.pageSize, filters]);
+
 
   // Debug useEffect to track stats changes
   useEffect(() => {

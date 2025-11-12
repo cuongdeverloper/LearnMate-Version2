@@ -82,57 +82,57 @@ const ReportManagement = () => {
   const [bookingDrawerVisible, setBookingDrawerVisible] = useState(false);
   const [relatedBooking, setRelatedBooking] = useState(null);
 
+  const calculateStatisticsFromReports = useCallback((reportsList) => {
+  const stats = {
+    total: reportsList.length,
+    pending: reportsList.filter(report => report.status === 'pending').length,
+    resolved: reportsList.filter(report => ['resolved', 'reviewed'].includes(report.status)).length,
+    rejected: reportsList.filter(report => ['rejected', 'dismissed'].includes(report.status)).length,
+  };
+
+  setStatistics(stats);
+  setStats({
+    totalReports: stats.total,
+    pendingReports: stats.pending,
+    resolvedReports: stats.resolved,
+    rejectedReports: stats.rejected,
+  });
+}, []);
 
   const fetchReports = useCallback(async () => {
-  setLoading(true);
-  try {
-    const params = {
-      page: pagination.current,
-      limit: pagination.pageSize,
-      status: filters.status !== 'all' ? filters.status : undefined,
-      targetType: filters.targetType !== 'all' ? filters.targetType : undefined,
-      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
-    };
+    setLoading(true);
+    try {
+      const params = {
+        page: pagination.current,
+        limit: pagination.pageSize,
+        status: filters.status !== 'all' ? filters.status : undefined,
+        targetType: filters.targetType !== 'all' ? filters.targetType : undefined,
+        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+      };
 
-    const response = await AdminService.getReports(params);
-    if (response.success) {
-      const reportsList = response.data.reports || [];
-      setReports(reportsList);
-      setPagination(prev => ({
-        ...prev,
-        total: response.data.total,
-        current: response.data.page,
-        pageSize: response.data.limit
-      }));
-      calculateStatisticsFromReports(reportsList);
+      const response = await AdminService.getReports(params);
+      if (response.success) {
+        const reportsList = response.data.reports || [];
+        setReports(reportsList);
+        setPagination(prev => ({
+          ...prev,
+          total: response.data.total,
+          current: response.data.page,
+          pageSize: response.data.limit
+        }));
+        calculateStatisticsFromReports(reportsList);
+      }
+    } catch (error) {
+      message.error('Không thể tải danh sách báo cáo');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    message.error('Không thể tải danh sách báo cáo');
-  } finally {
-    setLoading(false);
-  }
-}, [pagination, filters]);
+  }, [pagination, filters, calculateStatisticsFromReports]);
 
 
 
-  const calculateStatisticsFromReports = (reportsList) => {
-    const stats = {
-      total: reportsList.length,
-      pending: reportsList.filter(report => report.status === 'pending').length,
-      resolved: reportsList.filter(report => report.status === 'resolved' || report.status === 'reviewed').length,
-      rejected: reportsList.filter(report => report.status === 'rejected' || report.status === 'dismissed').length
-    };
 
-    //console.log('Calculated statistics from reports:', stats);
-    setStatistics(stats);
-    setStats({
-      totalReports: stats.total,
-      pendingReports: stats.pending,
-      resolvedReports: stats.resolved,
-      rejectedReports: stats.rejected
-    });
-  };
 
   const fetchStatistics = async () => {
     try {
@@ -174,12 +174,12 @@ const ReportManagement = () => {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      await fetchReports();
-      fetchStatistics();
-    };
-    loadData();
-  }, [fetchReports]);
+  const loadData = async () => {
+    await fetchReports();
+    fetchStatistics();
+  };
+  loadData();
+}, [fetchReports, fetchStatistics]);
 
   const fetchBookingDetails = async (bookingId) => {
     // Validate bookingId
