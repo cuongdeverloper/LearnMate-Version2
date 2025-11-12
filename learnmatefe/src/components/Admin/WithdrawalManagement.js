@@ -73,7 +73,24 @@ const WithdrawalManagement = () => {
 
   // Form
   const [updateForm] = Form.useForm();
-  const fetchWithdrawals = useCallback(async () => {
+  const calculateStatisticsFromWithdrawals = useCallback((withdrawalsList) => {
+  const pendingWithdrawals = withdrawalsList.filter(w => w.status === 'pending');
+  const pendingAmount = pendingWithdrawals.reduce((sum, w) => sum + (w.amount || 0), 0);
+
+  const stats = {
+    totalWithdrawals: withdrawalsList.length,
+    pendingWithdrawals: pendingWithdrawals.length,
+    approvedWithdrawals: withdrawalsList.filter(w => w.status === 'approved').length,
+    rejectedWithdrawals: withdrawalsList.filter(w => w.status === 'rejected').length,
+    totalAmount: withdrawalsList.reduce((sum, w) => sum + (w.amount || 0), 0),
+    pendingAmount
+  };
+
+  setStats(stats);
+}, []);
+
+// 🟩 2. Then define fetchWithdrawals using it safely
+const fetchWithdrawals = useCallback(async () => {
   try {
     setLoading(true);
     const params = {
@@ -81,7 +98,7 @@ const WithdrawalManagement = () => {
       limit: pagination.pageSize,
       status: filters.status !== 'all' ? filters.status : undefined,
       startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD'),
     };
 
     const response = await AdminService.getAllWithdrawals(params);
@@ -90,7 +107,7 @@ const WithdrawalManagement = () => {
       setWithdrawals(withdrawalsList);
       setPagination(prev => ({
         ...prev,
-        total: response.pagination?.totalItems || withdrawalsList.length
+        total: response.pagination?.totalItems || withdrawalsList.length,
       }));
       calculateStatisticsFromWithdrawals(withdrawalsList);
     }
@@ -166,38 +183,7 @@ const WithdrawalManagement = () => {
   }, [stats, withdrawals]);
 
 
-  const calculateStatisticsFromWithdrawals = (withdrawalsList) => {
-    //console.log('Raw withdrawals data:', withdrawalsList);
-    const pendingWithdrawals = withdrawalsList.filter(w => w.status === 'pending');
-    //console.log('Pending withdrawals:', pendingWithdrawals);
-
-    const pendingAmount = pendingWithdrawals.reduce((sum, w) => {
-      //console.log('Processing withdrawal:', w._id, 'Amount:', w.amount, 'Status:', w.status);
-      return sum + (w.amount || 0);
-    }, 0);
-
-    const stats = {
-      totalWithdrawals: withdrawalsList.length,
-      pendingWithdrawals: pendingWithdrawals.length,
-      approvedWithdrawals: withdrawalsList.filter(w => w.status === 'approved').length,
-      rejectedWithdrawals: withdrawalsList.filter(w => w.status === 'rejected').length,
-      totalAmount: withdrawalsList.reduce((sum, w) => sum + (w.amount || 0), 0),
-      pendingAmount: pendingAmount
-    };
-
-    //console.log('Calculated withdrawal statistics:', stats);
-    //console.log('Calculated pendingAmount specifically:', pendingAmount);
-
-    setStatistics(stats);
-    setStats({
-      totalWithdrawals: stats.totalWithdrawals,
-      pendingWithdrawals: stats.pendingWithdrawals,
-      approvedWithdrawals: stats.approvedWithdrawals,
-      rejectedWithdrawals: stats.rejectedWithdrawals,
-      totalAmount: stats.totalAmount,
-      pendingAmount: stats.pendingAmount
-    });
-  };
+  
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
