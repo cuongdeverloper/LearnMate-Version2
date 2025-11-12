@@ -9,15 +9,18 @@ import { PersistGate } from 'redux-persist/integration/react';
 import 'nprogress/nprogress.css';
 import { persistor, store } from './redux/store';
 import './tailwind.css'
+import { SocketProvider } from './SocketContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
     <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
-    {/* <SocketContextProvider> */}
-    <Layout />
-    {/* </SocketContextProvider> */}
-      
+      {/* <SocketContextProvider> */}
+      <SocketProvider>
+        <Layout />
+      </SocketProvider>
+      {/* </SocketContextProvider> */}
+
     </PersistGate>
   </Provider>
 );

@@ -20,8 +20,7 @@ import {
   Statistic,
   Avatar,
   Typography,
-  Alert,
-  
+  Badge
 } from 'antd';
 import {
   SearchOutlined,
@@ -33,7 +32,10 @@ import {
   ExclamationCircleOutlined,
   UserOutlined,
   FileTextOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  FlagOutlined,
+  WarningOutlined,
+  StopOutlined,
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import moment from 'moment';
@@ -46,6 +48,12 @@ const { Title, Text } = Typography;
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
   const [statistics, setStatistics] = useState({});
+  const [stats, setStats] = useState({
+    totalReports: 0,
+    pendingReports: 0,
+    resolvedReports: 0,
+    rejectedReports: 0
+  });
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -75,11 +83,13 @@ const ReportManagement = () => {
   const [relatedBooking, setRelatedBooking] = useState(null);
 
   useEffect(() => {
-  fetchReports();
-  fetchStatistics();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [pagination.current, pagination.pageSize, filters]);
-
+    // Fetch reports first, then statistics
+    const loadData = async () => {
+      await fetchReports(); // This will also calculate statistics from reports
+      fetchStatistics(); // This will try to get statistics from API (optional)
+    };
+    loadData();
+  }, [pagination.current, pagination.pageSize, filters]);
 
   const fetchReports = async () => {
     setLoading(true);
@@ -95,13 +105,17 @@ const ReportManagement = () => {
 
       const response = await AdminService.getReports(params);
       if (response.success) {
-        setReports(response.data.reports);
+        const reportsList = response.data.reports || [];
+        setReports(reportsList);
         setPagination(prev => ({
           ...prev,
           total: response.data.total,
           current: response.data.page,
           pageSize: response.data.limit
         }));
+        
+        // Calculate statistics from reports data as fallback
+        calculateStatisticsFromReports(reportsList);
       }
     } catch (error) {
       message.error('Không thể tải danh sách báo cáo');
@@ -110,14 +124,48 @@ const ReportManagement = () => {
     }
   };
 
+  const calculateStatisticsFromReports = (reportsList) => {
+    const stats = {
+      total: reportsList.length,
+      pending: reportsList.filter(report => report.status === 'pending').length,
+      resolved: reportsList.filter(report => report.status === 'resolved' || report.status === 'reviewed').length,
+      rejected: reportsList.filter(report => report.status === 'rejected' || report.status === 'dismissed').length
+    };
+    
+    //console.log('Calculated statistics from reports:', stats);
+    setStatistics(stats);
+    setStats({
+      totalReports: stats.total,
+      pendingReports: stats.pending,
+      resolvedReports: stats.resolved,
+      rejectedReports: stats.rejected
+    });
+  };
+
   const fetchStatistics = async () => {
     try {
       const response = await AdminService.getReportStats();
-      if (response.success) {
+      //console.log('Report Statistics API Response:', response);
+      
+      if (response && response.success && response.data && 
+          (response.data.total > 0 || response.data.pending > 0 || 
+           response.data.resolved > 0 || response.data.rejected > 0)) {
+        //console.log('Using API Statistics (has data):', response.data);
         setStatistics(response.data);
+        setStats({
+          totalReports: response.data.total || 0,
+          pendingReports: response.data.pending || 0,
+          resolvedReports: response.data.resolved || 0,
+          rejectedReports: response.data.rejected || 0
+        });
+      } else {
+        console.warn('API statistics empty or failed, keeping calculated statistics');
+        // Keep the statistics calculated from reports data
       }
     } catch (error) {
       console.error('Error fetching report statistics:', error);
+      console.warn('Keeping statistics calculated from reports data');
+      // Keep the statistics calculated from reports data
     }
   };
 
@@ -142,7 +190,7 @@ const ReportManagement = () => {
     }
 
     try {
-      console.log('Fetching booking details for ID:', bookingId);
+      //console.log('Fetching booking details for ID:', bookingId);
       const response = await AdminService.getBookingDetails(bookingId);
       if (response.success) {
         setRelatedBooking(response.data.booking);
@@ -288,20 +336,12 @@ const ReportManagement = () => {
     onChange: (selectedRowKeys) => {
       setSelectedReports(selectedRowKeys);
     },
+    getCheckboxProps: (record) => ({
+      disabled: record.status !== 'pending', // Chỉ cho phép chọn report có status 'pending'
+    }),
   };
 
   const columns = [
-    {
-      title: 'Mã báo cáo',
-      dataIndex: '_id',
-      key: '_id',
-      width: 120,
-      render: (id) => (
-        <Text code style={{ fontSize: '12px' }}>
-          {id.slice(-8)}
-        </Text>
-      )
-    },
     {
       title: 'Người báo cáo',
       dataIndex: 'reporter',
@@ -345,7 +385,7 @@ const ReportManagement = () => {
       key: 'status',
       width: 120,
       render: (status) => (
-        <Tag color={getStatusColor(status)}>
+        <Tag className={`status-${status}`}>
           {getStatusText(status)}
         </Tag>
       )
@@ -372,14 +412,16 @@ const ReportManagement = () => {
           >
             Chi tiết
           </Button>
-          <Button
-            type="default"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => openUpdateModal(record)}
-          >
-            Xử lý
-          </Button>
+          {record.status === 'pending' && (
+            <Button
+              type="default"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => openUpdateModal(record)}
+            >
+              Xử lý
+            </Button>
+          )}
         </Space>
       )
     }
@@ -388,108 +430,172 @@ const ReportManagement = () => {
   const statisticsCards = [
     {
       title: 'Tổng số báo cáo',
-      value: statistics.totalReports || 0,
+      value: statistics.total || 0,
       icon: <ExclamationCircleOutlined />,
       color: '#1890ff'
     },
     {
       title: 'Chờ xử lý',
-      value: statistics.pendingReports || 0,
+      value: statistics.pending || 0,
       icon: <CalendarOutlined />,
       color: '#faad14'
     },
     {
       title: 'Đã xử lý',
-      value: statistics.reviewedReports || 0,
+      value: statistics.resolved || 0,
       icon: <CheckCircleOutlined />,
       color: '#52c41a'
     },
     {
       title: 'Đã bỏ qua',
-      value: statistics.dismissedReports || 0,
+      value: statistics.rejected || 0,
       icon: <CloseCircleOutlined />,
       color: '#ff4d4f'
     }
   ];
 
   return (
-    <div className="report-management-container" style={{ padding: '24px' }}>
-      <Title level={2}>Quản lý Báo cáo</Title>
-      
-      {/* Statistics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        {statisticsCards.map((stat, index) => (
-          <Col xs={24} sm={12} md={6} key={index}>
-            <Card>
-              <Statistic
-                title={stat.title}
-                value={stat.value}
-                prefix={stat.icon}
-                valueStyle={{ color: stat.color }}
-              />
+    <div className="report-management">
+      {/* Modern Dashboard Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <div className="welcome-section">
+            <Title level={1} className="welcome-title">
+              <FlagOutlined />
+              Quản lý báo cáo
+            </Title>
+            <Text className="welcome-subtitle">
+              Quản lý và xử lý các báo cáo vi phạm từ người dùng
+            </Text>
+          </div>
+          <div className="header-stats">
+            <Badge count={stats.pendingReports} showZero>
+              <Avatar size={50} icon={<WarningOutlined />} />
+            </Badge>
+            <div className="current-date">
+              <CalendarOutlined />
+              {moment().format('DD/MM/YYYY')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Metrics Section */}
+      <div className="metrics-section">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card primary">
+              <div className="metric-content">
+                <div className="metric-icon primary">
+                  <FlagOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.totalReports}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#1890ff' }}
+                  />
+                  <Text className="metric-title">Tổng báo cáo</Text>
+                </div>
+              </div>
             </Card>
           </Col>
-        ))}
-      </Row>
-
-      {/* Reason Statistics */}
-      {statistics.reasonStats && statistics.reasonStats.length > 0 && (
-        <Card style={{ marginBottom: '16px' }}>
-          <Title level={4}>Thống kê theo lý do báo cáo</Title>
-          <Row gutter={[16, 8]}>
-            {statistics.reasonStats.map((stat, index) => (
-              <Col xs={12} sm={8} md={6} key={index}>
-                <div style={{ textAlign: 'center', padding: '8px' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1890ff' }}>
-                    {stat.count}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
-                    {getReasonText(stat._id)}
-                  </div>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card warning">
+              <div className="metric-content">
+                <div className="metric-icon warning">
+                  <WarningOutlined />
                 </div>
-              </Col>
-            ))}
-          </Row>
-        </Card>
-      )}
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.pendingReports}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#faad14' }}
+                  />
+                  <Text className="metric-title">Chờ xử lý</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card success">
+              <div className="metric-content">
+                <div className="metric-icon success">
+                  <CheckCircleOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.resolvedReports}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#52c41a' }}
+                  />
+                  <Text className="metric-title">Đã xử lý</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card danger">
+              <div className="metric-content">
+                <div className="metric-icon danger">
+                  <StopOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.rejectedReports}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#ff4d4f' }}
+                  />
+                  <Text className="metric-title">Bị từ chối</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
 
-      {/* Filters */}
-      <Card style={{ marginBottom: '16px' }}>
-        <Row gutter={[16, 16]} align="bottom">
+      {/* Modern Filters Section */}
+      <Card className="filter-card">
+        <Row gutter={[24, 16]} align="middle">
           <Col xs={24} sm={8} md={6}>
-            <label>Trạng thái:</label>
-            <Select
-              style={{ width: '100%', marginTop: '4px' }}
-              value={filters.status}
-              onChange={(value) => setFilters({ ...filters, status: value })}
-            >
-              <Option value="all">Tất cả</Option>
-              <Option value="pending">Chờ xử lý</Option>
-              <Option value="reviewed">Đã xử lý</Option>
-              <Option value="dismissed">Đã bỏ qua</Option>
-            </Select>
+            <div className="filter-group">
+              <Text strong>Trạng thái:</Text>
+              <Select
+                className="filter-select"
+                value={filters.status}
+                onChange={(value) => setFilters({ ...filters, status: value })}
+                placeholder="Chọn trạng thái"
+              >
+                <Option value="all">Tất cả</Option>
+                <Option value="pending">Chờ xử lý</Option>
+                <Option value="reviewed">Đã xử lý</Option>
+                <Option value="dismissed">Đã bỏ qua</Option>
+              </Select>
+            </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <label>Loại đối tượng:</label>
-            <Select
-              style={{ width: '100%', marginTop: '4px' }}
-              value={filters.targetType}
-              onChange={(value) => setFilters({ ...filters, targetType: value })}
-            >
-              <Option value="all">Tất cả</Option>
-              <Option value="booking">Booking</Option>
-              <Option value="tutor">Gia sư</Option>
-              <Option value="learner">Học viên</Option>
-            </Select>
+            <div className="filter-group">
+              <Text strong>Loại đối tượng:</Text>
+              <Select
+                className="filter-select"
+                value={filters.targetType}
+                onChange={(value) => setFilters({ ...filters, targetType: value })}
+                placeholder="Chọn loại"
+              >
+                <Option value="all">Tất cả</Option>
+                <Option value="booking">Booking</Option>
+                <Option value="tutor">Gia sư</Option>
+                <Option value="learner">Học viên</Option>
+              </Select>
+            </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <label>Khoảng thời gian:</label>
-            <RangePicker
-              style={{ width: '100%', marginTop: '4px' }}
-              value={filters.dateRange}
-              onChange={(dates) => setFilters({ ...filters, dateRange: dates })}
-              format="DD/MM/YYYY"
-            />
+            <div className="filter-group">
+              <Text strong>Khoảng thời gian:</Text>
+              <RangePicker
+                className="filter-select"
+                value={filters.dateRange}
+                onChange={(dates) => setFilters({ ...filters, dateRange: dates })}
+                format="DD/MM/YYYY"
+                placeholder={['Từ ngày', 'Đến ngày']}
+              />
+            </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
             <Space>
@@ -519,33 +625,43 @@ const ReportManagement = () => {
         </Row>
       </Card>
 
-      {/* Bulk Actions */}
-      {selectedReports.length > 0 && (
-        <Alert
-          message={`Đã chọn ${selectedReports.length} báo cáo`}
-          type="info"
-          showIcon
-          style={{ marginBottom: '16px' }}
-          action={
+      {/* Action Buttons */}
+      <div className="action-buttons">
+        <Button
+          type="primary"
+          icon={<ReloadOutlined />}
+          onClick={fetchReports}
+          loading={loading}
+        >
+          Làm mới dữ liệu
+        </Button>
+        {selectedReports.length > 0 && (
+          <>
             <Button
               type="primary"
-              size="small"
+              icon={<CheckCircleOutlined />}
               onClick={() => setBulkUpdateModalVisible(true)}
             >
-              Xử lý hàng loạt
+              Xử lý hàng loạt ({selectedReports.length})
             </Button>
-          }
-        />
-      )}
+            <Button
+              onClick={() => setSelectedReports([])}
+            >
+              Bỏ chọn tất cả
+            </Button>
+          </>
+        )}
+      </div>
 
-      {/* Table */}
-      <Card>
+      {/* Reports Table */}
+      <Card className="table-card">
         <Table
           columns={columns}
           dataSource={reports}
           rowKey="_id"
           loading={loading}
           rowSelection={rowSelection}
+          rowClassName={(record) => record.status !== 'pending' ? 'processed-row' : ''}
           pagination={{
             ...pagination,
             onChange: (page, pageSize) => {
@@ -583,26 +699,15 @@ const ReportManagement = () => {
             rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
           >
             <Radio.Group>
-              <Radio value="pending">Chờ xử lý</Radio>
               <Radio value="reviewed">Đã xử lý</Radio>
               <Radio value="dismissed">Bỏ qua</Radio>
             </Radio.Group>
           </Form.Item>
           
           <Form.Item
-            name="action"
-            label="Hành động với booking (nếu có)"
-          >
-            <Radio.Group>
-              <Radio value="">Không thay đổi</Radio>
-              <Radio value="cancel_booking">Hủy booking</Radio>
-              <Radio value="mark_reported">Đánh dấu đã được báo cáo</Radio>
-            </Radio.Group>
-          </Form.Item>
-          
-          <Form.Item
             name="adminNotes"
             label="Ghi chú của admin"
+            rules={[{ required: true, message: 'Vui lòng nhập ghi chú' }]}
           >
             <Input.TextArea
               rows={4}
@@ -650,6 +755,7 @@ const ReportManagement = () => {
           <Form.Item
             name="adminNotes"
             label="Ghi chú chung"
+            rules={[{ required: true, message: 'Vui lòng nhập ghi chú' }]}
           >
             <Input.TextArea
               rows={3}
@@ -742,7 +848,7 @@ const ReportManagement = () => {
                       const bookingId = typeof reportDetails.targetId === 'object' 
                         ? reportDetails.targetId._id 
                         : reportDetails.targetId;
-                      console.log('Booking ID:', bookingId);
+                      //console.log('Booking ID:', bookingId);
                       fetchBookingDetails(bookingId);
                     }}
                   >

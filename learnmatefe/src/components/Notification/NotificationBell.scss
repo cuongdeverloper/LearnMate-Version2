@@ -1,0 +1,128 @@
+.notification-container {
+  position: relative;
+  display: inline-block;
+
+  .bell-wrapper {
+    position: relative;
+    cursor: pointer;
+    .bell-icon {
+      font-size: 1.6rem;
+      color: #333;
+      transition: 0.2s;
+      &:hover {
+        color: #007bff;
+      }
+    }
+
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -6px;
+      background-color: #ff3b30;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      padding: 2px 5px;
+      font-weight: bold;
+    }
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 35px;
+    width: 320px;
+    max-height: 450px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 100;
+
+    .dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #f9fafb;
+      border-bottom: 1px solid #eee;
+
+      h4 {
+        font-size: 1rem;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .clear-btn {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 0.8rem;
+        cursor: pointer;
+        &:hover {
+          color: #e63946;
+        }
+      }
+    }
+
+    .notification-list {
+      max-height: 400px;
+      overflow-y: auto;
+
+      .empty-state {
+        text-align: center;
+        color: #999;
+        padding: 20px 0;
+        font-size: 0.9rem;
+      }
+
+      .notification-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 14px;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background 0.2s ease;
+
+        &.unread {
+          background: #eaf3ff;
+        }
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        .content {
+          flex: 1;
+          cursor: pointer;
+          h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+          }
+          p {
+            margin: 4px 0;
+            font-size: 0.85rem;
+            color: #555;
+          }
+          .time {
+            font-size: 0.75rem;
+            color: #999;
+          }
+        }
+
+        .delete-btn {
+          border: none;
+          background: none;
+          color: #ccc;
+          cursor: pointer;
+          font-size: 1rem;
+          padding: 0 4px;
+          &:hover {
+            color: #e63946;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Table, 
     Button, 
@@ -17,7 +17,7 @@ import {
     Select,
     Rate,
     Typography,
-
+    Badge,
 } from 'antd';
 import { 
     UserOutlined, 
@@ -28,7 +28,10 @@ import {
     FlagOutlined,
     ReloadOutlined,
     CommentOutlined,
-    ArrowLeftOutlined
+    StarOutlined,
+    CalendarOutlined,
+    CheckCircleOutlined,
+    FileTextOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AdminService from '../../Service/ApiService/AdminService';
@@ -38,10 +41,9 @@ import './ReviewManagement.scss';
 
 const { TextArea } = Input;
 const { Option } = Select;
-const { Paragraph } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
 const ReviewManagement = () => {
-    const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
@@ -71,10 +73,9 @@ const ReviewManagement = () => {
     });
 
     useEffect(() => {
-  fetchReviews();
-  fetchStats();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [currentPage, pageSize, statusFilter, searchFilter]);
+        fetchReviews();
+        fetchStats();
+    }, [currentPage, pageSize, statusFilter, searchFilter]);
 
     const fetchReviews = async () => {
         setLoading(true);
@@ -148,6 +149,8 @@ const ReviewManagement = () => {
 
     const handleMarkReview = async (review, type) => {
         try {
+            // Đánh dấu spam/vi phạm (backend sẽ tự động ẩn nếu cần)
+            const response = await AdminService.markReview(review._id, type);
             
             const isMarking = (type === 'spam' && !review.isSpam) || (type === 'offensive' && !review.isOffensive);
             const actionText = type === 'spam' ? 'spam' : 'vi phạm';
@@ -371,85 +374,103 @@ const ReviewManagement = () => {
 
     return (
         <div className="review-management">
+            {/* Modern Dashboard Header */}
             <div className="dashboard-header">
-                <Button 
-                    type="link" 
-                    icon={<ArrowLeftOutlined />} 
-                    onClick={() => navigate('/admin/dashboard')}
-                    style={{ marginBottom: 16 }}
-                >
-                    Quay lại Dashboard
-                </Button>
-                <h1>Quản lý đánh giá</h1>
-                <p>Quản lý và kiểm duyệt các đánh giá của người dùng</p>
+                <div className="header-content">
+                    <div className="welcome-section">
+                
+                        <Title level={1} className="welcome-title">
+                            <StarOutlined />
+                            Quản lý đánh giá
+                        </Title>
+                        <Text className="welcome-subtitle">
+                            Quản lý và kiểm duyệt các đánh giá của người dùng trong hệ thống
+                        </Text>
+                    </div>
+                    <div className="header-stats">
+                        <Badge count={stats.hiddenReviews} showZero>
+                            <Avatar size={50} icon={<CommentOutlined />} />
+                        </Badge>
+                        <div className="current-date">
+                            <CalendarOutlined />
+                            {moment().format('DD/MM/YYYY')}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Statistics */}
-            <Row gutter={[16, 16]} className="stats-row">
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Tổng đánh giá"
-                            value={stats.totalReviews}
-                            prefix={<CommentOutlined />}
-                            valueStyle={{ color: '#1890ff' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Đang hiển thị"
-                            value={stats.activeReviews}
-                            prefix={<EyeOutlined />}
-                            valueStyle={{ color: '#52c41a' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Đã ẩn"
-                            value={stats.hiddenReviews}
-                            prefix={<EyeInvisibleOutlined />}
-                            valueStyle={{ color: '#faad14' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Đã xóa"
-                            value={stats.deletedReviews}
-                            prefix={<DeleteOutlined />}
-                            valueStyle={{ color: '#ff4d4f' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Spam"
-                            value={stats.spamReviews}
-                            prefix={<WarningOutlined />}
-                            valueStyle={{ color: '#ff4d4f' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={4}>
-                    <Card>
-                        <Statistic
-                            title="Vi phạm"
-                            value={stats.offensiveReviews}
-                            prefix={<FlagOutlined />}
-                            valueStyle={{ color: '#722ed1' }}
-                        />
-                    </Card>
-                </Col>
-            </Row>
+            {/* Enhanced Metrics Section */}
+            <div className="metrics-section">
+                <Row gutter={[24, 24]}>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card primary">
+                            <div className="metric-content">
+                                <div className="metric-icon primary">
+                                    <CommentOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.totalReviews}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#1890ff' }}
+                                    />
+                                    <Text className="metric-title">Tổng đánh giá</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card success">
+                            <div className="metric-content">
+                                <div className="metric-icon success">
+                                    <CheckCircleOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.activeReviews}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#52c41a' }}
+                                    />
+                                    <Text className="metric-title">Đang hiển thị</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card warning">
+                            <div className="metric-content">
+                                <div className="metric-icon warning">
+                                    <EyeInvisibleOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.hiddenReviews}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#722ed1' }}
+                                    />
+                                    <Text className="metric-title">Đã ẩn</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card danger">
+                            <div className="metric-content">
+                                <div className="metric-icon danger">
+                                    <DeleteOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.deletedReviews}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#faad14' }}
+                                    />
+                                    <Text className="metric-title">Đã xóa</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
 
             {/* Filters */}
-            <Card className="filter-card">
+            <Card className="filter-card" style={{ marginBottom: 24 }}>
                 <Row gutter={[16, 16]} align="middle">
                     <Col xs={24} sm={8} md={6}>
                         <Select
@@ -479,25 +500,60 @@ const ReviewManagement = () => {
                 </Row>
             </Card>
 
+            {/* Filters */}
+            <Card className="filter-card" style={{ marginBottom: 24 }}>
+                <Row gutter={[16, 16]} align="middle">
+                    <Col xs={24} sm={8} md={6}>
+                        <Select
+                            placeholder="Lọc theo trạng thái"
+                            style={{ width: '100%' }}
+                            value={statusFilter}
+                            onChange={setStatusFilter}
+                            allowClear
+                        >
+                            <Option value="active">Đang hiển thị</Option>
+                            <Option value="hidden">Đã ẩn</Option>
+                            <Option value="deleted">Đã xóa</Option>
+                        </Select>
+                    </Col>
+                    <Col xs={24} sm={10} md={12}>
+                        <Input.Search
+                            placeholder="Tìm kiếm theo nội dung đánh giá..."
+                            value={searchFilter}
+                            onChange={(e) => setSearchFilter(e.target.value)}
+                            onSearch={fetchReviews}
+                            style={{ width: '100%' }}
+                        />
+                    </Col>
+                    <Col xs={24} sm={6} md={6}>
+                        <Button 
+                            type="primary" 
+                            icon={<ReloadOutlined />}
+                            onClick={() => {
+                                setStatusFilter('');
+                                setSearchFilter('');
+                                setCurrentPage(1);
+                                fetchReviews();
+                                fetchStats();
+                            }}
+                            loading={loading}
+                            style={{ width: '100%' }}
+                        >
+                            Làm mới
+                        </Button>
+                    </Col>
+                </Row>
+            </Card>
+
             {/* Reviews Table */}
-            <Card className="table-card">
-                <div className="table-header">
-                    <h2>Danh sách đánh giá</h2>
-                    <Button 
-                        type="primary" 
-                        icon={<ReloadOutlined />}
-                        onClick={() => {
-                            setStatusFilter('');
-                            setSearchFilter('');
-                            setCurrentPage(1);
-                            fetchReviews();
-                            fetchStats();
-                        }}
-                        loading={loading}
-                    >
-                        Làm mới
-                    </Button>
-                </div>
+            <div className="main-content">
+                <Card className="content-card">
+                    <div className="table-header">
+                        <Title level={3} style={{ margin: 0, color: '#262626' }}>
+                            <FileTextOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+                            Danh sách đánh giá
+                        </Title>
+                    </div>
                 
                 <Table 
                     columns={columns}
@@ -519,7 +575,8 @@ const ReviewManagement = () => {
                     }}
                     scroll={{ x: 1400 }}
                 />
-            </Card>
+                </Card>
+            </div>
 
             {/* Delete Modal */}
             <Modal

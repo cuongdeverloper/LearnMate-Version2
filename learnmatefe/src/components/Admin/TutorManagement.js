@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Table,
-    Button,
-    Modal,
-    Input,
-    Tag,
-    Space,
-    message,
+import { 
+    Table, 
+    Button, 
+    Modal, 
+    Input, 
+    Tag, 
+    Space, 
+    message, 
     Card,
     Avatar,
     Tooltip,
@@ -14,27 +14,29 @@ import {
     Col,
     Statistic,
     Descriptions,
-    List
+    List,
+    Typography,
+    Badge
 } from 'antd';
-import {
-    UserOutlined,
-    CheckOutlined,
+import { 
+    UserOutlined, 
+    CheckOutlined, 
     CloseOutlined,
     EyeOutlined,
     FileTextOutlined,
     BookOutlined,
     ClockCircleOutlined,
-    ArrowLeftOutlined
+    CalendarOutlined,
+    SafetyCertificateOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import AdminService from '../../Service/ApiService/AdminService';
 import moment from 'moment';
 import './TutorManagement.scss';
 
 const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const TutorManagement = () => {
-    const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState(null);
@@ -51,35 +53,37 @@ const TutorManagement = () => {
 
     useEffect(() => {
         fetchApplications();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchApplications = async () => {
         setLoading(true);
         try {
             const response = await AdminService.getAllTutorApplications();
-            console.log('Tutor applications API response:', response);
-
-            // Backend trả về format: { errorCode: 0, message: '...', data: [...] }
+            //console.log('Tutor applications API response:', response);
+            
+            // Handle both array and { data: [...] } formats
             let applicationList = [];
             if (!response) {
                 applicationList = [];
-            } else if (response.errorCode === 0 && response.data && Array.isArray(response.data)) {
-                applicationList = response.data;
             } else if (Array.isArray(response)) {
-                // Fallback nếu response là array trực tiếp
                 applicationList = response;
+            } else if (response.data && Array.isArray(response.data)) {
+                applicationList = response.data;
             } else {
                 applicationList = [];
             }
 
+            //console.log('Final applicationList:', applicationList);
+            //console.log('applicationList is array?', Array.isArray(applicationList));
+            
             if (applicationList.length > 0) {
                 setApplications(applicationList);
                 calculateStats(applicationList);
+                //console.log('Tutor applications loaded:', applicationList.length);
             } else {
-                console.log('No applications found or empty response');
+                console.error('No applications found');
                 setApplications([]);
-                // Không hiển thị error message nếu không có dữ liệu (có thể là trường hợp bình thường)
+                message.error('Không có dữ liệu đơn đăng ký');
             }
         } catch (error) {
             message.error('Không thể tải danh sách đơn đăng ký');
@@ -94,7 +98,7 @@ const TutorManagement = () => {
         if (!Array.isArray(applicationList)) {
             applicationList = [];
         }
-
+        
         const stats = {
             total: applicationList.length,
             pending: applicationList.filter(app => app.status === 'pending').length,
@@ -110,22 +114,20 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.approveTutorApplication(selectedApplication._id);
-
-            // Backend trả về format: { errorCode: 0, message: '...' }
-            if (response && response.errorCode === 0) {
+            
+            if (response) {
                 message.success('Đã duyệt đơn đăng ký thành công');
                 fetchApplications(); // Refresh the list
                 setActionModalVisible(false);
             } else {
-                const errorMessage = response?.message || 'Có lỗi xảy ra khi duyệt đơn';
-                message.error(errorMessage);
+                message.error('Có lỗi xảy ra khi duyệt đơn');
             }
         } catch (error) {
             // Show specific error message from backend
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi duyệt đơn';
             message.error(errorMessage);
             console.error('Approve error:', error);
-
+            
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -143,26 +145,25 @@ const TutorManagement = () => {
         try {
             setLoading(true);
             const response = await AdminService.rejectTutorApplication(
-                selectedApplication._id,
+                selectedApplication._id, 
                 rejectionReason
             );
-
-            // Backend trả về format: { errorCode: 0, message: '...' }
-            if (response && response.errorCode === 0) {
+            
+            if (response) {
                 message.success('Đã từ chối đơn đăng ký');
                 fetchApplications(); // Refresh the list
                 setActionModalVisible(false);
                 setRejectionReason('');
             } else {
-                const errorMessage = response?.message || 'Có lỗi xảy ra khi từ chối đơn';
-                message.error(errorMessage);
+                message.error('Có lỗi xảy ra khi từ chối đơn');
+
             }
         } catch (error) {
             // Show specific error message from backend
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi từ chối đơn';
             message.error(errorMessage);
             console.error('Reject error:', error);
-
+            
             // Refresh data even on error (in case backend updated but returned error)
             fetchApplications();
         } finally {
@@ -209,9 +210,9 @@ const TutorManagement = () => {
             key: 'avatar',
             width: 80,
             render: (image, record) => (
-                <Avatar
-                    src={image}
-                    icon={<UserOutlined />}
+                <Avatar 
+                    src={image} 
+                    icon={<UserOutlined />} 
                     size={40}
                 />
             ),
@@ -277,28 +278,28 @@ const TutorManagement = () => {
             render: (_, record) => (
                 <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button
-                            type="default"
+                        <Button 
+                            type="default" 
                             size="small"
                             icon={<EyeOutlined />}
                             onClick={() => openDetailModal(record)}
                         />
                     </Tooltip>
-
+                    
                     {record.status === 'pending' && (
                         <>
                             <Tooltip title="Duyệt đơn">
-                                <Button
-                                    type="primary"
+                                <Button 
+                                    type="primary" 
                                     size="small"
                                     icon={<CheckOutlined />}
                                     onClick={() => openActionModal(record, 'approve')}
                                 />
                             </Tooltip>
-
+                            
                             <Tooltip title="Từ chối">
-                                <Button
-                                    type="default"
+                                <Button 
+                                    type="default" 
                                     danger
                                     size="small"
                                     icon={<CloseOutlined />}
@@ -314,73 +315,120 @@ const TutorManagement = () => {
 
     return (
         <div className="tutor-management">
+            {/* Modern Dashboard Header */}
             <div className="dashboard-header">
-                <Button
-                    type="link"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => navigate('/admin/dashboard')}
-                    style={{ marginBottom: 16 }}
-                >
-                    Quay lại Dashboard
-                </Button>
-                <h1>Quản lý đơn đăng ký gia sư</h1>
-                <p>Duyệt và quản lý các đơn đăng ký trở thành gia sư</p>
+                <div className="header-content">
+                    <div className="welcome-section">
+                        
+                        <Title level={1} className="welcome-title">
+                            <SafetyCertificateOutlined />
+                            Quản lý đơn gia sư
+                        </Title>
+                        <Text className="welcome-subtitle">
+                            Duyệt và quản lý các đơn đăng ký trở thành gia sư trong hệ thống
+                        </Text>
+                    </div>
+                    <div className="header-stats">
+                        <Badge count={stats.pending} showZero>
+                            <Avatar size={50} icon={<ClockCircleOutlined />} />
+                        </Badge>
+                        <div className="current-date">
+                            <CalendarOutlined />
+                            {moment().format('DD/MM/YYYY')}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Statistics Cards */}
-            <Row gutter={[16, 16]} className="stats-row">
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Tổng đơn"
-                            value={stats.total}
-                            prefix={<FileTextOutlined />}
-                            valueStyle={{ color: '#1890ff' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Chờ duyệt"
-                            value={stats.pending}
-                            prefix={<ClockCircleOutlined />}
-                            valueStyle={{ color: '#faad14' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Đã duyệt"
-                            value={stats.approved}
-                            prefix={<CheckOutlined />}
-                            valueStyle={{ color: '#52c41a' }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Đã từ chối"
-                            value={stats.rejected}
-                            prefix={<CloseOutlined />}
-                            valueStyle={{ color: '#ff4d4f' }}
-                        />
-                    </Card>
-                </Col>
-            </Row>
+            {/* Enhanced Metrics Section */}
+            <div className="metrics-section">
+                <Row gutter={[24, 24]}>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card primary">
+                            <div className="metric-content">
+                                <div className="metric-icon primary">
+                                    <FileTextOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.total}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#1890ff' }}
+                                    />
+                                    <Text className="metric-title">Tổng đơn đăng ký</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card warning">
+                            <div className="metric-content">
+                                <div className="metric-icon warning">
+                                    <ClockCircleOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.pending}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#722ed1' }}
+                                    />
+                                    <Text className="metric-title">Chờ duyệt</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card success">
+                            <div className="metric-content">
+                                <div className="metric-icon success">
+                                    <CheckOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.approved}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#52c41a' }}
+                                    />
+                                    <Text className="metric-title">Đã duyệt</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={12} lg={6}>
+                        <Card className="metric-card danger">
+                            <div className="metric-content">
+                                <div className="metric-icon danger">
+                                    <CloseOutlined />
+                                </div>
+                                <div className="metric-details">
+                                    <Statistic
+                                        value={stats.rejected}
+                                        valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#faad14' }}
+                                    />
+                                    <Text className="metric-title">Đã từ chối</Text>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
 
             {/* Applications Table */}
-            <Card className="applications-table-card">
-                <div className="table-header">
-                    <h2>Danh sách đơn đăng ký</h2>
-                    <Button type="primary" onClick={fetchApplications} loading={loading}>
-                        Làm mới
-                    </Button>
-                </div>
-
-                <Table
+            <div className="main-content">
+                <Card className="content-card">
+                    <div className="table-header">
+                        <Title level={3} style={{ margin: 0, color: '#262626' }}>
+                            <FileTextOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+                            Danh sách đơn đăng ký
+                        </Title>
+                        <Button 
+                            type="primary" 
+                            onClick={fetchApplications} 
+                            loading={loading}
+                            style={{ borderRadius: '8px' }}
+                        >
+                            Làm mới
+                        </Button>
+                    </div>
+                
+                <Table 
                     columns={columns}
                     dataSource={applications || []}
                     rowKey="_id"
@@ -390,12 +438,13 @@ const TutorManagement = () => {
                         pageSize: 10,
                         showSizeChanger: true,
                         showQuickJumper: true,
-                        showTotal: (total, range) =>
+                        showTotal: (total, range) => 
                             `${range[0]}-${range[1]} của ${total} đơn đăng ký`,
                     }}
                     scroll={{ x: 1200 }}
                 />
-            </Card>
+                </Card>
+            </div>
 
             {/* Detail Modal */}
             <Modal
@@ -412,9 +461,9 @@ const TutorManagement = () => {
                 {selectedApplication && (
                     <div className="application-detail">
                         <div className="applicant-info">
-                            <Avatar
-                                src={selectedApplication.tutorId?.image}
-                                icon={<UserOutlined />}
+                            <Avatar 
+                                src={selectedApplication.tutorId?.image} 
+                                icon={<UserOutlined />} 
                                 size={80}
                             />
                             <div className="basic-info">
@@ -477,8 +526,8 @@ const TutorManagement = () => {
                         {selectedApplication.cvFile && (
                             <div className="cv-section">
                                 <h4>CV:</h4>
-                                <Button
-                                    type="link"
+                                <Button 
+                                    type="link" 
                                     icon={<FileTextOutlined />}
                                     href={selectedApplication.cvFile}
                                     target="_blank"
@@ -505,7 +554,7 @@ const TutorManagement = () => {
                     Bạn có chắc muốn {actionType === 'approve' ? 'duyệt' : 'từ chối'} đơn đăng ký của{' '}
                     <strong>{selectedApplication?.tutorId?.username}</strong>?
                 </p>
-
+                
                 {actionType === 'reject' && (
                     <div style={{ marginTop: 16 }}>
                         <label>Lý do từ chối:</label>

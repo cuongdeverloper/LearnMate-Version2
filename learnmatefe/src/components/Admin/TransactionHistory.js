@@ -13,6 +13,9 @@ import {
   Typography,
   Avatar,
   Tooltip,
+  Badge,
+  Statistic,
+  Progress
 } from 'antd';
 import {
   SearchOutlined,
@@ -20,6 +23,11 @@ import {
   HistoryOutlined,
   UserOutlined,
   DownloadOutlined,
+  DollarOutlined,
+  TransactionOutlined,
+  RiseOutlined,
+  FallOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import './TransactionHistory.scss';
@@ -30,6 +38,7 @@ const { Title, Text } = Typography;
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
+  const [allTransactions, setAllTransactions] = useState([]); // Tất cả transactions cho statistics
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -44,11 +53,23 @@ const TransactionHistory = () => {
     dateRange: null
   });
 
-  useEffect(() => {
-  fetchTransactions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [pagination.current, pagination.pageSize, filters]);
+  // Calculate statistics
+  const statistics = {
+    totalTransactions: allTransactions.length,
+    totalValue: allTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0),
+    totalIncome: allTransactions.filter(t => ['topup', 'earning', 'refund'].includes(t.type)).reduce((sum, t) => sum + t.amount, 0),
+    totalOutcome: allTransactions.filter(t => ['withdraw', 'spend'].includes(t.type)).reduce((sum, t) => sum + t.amount, 0),
+    successRate: allTransactions.length > 0 ? (allTransactions.filter(t => t.status === 'success').length / allTransactions.length * 100) : 0
+  };
 
+  useEffect(() => {
+    fetchTransactions();
+    fetchAllTransactions(); // Fetch all transactions for statistics
+  }, [pagination.current, pagination.pageSize, filters]);
+
+  useEffect(() => {
+    fetchAllTransactions(); // Fetch all transactions when component mounts
+  }, []);
 
   const fetchTransactions = async () => {
     try {
@@ -77,17 +98,38 @@ const TransactionHistory = () => {
     }
   };
 
+  const fetchAllTransactions = async () => {
+    try {
+      // Fetch all transactions without filtering for statistics
+      const params = {
+        page: 1,
+        limit: 10000, // Large number to get all transactions
+        // No type filter - get all types
+        userId: filters.userId || undefined,
+        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+      };
+
+      const response = await AdminService.getTransactionHistory(params);
+      if (response && response.success) {
+        setAllTransactions(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching all transactions:', error);
+    }
+  };
+
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
   };
 
   const getTypeColor = (type) => {
     const colors = {
-      topup: 'green',
-      withdraw: 'red', 
-      earning: 'blue',
-      spend: 'orange',
-      refund: 'purple'
+      topup: 'green',     // Nạp tiền - tăng số dư
+      withdraw: 'red',    // Rút tiền - giảm số dư
+      earning: 'blue',    // Thu nhập thực sự (gia sư nhận tiền từ học viên)
+      spend: 'orange',    // Chi tiêu (học viên trả tiền cho gia sư)
+      refund: 'cyan'      // Hoàn tiền - tăng số dư (không phải thu nhập)
     };
     return colors[type] || 'default';
   };
@@ -105,13 +147,24 @@ const TransactionHistory = () => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'topup': return '⬆️';
-      case 'withdraw': return '⬇️';
-      case 'earning': return '💰';
-      case 'spend': return '💳';
-      case 'refund': return '🔄';
+      case 'topup': return '⬆️';   // Nạp tiền lên
+      case 'withdraw': return '⬇️'; // Rút tiền xuống
+      case 'earning': return '💰';  // Thu nhập (tiền túi)
+      case 'spend': return '💳';    // Chi tiêu (thẻ tín dụng)
+      case 'refund': return '↩️';   // Hoàn trả (mũi tên quay lại)
       default: return '💵';
     }
+  };
+
+  const getTransactionTypeDescription = (type) => {
+    const descriptions = {
+      topup: 'Nạp tiền từ bên ngoài vào hệ thống',
+      withdraw: 'Rút tiền từ hệ thống ra tài khoản ngân hàng',
+      earning: 'Thu nhập từ việc dạy học (gia sư nhận tiền)',
+      spend: 'Chi tiêu cho việc học (học viên trả tiền)',
+      refund: 'Hoàn trả tiền đã có trong hệ thống'
+    };
+    return descriptions[type] || '';
   };
 
   const formatCurrency = (amount) => {
@@ -122,17 +175,6 @@ const TransactionHistory = () => {
   };
 
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: '_id',
-      key: '_id',
-      width: 100,
-      render: (text) => (
-        <Text code copyable={{ text }}>
-          {text.slice(-8)}
-        </Text>
-      )
-    },
     {
       title: 'Người dùng',
       key: 'user',
@@ -216,10 +258,16 @@ const TransactionHistory = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
-      render: (description) => (
-        <Tooltip title={description}>
-          <Text>{description}</Text>
-        </Tooltip>
+      render: (description, record) => (
+        <div>
+          <Tooltip title={description}>
+            <Text>{description}</Text>
+          </Tooltip>
+          <br />
+          <Text type="secondary" style={{ fontSize: '11px', fontStyle: 'italic' }}>
+            {getTransactionTypeDescription(record.type)}
+          </Text>
+        </div>
       )
     },
     {
@@ -240,46 +288,148 @@ const TransactionHistory = () => {
 
   return (
     <div className="transaction-history">
-      <div className="page-header">
-        <Title level={2}>
-          <HistoryOutlined /> Lịch sử Giao dịch
-        </Title>
+      {/* Modern Dashboard Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <div className="welcome-section">
+    
+            <Title level={1} className="welcome-title">
+              <TransactionOutlined />
+              Lịch sử Giao dịch
+            </Title>
+            <Text className="welcome-subtitle">
+              Quản lý và theo dõi tất cả giao dịch tài chính trong hệ thống
+            </Text>
+          </div>
+          <div className="header-stats">
+            <Badge count={statistics.totalTransactions} showZero>
+              <Avatar size={50} icon={<HistoryOutlined />} />
+            </Badge>
+            <div className="current-date">
+              <CalendarOutlined />
+              {new Date().toLocaleDateString('vi-VN')}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={8} md={5}>
-            <Input
-              placeholder="ID người dùng..."
-              prefix={<SearchOutlined />}
-              value={filters.userId}
-              onChange={(e) => setFilters(prev => ({ ...prev, userId: e.target.value }))}
-              allowClear
-            />
+      {/* Enhanced Metrics Section */}
+      <div className="metrics-section">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card primary">
+              <div className="metric-content">
+                <div className="metric-icon primary">
+                  <TransactionOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={statistics.totalTransactions}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#1890ff' }}
+                  />
+                  <Text className="metric-title">Tổng giao dịch</Text>
+                </div>
+              </div>
+            </Card>
           </Col>
-          <Col xs={24} sm={8} md={5}>
-            <Select
-              style={{ width: '100%' }}
-              placeholder="Loại giao dịch"
-              value={filters.type}
-              onChange={(value) => setFilters(prev => ({ ...prev, type: value }))}
-            >
-              <Option value="all">Tất cả loại</Option>
-              <Option value="topup">Nạp tiền</Option>
-              <Option value="withdraw">Rút tiền</Option>
-              <Option value="earning">Thu nhập</Option>
-              <Option value="spend">Chi tiêu</Option>
-              <Option value="refund">Hoàn tiền</Option>
-            </Select>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card warning">
+              <div className="metric-content">
+                <div className="metric-icon warning">
+                  <DollarOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={statistics.totalValue}
+                    formatter={(value) => formatCurrency(value)}
+                    valueStyle={{ fontSize: '24px', fontWeight: 'bold', color: '#faad14' }}
+                  />
+                  <Text className="metric-title">Tổng giá trị</Text>
+                </div>
+              </div>
+            </Card>
           </Col>
-          <Col xs={24} sm={8} md={8}>
-            <RangePicker
-              style={{ width: '100%' }}
-              placeholder={['Từ ngày', 'Đến ngày']}
-              value={filters.dateRange}
-              onChange={(dates) => setFilters(prev => ({ ...prev, dateRange: dates }))}
-            />
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card success">
+              <div className="metric-content">
+                <div className="metric-icon success">
+                  <RiseOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={statistics.totalIncome}
+                    formatter={(value) => formatCurrency(value)}
+                    valueStyle={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}
+                  />
+                  <Text className="metric-title">Thu nhập</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card danger">
+              <div className="metric-content">
+                <div className="metric-icon danger">
+                  <FallOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={statistics.totalOutcome}
+                    formatter={(value) => formatCurrency(value)}
+                    valueStyle={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}
+                  />
+                  <Text className="metric-title">Chi tiêu</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Modern Filters Section */}
+      <Card className="filter-card">
+        <Row gutter={[24, 16]} align="middle">
+          <Col xs={24} sm={8} md={6}>
+            <div className="filter-group">
+              <Text strong>ID người dùng:</Text>
+              <Input
+                className="filter-select"
+                placeholder="Tìm theo ID..."
+                prefix={<SearchOutlined />}
+                value={filters.userId}
+                onChange={(e) => setFilters(prev => ({ ...prev, userId: e.target.value }))}
+                allowClear
+              />
+            </div>
+          </Col>
+          <Col xs={24} sm={8} md={6}>
+            <div className="filter-group">
+              <Text strong>Loại giao dịch:</Text>
+              <Select
+                className="filter-select"
+                placeholder="Chọn loại giao dịch"
+                value={filters.type}
+                onChange={(value) => setFilters(prev => ({ ...prev, type: value }))}
+              >
+                <Option value="all">Tất cả loại</Option>
+                <Option value="topup">Nạp tiền</Option>
+                <Option value="withdraw">Rút tiền</Option>
+                <Option value="earning">Thu nhập</Option>
+                <Option value="spend">Chi tiêu</Option>
+                <Option value="refund">Hoàn tiền</Option>
+              </Select>
+            </div>
+          </Col>
+          <Col xs={24} sm={8} md={6}>
+            <div className="filter-group">
+              <Text strong>Khoảng thời gian:</Text>
+              <RangePicker
+                className="filter-select"
+                placeholder={['Từ ngày', 'Đến ngày']}
+                value={filters.dateRange}
+                onChange={(dates) => setFilters(prev => ({ ...prev, dateRange: dates }))}
+              />
+            </div>
           </Col>
           <Col>
             <Space>
@@ -311,55 +461,83 @@ const TransactionHistory = () => {
         </Row>
       </Card>
 
-      {/* Summary Cards */}
+      {/* Transaction Type Details */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card size="small">
-            <div className="summary-card">
-              <div className="summary-icon topup">⬆️</div>
-              <div className="summary-content">
-                <div className="summary-title">Nạp tiền</div>
-                <div className="summary-value">
-                  {transactions.filter(t => t.type === 'topup').length} giao dịch
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card className="transaction-detail-card topup">
+            <div className="transaction-detail">
+              <div className="transaction-icon">⬆️</div>
+              <div className="transaction-info">
+                <div className="transaction-type">Nạp tiền</div>
+                <div className="transaction-count">
+                  {allTransactions.filter(t => t.type === 'topup').length} giao dịch
+                </div>
+                <div className="transaction-amount">
+                  {formatCurrency(
+                    allTransactions
+                      .filter(t => t.type === 'topup')
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </div>
               </div>
             </div>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card size="small">
-            <div className="summary-card">
-              <div className="summary-icon withdraw">⬇️</div>
-              <div className="summary-content">
-                <div className="summary-title">Rút tiền</div>
-                <div className="summary-value">
-                  {transactions.filter(t => t.type === 'withdraw').length} giao dịch
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card className="transaction-detail-card withdraw">
+            <div className="transaction-detail">
+              <div className="transaction-icon">⬇️</div>
+              <div className="transaction-info">
+                <div className="transaction-type">Rút tiền</div>
+                <div className="transaction-count">
+                  {allTransactions.filter(t => t.type === 'withdraw').length} giao dịch
+                </div>
+                <div className="transaction-amount">
+                  {formatCurrency(
+                    allTransactions
+                      .filter(t => t.type === 'withdraw')
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </div>
               </div>
             </div>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card size="small">
-            <div className="summary-card">
-              <div className="summary-icon earning">💰</div>
-              <div className="summary-content">
-                <div className="summary-title">Thu nhập</div>
-                <div className="summary-value">
-                  {transactions.filter(t => t.type === 'earning').length} giao dịch
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card className="transaction-detail-card earning">
+            <div className="transaction-detail">
+              <div className="transaction-icon">💰</div>
+              <div className="transaction-info">
+                <div className="transaction-type">Thu nhập</div>
+                <div className="transaction-count">
+                  {allTransactions.filter(t => t.type === 'earning').length} giao dịch
+                </div>
+                <div className="transaction-amount">
+                  {formatCurrency(
+                    allTransactions
+                      .filter(t => t.type === 'earning')
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </div>
               </div>
             </div>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card size="small">
-            <div className="summary-card">
-              <div className="summary-icon spend">💳</div>
-              <div className="summary-content">
-                <div className="summary-title">Chi tiêu</div>
-                <div className="summary-value">
-                  {transactions.filter(t => t.type === 'spend').length} giao dịch
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card className="transaction-detail-card spend">
+            <div className="transaction-detail">
+              <div className="transaction-icon">💳</div>
+              <div className="transaction-info">
+                <div className="transaction-type">Chi tiêu</div>
+                <div className="transaction-count">
+                  {allTransactions.filter(t => t.type === 'spend').length} giao dịch
+                </div>
+                <div className="transaction-amount">
+                  {formatCurrency(
+                    allTransactions
+                      .filter(t => t.type === 'spend')
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </div>
               </div>
             </div>
@@ -367,8 +545,29 @@ const TransactionHistory = () => {
         </Col>
       </Row>
 
-      {/* Table */}
-      <Card>
+      {/* Action Buttons */}
+      <div className="action-buttons">
+        <Button
+          type="primary"
+          icon={<ReloadOutlined />}
+          onClick={fetchTransactions}
+          loading={loading}
+        >
+          Làm mới dữ liệu
+        </Button>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={() => {
+            // TODO: Implement export functionality
+            console.log('Export transactions');
+          }}
+        >
+          Xuất Excel
+        </Button>
+      </div>
+
+      {/* Transactions Table */}
+      <Card className="table-card">
         <Table
           columns={columns}
           dataSource={transactions}
@@ -384,6 +583,22 @@ const TransactionHistory = () => {
           onChange={handleTableChange}
           scroll={{ x: 1400 }}
         />
+      </Card>
+
+      {/* Success Rate Card */}
+      <Card style={{ marginTop: 24 }}>
+        <Title level={4}>Thống kê tỷ lệ thành công</Title>
+        <Progress 
+          percent={statistics.successRate} 
+          strokeColor={{
+            '0%': '#108ee9',
+            '100%': '#87d068',
+          }}
+          format={(percent) => `${percent?.toFixed(1)}%`}
+        />
+        <Text type="secondary">
+          {allTransactions.filter(t => t.status === 'success').length} / {allTransactions.length} giao dịch thành công
+        </Text>
       </Card>
     </div>
   );

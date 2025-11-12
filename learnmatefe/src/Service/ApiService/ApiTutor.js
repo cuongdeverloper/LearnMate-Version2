@@ -116,7 +116,6 @@ const getReviewsByTutor = async (tutorId) => {
   export const ApiGetAllSubjects = async () => {
     try {
       const res = await axios.get("/api/tutor/subjects");
-      console.log(res)
       return res;
     } catch (err) {
       throw err.response || err;

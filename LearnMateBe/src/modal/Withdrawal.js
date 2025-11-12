@@ -1,4 +1,4 @@
-// modal/Withdrawal.js
+// models/Withdrawal.js
 const mongoose = require('mongoose');
 
 const withdrawalSchema = new mongoose.Schema({
@@ -7,31 +7,31 @@ const withdrawalSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    amount: {
+    amount: { // Số tiền user yêu cầu rút
         type: Number,
         required: true,
-        min: 1000 // Ví dụ: số tiền rút tối thiểu 1.000 VND
+        min: 100000
     },
-    bankAccount: { // Thông tin tài khoản ngân hàng để rút về
+    actualWithdrawal: { // Số tiền thực nhận sau khi trừ phí
+        type: Number,
+        required: true
+    },
+    bankAccount: {
         bankName: { type: String, required: true },
         accountNumber: { type: String, required: true },
         accountHolderName: { type: String, required: true },
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected', 'cancelled'], // Chờ duyệt, đã duyệt, bị từ chối, đã hủy (bởi user)
+        enum: ['pending', 'approved', 'rejected', 'cancelled'],
         default: 'pending'
     },
-    processedBy: { // Admin xử lý yêu cầu rút
+    processedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    processedAt: {
-        type: Date
-    },
-    note: { // Ghi chú từ người dùng hoặc admin
-        type: String
-    }
+    processedAt: { type: Date },
+    note: { type: String }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Withdrawal', withdrawalSchema);

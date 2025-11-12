@@ -46,7 +46,7 @@ async function autoCancelPendingBookings() {
             userId: learner._id,
             amount: refundAmount,
             balanceChange: refundAmount,
-            type: "earning",
+            type: "refund",
             status: "success",
             description: `Hệ thống tự động hoàn tiền booking chưa duyệt (${booking._id
               .toString()

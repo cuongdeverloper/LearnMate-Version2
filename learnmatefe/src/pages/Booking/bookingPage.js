@@ -15,6 +15,10 @@ import { ApiCreateConversation } from "../../Service/ApiService/ApiMessage";
 import { useCallback } from "react";
 
 export default function BookingPage() {
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  });
   const { tutorId } = useParams();
   const [tutor, setTutor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -164,28 +168,28 @@ export default function BookingPage() {
     }
   }, [tutorId]);
 
-const fetchAvailabilities = useCallback(async () => {
-  if (!tutorId || !weekStart) return;
-  try {
-    const params = { weekStart: weekStart.toISOString().split("T")[0] };
-    const res = await axios.get(`/api/tutor/${tutorId}/availability`, {
-      params,
-    });
+  const fetchAvailabilities = useCallback(async () => {
+    if (!tutorId || !weekStart) return;
+    try {
+      const params = { weekStart: weekStart.toISOString().split("T")[0] };
+      const res = await axios.get(`/api/tutor/${tutorId}/availability`, {
+        params,
+      });
 
-    const data = res?.data ?? res;
-    setAvailabilities(data.availabilities || []);
-    setSchedules(data.schedules || []);
-    setSelectedSlots([]);
-  } catch {
-    toast.error("Lỗi khi tải lịch trống");
-    setAvailabilities([]);
-    setSchedules([]);
-  }
-}, [tutorId, weekStart]);
+      const data = res?.data ?? res;
+      setAvailabilities(data.availabilities || []);
+      setSchedules(data.schedules || []);
+      setSelectedSlots([]);
+    } catch {
+      toast.error("Lỗi khi tải lịch trống");
+      setAvailabilities([]);
+      setSchedules([]);
+    }
+  }, [tutorId, weekStart]);
 
-useEffect(() => {
-  fetchAvailabilities();
-}, [fetchAvailabilities]);
+  useEffect(() => {
+    fetchAvailabilities();
+  }, [fetchAvailabilities]);
 
 
 
@@ -236,6 +240,7 @@ useEffect(() => {
           availabilityIds: selectedSlots,
           addressDetail,
           province,
+          startDate,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -415,6 +420,15 @@ useEffect(() => {
             </div>
 
             <div className="form-group">
+              <label>Ngày bắt đầu học</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
               <label>Hình thức thanh toán</label>
               <p>
                 {numberOfMonths > 1 ? (
@@ -447,61 +461,69 @@ useEffect(() => {
                 </div>
 
                 <div className="grid-body">
-                  {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((dayName, idx) => {
-                    const dayOfWeek = idx === 6 ? 0 : idx + 1;
-                    return (
-                      <div key={idx} className="grid-day-column">
-                        {timeSlots.map((slotStr) => {
-                          const [startTime, endTime] = slotStr.split(" - ").map((s) => s.trim());
+                  {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map(
+                    (dayName, idx) => {
+                      const dayOfWeek = idx === 6 ? 0 : idx + 1;
+                      return (
+                        <div key={idx} className="grid-day-column">
+                          {timeSlots.map((slotStr) => {
+                            const [startTime, endTime] = slotStr
+                              .split(" - ")
+                              .map((s) => s.trim());
 
-                          const avail = availabilities.find(
-                            (a) =>
-                              a.dayOfWeek === dayOfWeek &&
-                              a.startTime === startTime &&
-                              a.endTime === endTime
-                          );
+                            const avail = availabilities.find(
+                              (a) =>
+                                a.dayOfWeek === dayOfWeek &&
+                                a.startTime === startTime &&
+                                a.endTime === endTime
+                            );
 
-                          const bookedSchedule = schedules.find(
-                            (s) =>
-                              new Date(s.date).getDay() === dayOfWeek &&
-                              s.startTime === startTime &&
-                              s.endTime === endTime
-                          );
+                            const bookedSchedule = schedules.find(
+                              (s) =>
+                                new Date(s.date).getDay() === dayOfWeek &&
+                                s.startTime === startTime &&
+                                s.endTime === endTime
+                            );
 
-                          const isSelected = avail && selectedSlots.includes(avail._id);
+                            const isSelected =
+                              avail && selectedSlots.includes(avail._id);
 
-                          // Xác định class:
-                          // - available: slot trống
-                          // - selected: slot trống đã chọn
-                          // - no-slot: slot không có lịch trống hoặc đã book
-                          const cls = avail
-                            ? isSelected
-                              ? "selected"
-                              : "available"
-                            : "no-slot"; // slot không trống hoặc đã book
+                            // Xác định class:
+                            // - available: slot trống
+                            // - selected: slot trống đã chọn
+                            // - no-slot: slot không có lịch trống hoặc đã book
+                            const cls = avail
+                              ? isSelected
+                                ? "selected"
+                                : "available"
+                              : "no-slot"; // slot không trống hoặc đã book
 
-                          // Nếu slot có avail nhưng đã book, cũng set class "no-slot"
-                          const finalCls = avail && (avail.isBooked || avail.bookingId || bookedSchedule)
-                            ? "no-slot"
-                            : cls;
+                            // Nếu slot có avail nhưng đã book, cũng set class "no-slot"
+                            const finalCls =
+                              avail &&
+                                (avail.isBooked ||
+                                  avail.bookingId ||
+                                  bookedSchedule)
+                                ? "no-slot"
+                                : cls;
 
-                          return (
-                            <div
-                              key={`${dayName}-${slotStr}`}
-                              className={`schedule-slot ${finalCls}`}
-                              onClick={() => {
-                                if (!avail || finalCls === "no-slot") return; // không click được
-                                toggleSlot(avail._id);
-                              }}
-                            >
-                              <span className="slot-time">{slotStr}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-
+                            return (
+                              <div
+                                key={`${dayName}-${slotStr}`}
+                                className={`schedule-slot ${finalCls}`}
+                                onClick={() => {
+                                  if (!avail || finalCls === "no-slot") return; // không click được
+                                  toggleSlot(avail._id);
+                                }}
+                              >
+                                <span className="slot-time">{slotStr}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               </div>
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Avatar, Dropdown, Badge, Tooltip } from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -9,10 +9,11 @@ import {
     LogoutOutlined,
     SettingOutlined,
     CommentOutlined,
-    BookOutlined,
     ExclamationCircleOutlined,
     DollarOutlined,
-    HistoryOutlined
+    HistoryOutlined,
+    BellOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,10 +24,20 @@ const { Header, Sider, Content } = Layout;
 
 const AdminLayout = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
     const user = useSelector(state => state.user.account);
+
+    // Update current time every minute
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 60000);
+
+        return () => clearInterval(timer);
+    }, []);
 
     const handleLogout = async () => {
         await dispatch(doLogout());
@@ -53,11 +64,6 @@ const AdminLayout = ({ children }) => {
             key: '/admin/review-management',
             icon: <CommentOutlined />,
             label: 'Quản lý đánh giá',
-        },
-        {
-            key: '/admin/booking-management',
-            icon: <BookOutlined />,
-            label: 'Quản lý Booking',
         },
         {
             key: '/admin/report-management',
@@ -104,58 +110,118 @@ const AdminLayout = ({ children }) => {
     };
 
     return (
-        <Layout className="admin-layout">
+        <Layout className="modern-admin-layout">
             <Sider 
                 trigger={null} 
                 collapsible 
                 collapsed={collapsed}
-                className="admin-sider"
-                width={250}
+                className="modern-admin-sider"
+                width={280}
             >
                 <div className="admin-logo">
-                    <h2>{collapsed ? 'LM' : 'LearnMate Admin'}</h2>
+                    <div className="logo-content">
+                        <div className="logo-icon">
+                            <DashboardOutlined />
+                        </div>
+                        {!collapsed && (
+                            <div className="logo-text">
+                                <h2>LearnMate</h2>
+                                <span>Admin Panel</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                
+                <div className="admin-info">
+                    {!collapsed && (
+                        <>
+                            <div className="admin-welcome">
+                                <Avatar 
+                                    src={user?.image} 
+                                    icon={<UserOutlined />}
+                                    size={48}
+                                    className="admin-avatar"
+                                />
+                                <div className="admin-details">
+                                    <div className="admin-name">{user?.username}</div>
+                                    <div className="admin-role">Administrator</div>
+                                </div>
+                            </div>
+                            <div className="current-time">
+                                {currentTime.toLocaleString('vi-VN', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </div>
+                        </>
+                    )}
                 </div>
                 
                 <Menu
-                    theme="dark"
                     mode="inline"
                     selectedKeys={[location.pathname]}
                     items={menuItems}
                     onClick={handleMenuClick}
-                    className="admin-menu"
+                    className="modern-admin-menu"
                 />
             </Sider>
             
-            <Layout className="site-layout">
-                <Header className="admin-header">
+            <Layout className="modern-site-layout">
+                <Header className="modern-admin-header">
                     <div className="header-left">
                         <Button
                             type="text"
                             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                             onClick={() => setCollapsed(!collapsed)}
-                            className="trigger-button"
+                            className="modern-trigger-button"
                         />
+                        <div className="header-breadcrumb">
+                            <span className="current-page">
+                                {menuItems.find(item => item.key === location.pathname)?.label || 'Dashboard'}
+                            </span>
+                        </div>
                     </div>
                     
                     <div className="header-right">
-                        <span className="welcome-text">Xin chào, {user?.username}</span>
-                        <Dropdown
-                            menu={{ items: userMenuItems }}
-                            placement="bottomRight"
-                            arrow
-                        >
-                            <Avatar 
-                                src={user?.image} 
-                                icon={<UserOutlined />}
-                                className="user-avatar"
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </Dropdown>
+                        <div className="header-actions">
+                            <Tooltip title="Thông báo">
+                                <Badge count={5} size="small">
+                                    <Button 
+                                        type="text" 
+                                        icon={<BellOutlined />}
+                                        className="action-button"
+                                    />
+                                </Badge>
+                            </Tooltip>
+                            
+                            <div className="user-section">
+                                <span className="welcome-text">Xin chào, {user?.username}</span>
+                                <Dropdown
+                                    menu={{ items: userMenuItems }}
+                                    placement="bottomRight"
+                                    arrow
+                                    trigger={['click']}
+                                >
+                                    <Avatar 
+                                        src={user?.image} 
+                                        icon={<UserOutlined />}
+                                        className="modern-user-avatar"
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </Dropdown>
+                            </div>
+                        </div>
                     </div>
                 </Header>
                 
-                <Content className="admin-content">
-                    {children}
+                <Content className="modern-admin-content">
+                    <div className="content-wrapper">
+                        {children}
+                    </div>
                 </Content>
             </Layout>
         </Layout>

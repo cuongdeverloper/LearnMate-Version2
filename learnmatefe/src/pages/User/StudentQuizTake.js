@@ -45,10 +45,11 @@ const StudentQuizTake = () => {
     return {
       currentIndex: 0,
       answers: {},
-      timer: quizDetails?.duration || 1800,
+      timer: 1800,
       startedAt: Date.now(),
     };
   });
+
   const {
     selectedCourse,
     selectedQuiz,
@@ -56,6 +57,12 @@ const StudentQuizTake = () => {
     loading,
     error,
   } = useSelector((state) => state.courses);
+
+  useEffect(() => {
+    if (quizDetails?.duration) {
+      setState((s) => ({ ...s, timer: quizDetails.duration }));
+    }
+  }, [quizDetails]);
 
   useEffect(() => {
     if (id) dispatch(fetchQuizDetailsById(id));
@@ -80,7 +87,7 @@ const StudentQuizTake = () => {
       return;
     }
   }, [quizDetails, navigate, selectedCourse]);
-const handleSubmit = useCallback(async (fromAuto = false) => {
+  const handleSubmit = useCallback(async (fromAuto = false) => {
     if (!fromAuto) {
       setConfirmOpen(true);
       return;
@@ -102,8 +109,8 @@ const handleSubmit = useCallback(async (fromAuto = false) => {
       toast.error(e.message);
     }
   }, [state, quizDetails, selectedQuiz, dispatch, navigate, error, storageKey]);
-  
-  
+
+
 
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -152,7 +159,7 @@ const handleSubmit = useCallback(async (fromAuto = false) => {
     } catch (e) { }
   };
 
-  
+
 
   if (loading || !quizDetails) {
     return <div className="p-6 text-center">Loading quiz details...</div>;

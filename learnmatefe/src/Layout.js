@@ -41,7 +41,6 @@ import SubmitAssignment from "./pages/User/SubmitAssignment";
 import ViewAssignmentFeedback from "./pages/User/ViewAssignmentFeedback";
 import TutorManagement from "./components/Admin/TutorManagement";
 import ReviewManagement from "./components/Admin/ReviewManagement";
-import BookingManagement from "./components/Admin/BookingManagement";
 import ReportManagement from "./components/Admin/ReportManagement";
 import "./tailwind.css"
 import WithdrawalManagement from "./components/Admin/WithdrawalManagement";
@@ -142,16 +141,6 @@ const Layout = () => {
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminLayout>
                   <ReviewManagement />
-                </AdminLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/booking-management"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminLayout>
-                  <BookingManagement />
                 </AdminLayout>
               </ProtectedRoute>
             }

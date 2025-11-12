@@ -40,7 +40,7 @@ const bookingSchema = new mongoose.Schema(
     initialPayment: { type: Number, default: 0 }, // Đã thanh toán lúc đầu (tháng đầu + cọc)
     paidMonths: { type: Number, default: 0 }, // Số tháng đã thanh toán
     numberOfMonths: { type: Number, default: 1 }, // Tổng số tháng học
-
+    startDate: { type: Date, required: true },
     lastPaymentAt: { type: Date }, // Ngày thanh toán gần nhất
 
     note: { type: String, default: "" },

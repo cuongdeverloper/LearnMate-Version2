@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 import Header from "../../components/Layout/Header/Header";
 import { ApiGetUserByUserId } from "../../Service/ApiService/ApiUser";
 import { ApiGetMessageByConversationId, ApiSendMessage, getConversationApi } from "../../Service/ApiService/ApiMessage";
-
+import { toast } from "react-toastify";
 
 const Messenger = () => {
   const { conversationId } = useParams();
@@ -65,6 +65,7 @@ const Messenger = () => {
         text: data.text,
         createdAt: Date.now(),
         conversationId: data.conversationId,
+         textPreview: data.text
       });
     });
 
@@ -84,7 +85,16 @@ const Messenger = () => {
     }
   }, [arrivalMessage, currentChat]);
 
+  useEffect(() => {
+    if (!arrivalMessage) return;
 
+    if (!currentChat || arrivalMessage.conversationId !== currentChat._id) {
+      toast.info(`💬 Bạn có tin nhắn mới: "${arrivalMessage.textPreview}"`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  }, [arrivalMessage, currentChat]);
 
   useEffect(() => {
     socket.current.emit("addUser", user.account.id);
@@ -166,16 +176,16 @@ const Messenger = () => {
 
 
   useEffect(() => {
-  socket.current.on("messageSeen", ({ conversationId }) => {
-    if (currentChat && currentChat._id === conversationId) {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.sender._id === user.account.id ? { ...msg, seen: true } : msg
-        )
-      );
-    }
-  });
-}, [currentChat, user.account.id]);
+    socket.current.on("messageSeen", ({ conversationId }) => {
+      if (currentChat && currentChat._id === conversationId) {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.sender._id === user.account.id ? { ...msg, seen: true } : msg
+          )
+        );
+      }
+    });
+  }, [currentChat, user.account.id]);
 
 
   return (

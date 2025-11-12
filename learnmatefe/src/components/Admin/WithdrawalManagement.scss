@@ -1,72 +1,377 @@
 .withdrawal-management {
-    background-color: #f0f2f5;
+    background: #f5f5f5;
     min-height: 100vh;
-    padding: 24px;
+    padding: 20px;
 
-    .page-header {
+    // Modern Dashboard Header
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 32px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+
+            .welcome-section {
+                .back-button {
+                    margin-bottom: 12px;
+
+                    .ant-btn {
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 8px;
+                        color: white;
+
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.2);
+                            border-color: rgba(255, 255, 255, 0.3);
+                            color: white;
+                        }
+                    }
+                }
+
+                .welcome-title {
+                    color: white !important;
+                    font-size: 32px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+                    .anticon {
+                        margin-right: 12px;
+                        color: #52c41a; // Green for money/wallet theme
+                    }
+                }
+
+                .welcome-subtitle {
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 16px;
+                    font-weight: 400;
+                }
+            }
+
+            .header-stats {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+
+                .ant-badge {
+                    .ant-avatar {
+                        background: rgba(255, 255, 255, 0.2);
+                        border: 2px solid rgba(255, 255, 255, 0.3);
+                        backdrop-filter: blur(10px);
+                    }
+                }
+
+                .current-date {
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+            }
+        }
+    }
+
+    // Enhanced Metrics Section
+    .metrics-section {
+        margin-bottom: 32px;
+
+        .metric-card {
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                border-radius: 16px 16px 0 0;
+            }
+
+            &.primary::before {
+                background: linear-gradient(90deg, #1890ff, #40a9ff);
+            }
+
+            &.warning::before {
+                background: linear-gradient(90deg, #faad14, #ffc53d);
+            }
+
+            &.success::before {
+                background: linear-gradient(90deg, #52c41a, #73d13d);
+            }
+
+            &.danger::before {
+                background: linear-gradient(90deg, #ff4d4f, #ff7875);
+            }
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            }
+
+            .ant-card-body {
+                padding: 24px;
+            }
+
+            .metric-content {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                .metric-icon {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: white;
+                    position: relative;
+                    overflow: hidden;
+
+                    &::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: inherit;
+                        opacity: 0.1;
+                        border-radius: inherit;
+                    }
+
+                    &.primary {
+                        background: linear-gradient(135deg, #1890ff, #40a9ff);
+                    }
+
+                    &.warning {
+                        background: linear-gradient(135deg, #faad14, #ffc53d);
+                    }
+
+                    &.success {
+                        background: linear-gradient(135deg, #52c41a, #73d13d);
+                    }
+
+                    &.danger {
+                        background: linear-gradient(135deg, #ff4d4f, #ff7875);
+                    }
+                }
+
+                .metric-details {
+                    flex: 1;
+
+                    .ant-statistic {
+                        .ant-statistic-content {
+                            font-size: 28px;
+                            font-weight: 700;
+                            line-height: 1.2;
+                        }
+                    }
+
+                    .metric-title {
+                        color: #8c8c8c;
+                        font-size: 14px;
+                        font-weight: 500;
+                        margin-top: 4px;
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+
+    // Filter Card
+    .filter-card {
         margin-bottom: 24px;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-        h2 {
-            margin: 0;
-            color: #1890ff;
+        .ant-card-body {
+            padding: 24px;
+        }
+
+        .filter-group {
+            .ant-typography {
+                display: block;
+                margin-bottom: 8px;
+                color: #262626;
+                font-size: 14px;
+            }
+
+            .filter-select {
+                width: 100%;
+
+                .ant-select-selector,
+                .ant-picker,
+                .ant-input {
+                    border-radius: 8px;
+                    border: 1px solid #d9d9d9;
+                    transition: all 0.3s;
+
+                    &:hover {
+                        border-color: #40a9ff;
+                    }
+
+                    &:focus,
+                    &.ant-select-focused,
+                    &.ant-picker-focused {
+                        border-color: #40a9ff;
+                        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+                    }
+                }
+            }
         }
     }
 
-    .ant-card {
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e8e8e8;
+    // Action Buttons
+    .action-buttons {
+        margin-bottom: 16px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+
+        .ant-btn {
+            border-radius: 8px;
+            font-weight: 500;
+            height: 36px;
+            padding: 0 16px;
+            transition: all 0.3s;
+
+            &.ant-btn-primary {
+                background: linear-gradient(135deg, #1890ff, #40a9ff);
+                border: none;
+
+                &:hover {
+                    background: linear-gradient(135deg, #40a9ff, #1890ff);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+                }
+            }
+
+            &.ant-btn-default {
+                &:hover {
+                    border-color: #40a9ff;
+                    color: #40a9ff;
+                }
+            }
+        }
     }
 
-    .ant-statistic {
-        .ant-statistic-title {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .ant-statistic-content {
-            font-size: 24px;
-            font-weight: 600;
-        }
-    }
-
+    // Table Enhancements
     .ant-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+        .ant-table-container {
+            border-radius: 12px;
+        }
+
         .ant-table-thead>tr>th {
-            background-color: #fafafa;
-            border-bottom: 2px solid #e8e8e8;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            color: #262626;
             font-weight: 600;
-            color: #333;
+            font-size: 14px;
+            padding: 16px;
+
+            &:first-child {
+                border-top-left-radius: 12px;
+            }
+
+            &:last-child {
+                border-top-right-radius: 12px;
+            }
         }
 
-        .ant-table-tbody>tr:hover>td {
-            background-color: #f5f5f5;
+        .ant-table-tbody>tr {
+            transition: all 0.3s;
+
+            &:hover>td {
+                background: #f5f5f5;
+            }
+
+            >td {
+                padding: 16px;
+                border-bottom: 1px solid #f0f0f0;
+                font-size: 14px;
+            }
         }
     }
 
+    // Status Tags
     .ant-tag {
-        border-radius: 4px;
+        border-radius: 16px;
+        padding: 4px 12px;
         font-weight: 500;
-    }
+        border: none;
+        font-size: 12px;
 
-    .ant-btn {
-        border-radius: 6px;
-        font-weight: 500;
+        &.status-pending {
+            background: #fff7e6;
+            color: #d46b08;
+        }
 
-        &.ant-btn-primary {
-            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+        &.status-approved {
+            background: #f6ffed;
+            color: #389e0d;
+        }
+
+        &.status-rejected {
+            background: #fff2f0;
+            color: #cf1322;
         }
     }
 
+    // Amount styling
+    .amount {
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+
+        &.positive {
+            color: #52c41a;
+        }
+
+        &.negative {
+            color: #ff4d4f;
+        }
+    }
+
+    // Modals
     .ant-modal {
+        .ant-modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
         .ant-modal-header {
+            background: #fafafa;
             border-bottom: 1px solid #e8e8e8;
             padding: 16px 24px;
 
             .ant-modal-title {
-                font-size: 18px;
                 font-weight: 600;
-                color: #1890ff;
+                color: #262626;
             }
         }
 
@@ -75,37 +380,106 @@
         }
     }
 
-    .ant-descriptions {
-        .ant-descriptions-item-label {
-            font-weight: 600;
-            color: #333;
-            background-color: #fafafa;
-        }
-
-        .ant-descriptions-item-content {
-            background-color: #ffffff;
-        }
-    }
-
-    .ant-form {
-        .ant-form-item-label>label {
-            font-weight: 600;
-            color: #333;
-        }
-    }
-
-    // Responsive
+    // Responsive Design
     @media (max-width: 768px) {
-        padding: 16px;
+        padding: 12px;
 
-        .page-header h2 {
-            font-size: 20px;
+        .dashboard-header {
+            padding: 20px;
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+
+                .welcome-section .welcome-title {
+                    font-size: 24px;
+                }
+            }
+        }
+
+        .metrics-section {
+            .ant-col {
+                margin-bottom: 16px;
+            }
+        }
+
+        .filter-card {
+            .ant-row {
+                .ant-col {
+                    margin-bottom: 16px;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .action-buttons {
+            .ant-btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
         }
 
         .ant-table {
-            .ant-table-content {
-                overflow-x: auto;
+            .ant-table-container {
+                .ant-table-content {
+                    overflow-x: auto;
+                }
             }
         }
+    }
+}
+
+// Loading Animations
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.withdrawal-management {
+    .metric-card {
+        animation: fadeInUp 0.6s ease-out;
+
+        &:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        &:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        &:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+    }
+
+    .filter-card {
+        animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .ant-table {
+        animation: fadeInUp 0.6s ease-out 0.6s both;
     }
 }

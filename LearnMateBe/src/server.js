@@ -16,7 +16,7 @@ const RouterTutor = require("./routes/tutorRoutes");
 const RouteBooking = require("./routes/BookingRoutes");
 const RouterAdmin = require("./routes/adminRoutes");
 const RouteMessage = require("./routes/messageRoutes");
-
+const RouteNotification = require("./routes/notificationRoutes");
 const quizRouter = require("./routes/QuizRoutes");
 const assignmentRouter = require("./routes/AssignmentRoutes");
 const courseRouter = require("./routes/courseRoutes");
@@ -36,6 +36,7 @@ const io = socketIo(server, {
     credentials: true,
   },
 });
+app.set("io", io);
 // Configure request body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -73,7 +74,7 @@ app.use("/api/booking", RouteBooking);
 app.use("/api/message", RouteMessage);
 app.use("/api/payment", RoutePayment);
 app.use("/api/admin", RouterAdmin);
-
+app.use("/api/notifications", RouteNotification);
 // ducns
 app.use("/api/quizzes", quizRouter);
 app.use("/api/assignments", assignmentRouter);

@@ -1,136 +1,650 @@
 .transaction-history {
-    background-color: #f0f2f5;
+    background: #f5f5f5;
     min-height: 100vh;
-    padding: 24px;
+    padding: 20px;
 
-    .page-header {
-        margin-bottom: 24px;
+    // Modern Dashboard Header
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 32px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 
-        h2 {
-            margin: 0;
-            color: #1890ff;
-        }
-    }
-
-    .ant-card {
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e8e8e8;
-    }
-
-    .summary-card {
-        display: flex;
-        align-items: center;
-        padding: 8px 0;
-
-        .summary-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        .header-content {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-right: 12px;
+            flex-wrap: wrap;
+            gap: 20px;
 
-            &.topup {
-                background-color: #f6ffed;
-                border: 1px solid #b7eb8f;
-            }
+            .welcome-section {
+                .back-button {
+                    margin-bottom: 12px;
 
-            &.withdraw {
-                background-color: #fff2e8;
-                border: 1px solid #ffbb96;
-            }
+                    .ant-btn {
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 8px;
+                        color: white;
 
-            &.earning {
-                background-color: #e6f7ff;
-                border: 1px solid #91d5ff;
-            }
-
-            &.spend {
-                background-color: #fff7e6;
-                border: 1px solid #ffd666;
-            }
-        }
-
-        .summary-content {
-            flex: 1;
-
-            .summary-title {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 4px;
-            }
-
-            .summary-value {
-                font-size: 16px;
-                font-weight: 600;
-                color: #1890ff;
-            }
-        }
-    }
-
-    .ant-table {
-        .ant-table-thead>tr>th {
-            background-color: #fafafa;
-            border-bottom: 2px solid #e8e8e8;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .ant-table-tbody>tr:hover>td {
-            background-color: #f5f5f5;
-        }
-    }
-
-    .ant-tag {
-        border-radius: 4px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .ant-btn {
-        border-radius: 6px;
-        font-weight: 500;
-
-        &.ant-btn-primary {
-            background-color: #1890ff;
-            border-color: #1890ff;
-
-            &:hover {
-                background-color: #40a9ff;
-                border-color: #40a9ff;
-            }
-        }
-    }
-
-    // Responsive
-    @media (max-width: 768px) {
-        padding: 16px;
-
-        .page-header h2 {
-            font-size: 20px;
-        }
-
-        .summary-card {
-            .summary-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-                margin-right: 8px;
-            }
-
-            .summary-content {
-                .summary-title {
-                    font-size: 12px;
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.2);
+                            border-color: rgba(255, 255, 255, 0.3);
+                            color: white;
+                        }
+                    }
                 }
 
-                .summary-value {
+                .welcome-title {
+                    color: white !important;
+                    font-size: 32px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+                    .anticon {
+                        margin-right: 12px;
+                        color: #ffa940; // Orange for transaction theme
+                    }
+                }
+
+                .welcome-subtitle {
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 16px;
+                    font-weight: 400;
+                }
+            }
+
+            .header-stats {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+
+                .ant-badge {
+                    .ant-avatar {
+                        background: rgba(255, 255, 255, 0.2);
+                        border: 2px solid rgba(255, 255, 255, 0.3);
+                        backdrop-filter: blur(10px);
+                    }
+                }
+
+                .current-date {
+                    color: rgba(255, 255, 255, 0.9);
                     font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+            }
+        }
+    }
+
+    // Enhanced Metrics Section
+    .metrics-section {
+        margin-bottom: 32px;
+
+        .metric-card {
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                z-index: 1;
+            }
+
+            &.primary::before {
+                background: linear-gradient(90deg, #1890ff, #36cfc9);
+            }
+
+            &.warning::before {
+                background: linear-gradient(90deg, #faad14, #ffd666);
+            }
+
+            &.success::before {
+                background: linear-gradient(90deg, #52c41a, #73d13d);
+            }
+
+            &.danger::before {
+                background: linear-gradient(90deg, #ff4d4f, #ff7875);
+            }
+
+            &:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .ant-card-body {
+                padding: 24px;
+            }
+
+            .metric-content {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                .metric-icon {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: white;
+
+                    &.primary {
+                        background: linear-gradient(45deg, #1890ff, #36cfc9);
+                    }
+
+                    &.warning {
+                        background: linear-gradient(45deg, #faad14, #ffd666);
+                    }
+
+                    &.success {
+                        background: linear-gradient(45deg, #52c41a, #73d13d);
+                    }
+
+                    &.danger {
+                        background: linear-gradient(45deg, #ff4d4f, #ff7875);
+                    }
+                }
+
+                .metric-details {
+                    flex: 1;
+
+                    .ant-statistic {
+                        .ant-statistic-content {
+                            line-height: 1;
+                        }
+                    }
+
+                    .metric-title {
+                        color: #8c8c8c;
+                        font-size: 14px;
+                        margin-top: 8px;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+
+    // Modern Filters Section
+    .filter-card {
+        background: white;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+
+        .ant-card-body {
+            padding: 24px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .ant-typography {
+                color: #262626;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .filter-select {
+
+                .ant-input,
+                .ant-select-selector,
+                .ant-picker {
+                    border-radius: 8px;
+                    border: 1px solid #d9d9d9;
+                    padding: 8px 12px;
+                    font-size: 14px;
+
+                    &:hover,
+                    &:focus {
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+                    }
+                }
+            }
+        }
+
+        .ant-btn {
+            border-radius: 8px;
+            font-weight: 500;
+            height: 40px;
+            padding: 0 20px;
+
+            &.ant-btn-primary {
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                border: none;
+
+                &:hover {
+                    background: linear-gradient(45deg, #5a6fd8, #6a4190);
+                    transform: translateY(-1px);
+                }
+            }
+
+            &:not(.ant-btn-primary) {
+                border-color: #d9d9d9;
+
+                &:hover {
+                    border-color: #667eea;
+                    color: #667eea;
+                }
+            }
+        }
+    }
+
+    // Transaction Detail Cards
+    .transaction-detail-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        &.topup::before {
+            background: linear-gradient(90deg, #52c41a, #73d13d);
+        }
+
+        &.withdraw::before {
+            background: linear-gradient(90deg, #ff4d4f, #ff7875);
+        }
+
+        &.earning::before {
+            background: linear-gradient(90deg, #1890ff, #36cfc9);
+        }
+
+        &.spend::before {
+            background: linear-gradient(90deg, #faad14, #ffd666);
+        }
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .ant-card-body {
+            padding: 20px;
+        }
+
+        .transaction-detail {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .transaction-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            .transaction-info {
+                flex: 1;
+
+                .transaction-type {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #262626;
+                    margin-bottom: 4px;
+                }
+
+                .transaction-count {
+                    font-size: 14px;
+                    color: #8c8c8c;
+                    margin-bottom: 4px;
+                }
+
+                .transaction-amount {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1890ff;
+                }
+            }
+        }
+    }
+
+    // Action Buttons
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+
+        .ant-btn {
+            border-radius: 8px;
+            font-weight: 500;
+            height: 40px;
+            padding: 0 20px;
+
+            &.ant-btn-primary {
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                border: none;
+
+                &:hover {
+                    background: linear-gradient(45deg, #5a6fd8, #6a4190);
+                    transform: translateY(-1px);
+                }
+            }
+
+            &:not(.ant-btn-primary) {
+                border-color: #d9d9d9;
+
+                &:hover {
+                    border-color: #667eea;
+                    color: #667eea;
+                }
+            }
+        }
+    }
+
+    // Table Card
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+
+        .ant-card-body {
+            padding: 0;
+        }
+
+        .ant-table {
+            .ant-table-thead>tr>th {
+                background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+                border-bottom: 2px solid #e6f7ff;
+                font-weight: 600;
+                color: #262626;
+                font-size: 14px;
+                padding: 16px;
+            }
+
+            .ant-table-tbody>tr {
+                transition: all 0.2s ease;
+
+                &:hover>td {
+                    background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+                }
+
+                td {
+                    padding: 16px;
+                    border-bottom: 1px solid #f5f5f5;
+                }
+            }
+
+            .ant-tag {
+                border-radius: 8px;
+                font-weight: 500;
+                padding: 4px 8px;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                border: none;
+
+                &.ant-tag-green {
+                    background: linear-gradient(45deg, #f6ffed, #d9f7be);
+                    color: #389e0d;
+                }
+
+                &.ant-tag-red {
+                    background: linear-gradient(45deg, #fff2e8, #ffccc7);
+                    color: #cf1322;
+                }
+
+                &.ant-tag-blue {
+                    background: linear-gradient(45deg, #e6f7ff, #bae7ff);
+                    color: #1890ff;
+                }
+
+                &.ant-tag-orange {
+                    background: linear-gradient(45deg, #fff7e6, #ffd591);
+                    color: #d48806;
+                }
+            }
+
+            .ant-avatar {
+                border: 2px solid #f0f0f0;
+            }
+        }
+
+        .ant-pagination {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+
+            .ant-pagination-item {
+                border-radius: 6px;
+                border: 1px solid #d9d9d9;
+
+                &.ant-pagination-item-active {
+                    background: linear-gradient(45deg, #667eea, #764ba2);
+                    border-color: #667eea;
+
+                    a {
+                        color: white;
+                    }
+                }
+            }
+
+            .ant-pagination-prev,
+            .ant-pagination-next {
+                border-radius: 6px;
+            }
+        }
+    }
+
+    // Progress Card
+    .ant-card:last-child {
+        background: white;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+        .ant-card-body {
+            padding: 24px;
+        }
+
+        h4 {
+            color: #262626;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .ant-progress {
+            .ant-progress-bg {
+                border-radius: 10px;
+            }
+
+            .ant-progress-inner {
+                border-radius: 10px;
+                background: #f5f5f5;
+            }
+        }
+    }
+
+    // Responsive Design
+    @media (max-width: 1200px) {
+        padding: 16px;
+
+        .dashboard-header {
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .metrics-section {
+            margin-bottom: 24px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        padding: 12px;
+
+        .dashboard-header {
+            padding: 20px;
+            margin-bottom: 20px;
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+
+                .welcome-section {
+                    .welcome-title {
+                        font-size: 24px !important;
+                    }
+
+                    .welcome-subtitle {
+                        font-size: 14px;
+                    }
+                }
+
+                .header-stats {
+                    .ant-badge .ant-avatar {
+                        width: 40px;
+                        height: 40px;
+                    }
+
+                    .current-date {
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+
+        .metrics-section {
+            .metric-card {
+                .ant-card-body {
+                    padding: 16px;
+                }
+
+                .metric-content {
+                    gap: 12px;
+
+                    .metric-icon {
+                        width: 48px;
+                        height: 48px;
+                        font-size: 20px;
+                    }
+
+                    .metric-details {
+                        .ant-statistic-content-value {
+                            font-size: 20px !important;
+                        }
+
+                        .metric-title {
+                            font-size: 12px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .transaction-detail-card {
+            .ant-card-body {
+                padding: 16px;
+            }
+
+            .transaction-detail {
+                gap: 12px;
+
+                .transaction-icon {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 18px;
+                }
+
+                .transaction-info {
+                    .transaction-type {
+                        font-size: 14px;
+                    }
+
+                    .transaction-count {
+                        font-size: 12px;
+                    }
+
+                    .transaction-amount {
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+
+        .filter-card {
+            .ant-card-body {
+                padding: 16px;
+            }
+
+            .filter-group {
+                gap: 6px;
+
+                .ant-typography {
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .table-card {
+            .ant-table {
+
+                .ant-table-thead>tr>th,
+                .ant-table-tbody>tr>td {
+                    padding: 12px 8px;
+                    font-size: 12px;
+                }
+            }
+
+            .ant-pagination {
+                padding: 12px 16px;
+            }
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 8px;
+
+            .ant-btn {
+                width: 100%;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dashboard-header {
+            .header-content {
+                .welcome-section {
+                    .welcome-title {
+                        font-size: 20px !important;
+                    }
                 }
             }
         }

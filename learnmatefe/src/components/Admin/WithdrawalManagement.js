@@ -26,7 +26,11 @@ import {
   ReloadOutlined,
   DollarOutlined,
   BankOutlined,
-  UserOutlined
+  UserOutlined,
+  WalletOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import './WithdrawalManagement.scss';
@@ -38,7 +42,15 @@ const { Title, Text } = Typography;
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
-  const [statistics, setStatistics] = useState({});
+  const [setStatistics] = useState({});
+  const [stats, setStats] = useState({
+    totalWithdrawals: 0,
+    pendingWithdrawals: 0,
+    approvedWithdrawals: 0,
+    rejectedWithdrawals: 0,
+    totalAmount: 0,
+    pendingAmount: 0
+  });
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -62,10 +74,41 @@ const WithdrawalManagement = () => {
   const [updateForm] = Form.useForm();
 
   useEffect(() => {
-    fetchWithdrawals();
-    fetchStatistics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadData = async () => {
+      // Load withdrawals first (this will calculate stats from real data)
+      await fetchWithdrawals();
+      // Then try to get API stats (only if they have better data)
+      fetchStatistics();
+    };
+    loadData();
   }, [pagination.current, pagination.pageSize, filters]);
+
+  // Debug useEffect to track stats changes
+  useEffect(() => {
+    //console.log('Stats updated:', stats);
+    //console.log('Pending Amount specifically:', stats.pendingAmount);
+    
+    // If pending amount is still 0 but we have withdrawals, something might be wrong
+    if (stats.pendingAmount === 0 && withdrawals.length > 0) {
+      console.warn('Pending amount is 0 but we have withdrawals. Let me check withdrawals data:');
+      //console.log('Current withdrawals:', withdrawals);
+      
+      // Manual calculation as fallback
+      const manualPendingAmount = withdrawals
+        .filter(w => w.status === 'pending')
+        .reduce((sum, w) => sum + (Number(w.amount) || 0), 0);
+      
+      //console.log('Manual calculation of pending amount:', manualPendingAmount);
+      
+      if (manualPendingAmount > 0 && stats.pendingAmount === 0) {
+        //console.log('Manual calculation found pending amount, updating stats...');
+        setStats(prev => ({
+          ...prev,
+          pendingAmount: manualPendingAmount
+        }));
+      }
+    }
+  }, [stats, withdrawals]);
 
   const fetchWithdrawals = async () => {
     try {
@@ -80,11 +123,15 @@ const WithdrawalManagement = () => {
 
       const response = await AdminService.getAllWithdrawals(params);
       if (response && response.success) {
-        setWithdrawals(response.data);
+        const withdrawalsList = response.data || [];
+        setWithdrawals(withdrawalsList);
         setPagination(prev => ({
           ...prev,
-          total: response.pagination.totalItems
+          total: response.pagination?.totalItems || withdrawalsList.length
         }));
+        
+        // Calculate statistics from withdrawals data as fallback
+        calculateStatisticsFromWithdrawals(withdrawalsList);
       }
     } catch (error) {
       console.error('Error fetching withdrawals:', error);
@@ -94,14 +141,80 @@ const WithdrawalManagement = () => {
     }
   };
 
+  const calculateStatisticsFromWithdrawals = (withdrawalsList) => {
+    //console.log('Raw withdrawals data:', withdrawalsList);
+    const pendingWithdrawals = withdrawalsList.filter(w => w.status === 'pending');
+    //console.log('Pending withdrawals:', pendingWithdrawals);
+    
+    const pendingAmount = pendingWithdrawals.reduce((sum, w) => {
+      //console.log('Processing withdrawal:', w._id, 'Amount:', w.amount, 'Status:', w.status);
+      return sum + (w.amount || 0);
+    }, 0);
+    
+    const stats = {
+      totalWithdrawals: withdrawalsList.length,
+      pendingWithdrawals: pendingWithdrawals.length,
+      approvedWithdrawals: withdrawalsList.filter(w => w.status === 'approved').length,
+      rejectedWithdrawals: withdrawalsList.filter(w => w.status === 'rejected').length,
+      totalAmount: withdrawalsList.reduce((sum, w) => sum + (w.amount || 0), 0),
+      pendingAmount: pendingAmount
+    };
+    
+    //console.log('Calculated withdrawal statistics:', stats);
+    //console.log('Calculated pendingAmount specifically:', pendingAmount);
+    
+    setStatistics(stats);
+    setStats({
+      totalWithdrawals: stats.totalWithdrawals,
+      pendingWithdrawals: stats.pendingWithdrawals,
+      approvedWithdrawals: stats.approvedWithdrawals,
+      rejectedWithdrawals: stats.rejectedWithdrawals,
+      totalAmount: stats.totalAmount,
+      pendingAmount: stats.pendingAmount
+    });
+  };
+
   const fetchStatistics = async () => {
     try {
       const response = await AdminService.getWithdrawalStats();
-      if (response && response.success) {
-        setStatistics(response.data);
+      //console.log('Withdrawal Statistics API Response:', response);
+      
+      if (response && response.success && response.data) {
+        //console.log('API Data Structure:', response.data);
+        //console.log('API pendingAmount:', response.data.pendingAmount);
+        //console.log('API pendingWithdrawalAmount:', response.data.pendingWithdrawalAmount);
+        
+        // Check if API has meaningful data to use
+        const hasValidData = response.data.totalWithdrawals > 0 || 
+                            response.data.pendingWithdrawals > 0 || 
+                            response.data.approvedWithdrawals > 0 ||
+                            response.data.pendingAmount > 0 ||
+                            response.data.pendingWithdrawalAmount > 0;
+        
+        if (hasValidData) {
+          //console.log('Using API Statistics (has valid data):', response.data);
+          setStatistics(response.data);
+          setStats({
+            totalWithdrawals: response.data.totalWithdrawals || 0,
+            pendingWithdrawals: response.data.pendingWithdrawals || 0,
+            approvedWithdrawals: response.data.approvedWithdrawals || 0,
+            rejectedWithdrawals: response.data.rejectedWithdrawals || 0,
+            totalAmount: response.data.totalAmount || 0,
+            // Try both possible field names from API
+            pendingAmount: response.data.pendingAmount || response.data.pendingWithdrawalAmount || 0
+          });
+        } else {
+          console.warn('API statistics has no valid data, keeping calculated statistics');
+          // Keep the statistics calculated from withdrawals data
+        }
+      } else {
+        console.warn('API statistics empty or failed, keeping calculated statistics');
+        // Keep the statistics calculated from withdrawals data
       }
     } catch (error) {
-      console.error('Error fetching statistics:', error);
+      console.error('Error fetching withdrawal statistics:', error);
+      console.warn('Keeping statistics calculated from withdrawals data');
+      // Keep the statistics calculated from withdrawals data
     }
   };
 
@@ -175,8 +288,7 @@ const WithdrawalManagement = () => {
     const colors = {
       pending: 'orange',
       approved: 'blue',
-      rejected: 'red',
-      completed: 'green'
+      rejected: 'red'
     };
     return colors[status] || 'default';
   };
@@ -185,31 +297,27 @@ const WithdrawalManagement = () => {
     const texts = {
       pending: 'Chờ xử lý',
       approved: 'Đã duyệt',
-      rejected: 'Từ chối',
-      completed: 'Hoàn thành'
+      rejected: 'Từ chối'
     };
     return texts[status] || status;
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
+    if (amount === null || amount === undefined || isNaN(amount)) {
+      return '0 ₫';
+    }
+    try {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(amount);
+    } catch (error) {
+      console.error('Error formatting currency:', error, 'Amount:', amount);
+      return `${amount} ₫`;
+    }
   };
 
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: '_id',
-      key: '_id',
-      width: 100,
-      render: (text) => (
-        <Text code copyable={{ text }}>
-          {text.slice(-8)}
-        </Text>
-      )
-    },
     {
       title: 'Người dùng',
       key: 'user',
@@ -258,7 +366,7 @@ const WithdrawalManagement = () => {
       key: 'status',
       width: 120,
       render: (status) => (
-        <Tag color={getStatusColor(status)}>
+        <Tag className={`status-${status}`}>
           {getStatusText(status)}
         </Tag>
       )
@@ -302,89 +410,146 @@ const WithdrawalManagement = () => {
 
   return (
     <div className="withdrawal-management">
-      <div className="page-header">
-        <Title level={2}>
-          <DollarOutlined /> Quản lý Rút tiền
-        </Title>
+      {/* Modern Dashboard Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <div className="welcome-section">
+            <Title level={1} className="welcome-title">
+              <WalletOutlined />
+              Quản lý rút tiền
+            </Title>
+            <Text className="welcome-subtitle">
+              Quản lý và xử lý các yêu cầu rút tiền từ người dùng
+            </Text>
+          </div>
+          <div className="header-stats">
+            <Badge count={stats.pendingWithdrawals} showZero>
+              <Avatar size={50} icon={<ClockCircleOutlined />} />
+            </Badge>
+            <div className="current-date">
+              <CalendarOutlined />
+              {new Date().toLocaleDateString('vi-VN')}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Statistics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Tổng yêu cầu"
-              value={statistics.totalWithdrawals || 0}
-              prefix={<DollarOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Chờ xử lý"
-              value={statistics.pendingWithdrawals || 0}
-              prefix={<Badge status="processing" />}
-              valueStyle={{ color: '#faad14' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Đã hoàn thành"
-              value={statistics.completedWithdrawals || 0}
-              prefix={<Badge status="success" />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Tổng số tiền chờ"
-              value={statistics.pendingWithdrawalAmount || 0}
-              formatter={(value) => formatCurrency(value)}
-              valueStyle={{ color: '#f5222d' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      {/* Enhanced Metrics Section */}
+      <div className="metrics-section">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card primary">
+              <div className="metric-content">
+                <div className="metric-icon primary">
+                  <WalletOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.totalWithdrawals}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#1890ff' }}
+                  />
+                  <Text className="metric-title">Tổng yêu cầu</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card warning">
+              <div className="metric-content">
+                <div className="metric-icon warning">
+                  <ClockCircleOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.pendingWithdrawals}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#faad14' }}
+                  />
+                  <Text className="metric-title">Chờ xử lý</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card success">
+              <div className="metric-content">
+                <div className="metric-icon success">
+                  <CheckCircleOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.approvedWithdrawals}
+                    valueStyle={{ fontSize: '28px', fontWeight: 'bold', color: '#52c41a' }}
+                  />
+                  <Text className="metric-title">Đã duyệt</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="metric-card danger">
+              <div className="metric-content">
+                <div className="metric-icon danger">
+                  <DollarOutlined />
+                </div>
+                <div className="metric-details">
+                  <Statistic
+                    value={stats.pendingAmount || 0}
+                    formatter={(value) => {
+                      //console.log('Pending Amount - Raw value:', value, 'Type:', typeof value);
+                      return formatCurrency(Number(value) || 0);
+                    }}
+                    valueStyle={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}
+                  />
+                  <Text className="metric-title">Tiền chờ duyệt</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
 
-      {/* Filters */}
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
+      {/* Modern Filters Section */}
+      <Card className="filter-card">
+        <Row gutter={[24, 16]} align="middle">
           <Col xs={24} sm={8} md={6}>
-            <Input
-              placeholder="Tìm kiếm..."
-              prefix={<SearchOutlined />}
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              allowClear
-            />
+            <div className="filter-group">
+              <Text strong>Tìm kiếm:</Text>
+              <Input
+                className="filter-select"
+                placeholder="Tìm theo tên, email..."
+                prefix={<SearchOutlined />}
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                allowClear
+              />
+            </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Select
-              style={{ width: '100%' }}
-              placeholder="Trạng thái"
-              value={filters.status}
-              onChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
-            >
-              <Option value="all">Tất cả trạng thái</Option>
-              <Option value="pending">Chờ xử lý</Option>
-              <Option value="approved">Đã duyệt</Option>
-              <Option value="rejected">Từ chối</Option>
-              <Option value="completed">Hoàn thành</Option>
-            </Select>
+            <div className="filter-group">
+              <Text strong>Trạng thái:</Text>
+              <Select
+                className="filter-select"
+                placeholder="Chọn trạng thái"
+                value={filters.status}
+                onChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
+              >
+                <Option value="all">Tất cả trạng thái</Option>
+                <Option value="pending">Chờ xử lý</Option>
+                <Option value="approved">Đã duyệt</Option>
+                <Option value="rejected">Từ chối</Option>
+              </Select>
+            </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <RangePicker
-              style={{ width: '100%' }}
-              placeholder={['Từ ngày', 'Đến ngày']}
-              value={filters.dateRange}
-              onChange={(dates) => setFilters(prev => ({ ...prev, dateRange: dates }))}
-            />
+            <div className="filter-group">
+              <Text strong>Khoảng thời gian:</Text>
+              <RangePicker
+                className="filter-select"
+                placeholder={['Từ ngày', 'Đến ngày']}
+                value={filters.dateRange}
+                onChange={(dates) => setFilters(prev => ({ ...prev, dateRange: dates }))}
+              />
+            </div>
           </Col>
           <Col>
             <Button
@@ -404,8 +569,20 @@ const WithdrawalManagement = () => {
         </Row>
       </Card>
 
-      {/* Table */}
-      <Card>
+      {/* Action Buttons */}
+      <div className="action-buttons">
+        <Button
+          type="primary"
+          icon={<ReloadOutlined />}
+          onClick={fetchWithdrawals}
+          loading={loading}
+        >
+          Làm mới dữ liệu
+        </Button>
+      </div>
+
+      {/* Withdrawals Table */}
+      <Card className="table-card">
         <Table
           columns={columns}
           dataSource={withdrawals}
@@ -483,9 +660,9 @@ const WithdrawalManagement = () => {
             </Descriptions.Item>
             <Descriptions.Item label="Thông tin ngân hàng" span={2}>
               <div>
-                <div><strong>Tên ngân hàng:</strong> {selectedWithdrawal.bankName}</div>
-                <div><strong>Số tài khoản:</strong> {selectedWithdrawal.accountNumber}</div>
-                <div><strong>Tên tài khoản:</strong> {selectedWithdrawal.accountName}</div>
+                <div><strong>Tên ngân hàng:</strong> {selectedWithdrawal.bankAccount?.bankName || 'Không có thông tin'}</div>
+                <div><strong>Số tài khoản:</strong> {selectedWithdrawal.bankAccount?.accountNumber || 'Không có thông tin'}</div>
+                <div><strong>Tên tài khoản:</strong> {selectedWithdrawal.bankAccount?.accountHolderName || 'Không có thông tin'}</div>
               </div>
             </Descriptions.Item>
             <Descriptions.Item label="Ngày tạo">
@@ -533,7 +710,6 @@ const WithdrawalManagement = () => {
             <Select placeholder="Chọn trạng thái">
               <Option value="approved">Duyệt</Option>
               <Option value="rejected">Từ chối</Option>
-              <Option value="completed">Hoàn thành</Option>
             </Select>
           </Form.Item>
           

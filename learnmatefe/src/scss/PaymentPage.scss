@@ -468,3 +468,170 @@
       }
   }
 }
+.withdraw-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65); /* Nền mờ tối */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Z-index cao */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.withdraw-modal-content {
+  background-color: #ffffff; /* Nền modal trắng */
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); /* Bóng đổ sâu hơn */
+  padding: 30px;
+  width: 90%;
+  max-width: 420px; /* Kích thước tối ưu */
+  color: #333333;
+  animation: slideIn 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hiệu ứng động đẹp hơn */
+}
+
+.withdraw-modal-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #007bff; /* Màu xanh dương nổi bật */
+  padding-bottom: 10px;
+  border-bottom: 3px solid #eeeeee;
+}
+
+.withdraw-modal-body {
+  margin-bottom: 30px;
+  background-color: #f7f9fc; /* Nền nhẹ cho phần nội dung */
+  padding: 15px;
+  border-radius: 8px;
+
+  p {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    margin: 0;
+    font-size: 1rem;
+
+    strong {
+      font-weight: 600;
+      color: #6c757d; /* Màu xám cho nhãn */
+      flex-shrink: 0;
+      margin-right: 15px;
+    }
+
+    /* Đánh dấu thông tin số tiền */
+    &:nth-child(1), /* Số tiền muốn rút */
+    &:nth-child(3) { /* Số tiền thực nhận */
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #28a745; /* Màu xanh lá cho số tiền nhận */
+    }
+
+    /* Đánh dấu phí rút */
+    &:nth-child(2) {
+      color: #dc3545; /* Màu đỏ cho phí */
+    }
+
+    /* Đường phân cách giữa các dòng */
+    & + p {
+      border-top: 1px dashed #cccccc;
+    }
+  }
+}
+
+.withdraw-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding-top: 10px;
+
+  button {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    &:focus {
+      outline: 3px solid rgba(0, 123, 255, 0.4);
+      outline-offset: 2px;
+    }
+  }
+
+  .withdraw-modal-cancel {
+    background-color: #6c757d;
+    color: #ffffff;
+    
+    &:hover {
+      background-color: #5a6268;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .withdraw-modal-confirm {
+    background-color: #007bff;
+    color: #ffffff;
+    
+    &:hover {
+      background-color: #0056b3;
+      box-shadow: 0 8px 15px rgba(0, 123, 255, 0.5);
+      transform: translateY(-2px); /* Hiệu ứng nhấn */
+    }
+  }
+}
+
+/* Keyframes cho animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-70px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Tùy chỉnh cho màn hình điện thoại */
+@media (max-width: 500px) {
+  .withdraw-modal-content {
+    margin: 0 10px;
+    padding: 20px;
+  }
+  
+  .withdraw-modal-title {
+    font-size: 1.6rem;
+  }
+  
+  .withdraw-modal-body p {
+    flex-direction: column; /* Xếp nhãn và giá trị theo chiều dọc */
+    align-items: flex-start;
+    padding: 8px 0;
+    
+    strong {
+      margin-bottom: 2px;
+    }
+  }
+
+  .withdraw-modal-buttons {
+    flex-direction: column; 
+    gap: 10px;
+    
+    button {
+      padding: 14px;
+    }
+  }
+}
