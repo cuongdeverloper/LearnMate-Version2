@@ -66,30 +66,31 @@ const TransactionHistory = () => {
 
 
   const fetchTransactions = useCallback(async () => {
-    try {
-      setLoading(true);
-      const params = {
-        page: pagination.current,
-        limit: pagination.pageSize,
-        type: filters.type !== 'all' ? filters.type : undefined,
-        userId: filters.userId || undefined,
-        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
-      };
-      const response = await AdminService.getTransactionHistory(params);
-      if (response && response.success) {
-        setTransactions(response.data);
-        setPagination(prev => ({
-          ...prev,
-          total: response.pagination.totalItems
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const params = {
+      page: pagination.current,
+      limit: pagination.pageSize,
+      type: filters.type !== 'all' ? filters.type : undefined,
+      userId: filters.userId || undefined,
+      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+    };
+    const response = await AdminService.getTransactionHistory(params);
+    if (response && response.success) {
+      setTransactions(response.data);
+      setPagination(prev => ({
+        ...prev,
+        total: response.pagination.totalItems
+      }));
     }
-  }, [pagination.current, pagination.pageSize, filters]);
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [pagination, filters]); 
+
 
   // fetchAllTransactions
   const fetchAllTransactions = useCallback(async () => {

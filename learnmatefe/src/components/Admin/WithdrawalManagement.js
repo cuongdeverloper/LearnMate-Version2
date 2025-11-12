@@ -74,32 +74,33 @@ const WithdrawalManagement = () => {
   // Form
   const [updateForm] = Form.useForm();
   const fetchWithdrawals = useCallback(async () => {
-    try {
-      setLoading(true);
-      const params = {
-        page: pagination.current,
-        limit: pagination.pageSize,
-        status: filters.status !== 'all' ? filters.status : undefined,
-        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
-      };
+  try {
+    setLoading(true);
+    const params = {
+      page: pagination.current,
+      limit: pagination.pageSize,
+      status: filters.status !== 'all' ? filters.status : undefined,
+      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+    };
 
-      const response = await AdminService.getAllWithdrawals(params);
-      if (response && response.success) {
-        const withdrawalsList = response.data || [];
-        setWithdrawals(withdrawalsList);
-        setPagination(prev => ({
-          ...prev,
-          total: response.pagination?.totalItems || withdrawalsList.length
-        }));
-        calculateStatisticsFromWithdrawals(withdrawalsList);
-      }
-    } catch (error) {
-      message.error('Không thể tải danh sách rút tiền');
-    } finally {
-      setLoading(false);
+    const response = await AdminService.getAllWithdrawals(params);
+    if (response && response.success) {
+      const withdrawalsList = response.data || [];
+      setWithdrawals(withdrawalsList);
+      setPagination(prev => ({
+        ...prev,
+        total: response.pagination?.totalItems || withdrawalsList.length
+      }));
+      calculateStatisticsFromWithdrawals(withdrawalsList);
     }
-  }, [pagination.current, pagination.pageSize, filters]);
+  } catch (error) {
+    message.error('Không thể tải danh sách rút tiền');
+  } finally {
+    setLoading(false);
+  }
+}, [pagination, filters, calculateStatisticsFromWithdrawals]);
+
 
   const fetchStatistics = useCallback(async () => {
     try {
@@ -122,9 +123,10 @@ const WithdrawalManagement = () => {
   }, []);
 
   useEffect(() => {
-    fetchWithdrawals();
-    fetchStatistics();
-  }, [fetchWithdrawals, fetchStatistics]);
+  fetchWithdrawals();
+  fetchStatistics();
+}, [fetchWithdrawals, fetchStatistics]);
+
 
   useEffect(() => {
     const loadData = async () => {

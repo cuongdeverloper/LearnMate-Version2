@@ -31,52 +31,6 @@ export default function PaymentPage() {
     const [useCombinedFinancialFlow, setUseCombinedFinancialFlow] =
         useState(true); // true = /me/financial-flowhistory (FinancialHistory model), false = /me/financial-flow (tự tổng hợp)
     
-        {showWithdrawModal && (
-            <div className="modal-overlay">
-                <div className="modal-content">
-                    <h3>Xác nhận rút tiền</h3>
-                    <p>
-                        <strong>Số tiền muốn rút:</strong>{" "}
-                        {Number(amountToWithdraw).toLocaleString()} VND
-                    </p>
-                    <p>
-                        <strong>Phí rút:</strong> {calculatedFee.toLocaleString()} VND
-                    </p>
-                    <p>
-                        <strong>Số tiền thực nhận:</strong>{" "}
-                        {calculatedActualWithdrawal.toLocaleString()} VND
-                    </p>
-                    <p>
-                        <strong>Ngân hàng:</strong> {bankAccount.bankName || "N/A"}
-                    </p>
-                    <p>
-                        <strong>Số TK:</strong> {bankAccount.accountNumber || "N/A"}
-                    </p>
-                    <p>
-                        <strong>Tên chủ TK:</strong>{" "}
-                        {bankAccount.accountHolderName || "N/A"}
-                    </p>
-
-                    <div className="modal-buttons">
-                        <button
-                            onClick={() => {
-                                setShowWithdrawModal(false);
-                            }}
-                        >
-                            Hủy
-                        </button>
-                        <button
-                            onClick={() => {
-                                setShowWithdrawModal(false);
-                                handleWithdraw(); // Gọi API rút tiền
-                            }}
-                        >
-                            Xác nhận
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )};
 
     const fetchPaymentData = useCallback(async () => {
         if (!userId) {
