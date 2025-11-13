@@ -44,7 +44,6 @@ router.get("/learner/all-quizzes", checkAccessToken, getAllQuizzesByLearnerId);
 router.post(
   "/import-question-storage",
   checkAccessToken,
-  upload.single("file"),
   importQuestionsToStorage
 );
 

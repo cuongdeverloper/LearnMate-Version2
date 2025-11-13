@@ -34,7 +34,6 @@ import {
 } from '@ant-design/icons';
 import AdminService from '../../Service/ApiService/AdminService';
 import './WithdrawalManagement.scss';
-import { useCallback } from 'react';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -72,99 +71,34 @@ const WithdrawalManagement = () => {
 
   // Form
   const [updateForm] = Form.useForm();
-  const calculateStatisticsFromWithdrawals = useCallback((withdrawalsList) => {
-  const pendingWithdrawals = withdrawalsList.filter(w => w.status === 'pending');
-  const pendingAmount = pendingWithdrawals.reduce((sum, w) => sum + (w.amount || 0), 0);
-
-  const stats = {
-    totalWithdrawals: withdrawalsList.length,
-    pendingWithdrawals: pendingWithdrawals.length,
-    approvedWithdrawals: withdrawalsList.filter(w => w.status === 'approved').length,
-    rejectedWithdrawals: withdrawalsList.filter(w => w.status === 'rejected').length,
-    totalAmount: withdrawalsList.reduce((sum, w) => sum + (w.amount || 0), 0),
-    pendingAmount
-  };
-
-  setStats(stats);
-}, []);
-
-// 🟩 2. Then define fetchWithdrawals using it safely
-const fetchWithdrawals = useCallback(async () => {
-  try {
-    setLoading(true);
-    const params = {
-      page: pagination.current,
-      limit: pagination.pageSize,
-      status: filters.status !== 'all' ? filters.status : undefined,
-      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD'),
-    };
-
-    const response = await AdminService.getAllWithdrawals(params);
-    if (response && response.success) {
-      const withdrawalsList = response.data || [];
-      setWithdrawals(withdrawalsList);
-      setPagination(prev => ({
-        ...prev,
-        total: response.pagination?.totalItems || withdrawalsList.length,
-      }));
-      calculateStatisticsFromWithdrawals(withdrawalsList);
-    }
-  } catch (error) {
-    message.error('Không thể tải danh sách rút tiền');
-  } finally {
-    setLoading(false);
-  }
-}, [pagination, filters, calculateStatisticsFromWithdrawals]);
-
-
-  const fetchStatistics = useCallback(async () => {
-    try {
-      const response = await AdminService.getWithdrawalStats();
-      if (response && response.success && response.data) {
-        const data = response.data;
-        setStats(prev => ({
-          ...prev,
-          totalWithdrawals: data.totalWithdrawals || prev.totalWithdrawals,
-          pendingWithdrawals: data.pendingWithdrawals || prev.pendingWithdrawals,
-          approvedWithdrawals: data.approvedWithdrawals || prev.approvedWithdrawals,
-          rejectedWithdrawals: data.rejectedWithdrawals || prev.rejectedWithdrawals,
-          totalAmount: data.totalAmount || prev.totalAmount,
-          pendingAmount: data.pendingAmount || data.pendingWithdrawalAmount || prev.pendingAmount
-        }));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
 
   useEffect(() => {
-  const loadData = async () => {
-    await fetchWithdrawals();
-    fetchStatistics();
-  };
-  loadData();
-}, [fetchWithdrawals, fetchStatistics, pagination, filters]);
-
+    const loadData = async () => {
+      // Load withdrawals first (this will calculate stats from real data)
+      await fetchWithdrawals();
+      // Then try to get API stats (only if they have better data)
+      fetchStatistics();
+    };
+    loadData();
+  }, [pagination.current, pagination.pageSize, filters]);
 
   // Debug useEffect to track stats changes
   useEffect(() => {
     //console.log('Stats updated:', stats);
     //console.log('Pending Amount specifically:', stats.pendingAmount);
-
+    
     // If pending amount is still 0 but we have withdrawals, something might be wrong
     if (stats.pendingAmount === 0 && withdrawals.length > 0) {
       console.warn('Pending amount is 0 but we have withdrawals. Let me check withdrawals data:');
       //console.log('Current withdrawals:', withdrawals);
-
+      
       // Manual calculation as fallback
       const manualPendingAmount = withdrawals
         .filter(w => w.status === 'pending')
         .reduce((sum, w) => sum + (Number(w.amount) || 0), 0);
-
+      
       //console.log('Manual calculation of pending amount:', manualPendingAmount);
-
+      
       if (manualPendingAmount > 0 && stats.pendingAmount === 0) {
         //console.log('Manual calculation found pending amount, updating stats...');
         setStats(prev => ({
@@ -175,8 +109,111 @@ const fetchWithdrawals = useCallback(async () => {
     }
   }, [stats, withdrawals]);
 
+  const fetchWithdrawals = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: pagination.current,
+        limit: pagination.pageSize,
+        status: filters.status !== 'all' ? filters.status : undefined,
+        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+      };
 
-  
+      const response = await AdminService.getAllWithdrawals(params);
+      if (response && response.success) {
+        const withdrawalsList = response.data || [];
+        setWithdrawals(withdrawalsList);
+        setPagination(prev => ({
+          ...prev,
+          total: response.pagination?.totalItems || withdrawalsList.length
+        }));
+        
+        // Calculate statistics from withdrawals data as fallback
+        calculateStatisticsFromWithdrawals(withdrawalsList);
+      }
+    } catch (error) {
+      console.error('Error fetching withdrawals:', error);
+      message.error('Không thể tải danh sách rút tiền');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStatisticsFromWithdrawals = (withdrawalsList) => {
+    //console.log('Raw withdrawals data:', withdrawalsList);
+    const pendingWithdrawals = withdrawalsList.filter(w => w.status === 'pending');
+    //console.log('Pending withdrawals:', pendingWithdrawals);
+    
+    const pendingAmount = pendingWithdrawals.reduce((sum, w) => {
+      //console.log('Processing withdrawal:', w._id, 'Amount:', w.amount, 'Status:', w.status);
+      return sum + (w.amount || 0);
+    }, 0);
+    
+    const stats = {
+      totalWithdrawals: withdrawalsList.length,
+      pendingWithdrawals: pendingWithdrawals.length,
+      approvedWithdrawals: withdrawalsList.filter(w => w.status === 'approved').length,
+      rejectedWithdrawals: withdrawalsList.filter(w => w.status === 'rejected').length,
+      totalAmount: withdrawalsList.reduce((sum, w) => sum + (w.amount || 0), 0),
+      pendingAmount: pendingAmount
+    };
+    
+    //console.log('Calculated withdrawal statistics:', stats);
+    //console.log('Calculated pendingAmount specifically:', pendingAmount);
+    
+    setStats({
+      totalWithdrawals: stats.totalWithdrawals,
+      pendingWithdrawals: stats.pendingWithdrawals,
+      approvedWithdrawals: stats.approvedWithdrawals,
+      rejectedWithdrawals: stats.rejectedWithdrawals,
+      totalAmount: stats.totalAmount,
+      pendingAmount: stats.pendingAmount
+    });
+  };
+
+  const fetchStatistics = async () => {
+    try {
+      const response = await AdminService.getWithdrawalStats();
+      //console.log('Withdrawal Statistics API Response:', response);
+      
+      if (response && response.success && response.data) {
+        //console.log('API Data Structure:', response.data);
+        //console.log('API pendingAmount:', response.data.pendingAmount);
+        //console.log('API pendingWithdrawalAmount:', response.data.pendingWithdrawalAmount);
+        
+        // Check if API has meaningful data to use
+        const hasValidData = response.data.totalWithdrawals > 0 || 
+                            response.data.pendingWithdrawals > 0 || 
+                            response.data.approvedWithdrawals > 0 ||
+                            response.data.pendingAmount > 0 ||
+                            response.data.pendingWithdrawalAmount > 0;
+        
+        if (hasValidData) {
+          //console.log('Using API Statistics (has valid data):', response.data);
+          setStats({
+            totalWithdrawals: response.data.totalWithdrawals || 0,
+            pendingWithdrawals: response.data.pendingWithdrawals || 0,
+            approvedWithdrawals: response.data.approvedWithdrawals || 0,
+            rejectedWithdrawals: response.data.rejectedWithdrawals || 0,
+            totalAmount: response.data.totalAmount || 0,
+            // Try both possible field names from API
+            pendingAmount: response.data.pendingAmount || response.data.pendingWithdrawalAmount || 0
+          });
+        } else {
+          console.warn('API statistics has no valid data, keeping calculated statistics');
+          // Keep the statistics calculated from withdrawals data
+        }
+      } else {
+        console.warn('API statistics empty or failed, keeping calculated statistics');
+        // Keep the statistics calculated from withdrawals data
+      }
+    } catch (error) {
+      console.error('Error fetching withdrawal statistics:', error);
+      console.warn('Keeping statistics calculated from withdrawals data');
+      // Keep the statistics calculated from withdrawals data
+    }
+  };
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
@@ -198,25 +235,25 @@ const fetchWithdrawals = useCallback(async () => {
   const handleUpdateStatus = async (values) => {
     try {
       setUpdateModalVisible(false);
-
+      
       const hideLoading = message.loading('Đang cập nhật trạng thái...', 0);
-
+      
       const response = await AdminService.updateWithdrawalStatus(selectedWithdrawal._id, values);
-
+      
       hideLoading();
-
+      
       if (response && response.success) {
         message.success('Cập nhật trạng thái thành công');
-
+        
         // Update local state
-        setWithdrawals(prevWithdrawals =>
-          prevWithdrawals.map(withdrawal =>
-            withdrawal._id === selectedWithdrawal._id
+        setWithdrawals(prevWithdrawals => 
+          prevWithdrawals.map(withdrawal => 
+            withdrawal._id === selectedWithdrawal._id 
               ? { ...withdrawal, status: values.status, adminNotes: values.adminNotes }
               : withdrawal
           )
         );
-
+        
         fetchStatistics();
       } else {
         throw new Error(response?.message || 'Unknown error occurred');
@@ -225,7 +262,7 @@ const fetchWithdrawals = useCallback(async () => {
       console.error('Error updating withdrawal status:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Không thể cập nhật trạng thái';
       message.error(`Lỗi: ${errorMessage}`, 5);
-
+      
       // Reopen modal with original values
       updateForm.setFieldsValue({
         status: selectedWithdrawal.status,
@@ -284,8 +321,8 @@ const fetchWithdrawals = useCallback(async () => {
       width: 200,
       render: (_, record) => (
         <Space>
-          <Avatar
-            src={record.userId?.image}
+          <Avatar 
+            src={record.userId?.image} 
             icon={<UserOutlined />}
             size="small"
           />
@@ -552,7 +589,7 @@ const fetchWithdrawals = useCallback(async () => {
             ...pagination,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
+            showTotal: (total, range) => 
               `${range[0]}-${range[1]} của ${total} yêu cầu rút tiền`
           }}
           onChange={handleTableChange}
@@ -593,8 +630,8 @@ const fetchWithdrawals = useCallback(async () => {
             </Descriptions.Item>
             <Descriptions.Item label="Người dùng">
               <Space>
-                <Avatar
-                  src={selectedWithdrawal.userId?.image}
+                <Avatar 
+                  src={selectedWithdrawal.userId?.image} 
                   icon={<UserOutlined />}
                 />
                 {selectedWithdrawal.userId?.username}
@@ -629,7 +666,7 @@ const fetchWithdrawals = useCallback(async () => {
               {new Date(selectedWithdrawal.createdAt).toLocaleString('vi-VN')}
             </Descriptions.Item>
             <Descriptions.Item label="Ngày xử lý">
-              {selectedWithdrawal.processedAt
+              {selectedWithdrawal.processedAt 
                 ? new Date(selectedWithdrawal.processedAt).toLocaleString('vi-VN')
                 : 'Chưa xử lý'
               }
@@ -672,7 +709,7 @@ const fetchWithdrawals = useCallback(async () => {
               <Option value="rejected">Từ chối</Option>
             </Select>
           </Form.Item>
-
+          
           <Form.Item
             name="adminNotes"
             label="Ghi chú"

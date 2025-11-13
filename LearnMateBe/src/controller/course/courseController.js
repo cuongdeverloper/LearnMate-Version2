@@ -191,8 +191,6 @@ const getMyAllCoursesDetails = async (req, res) => {
       };
     });
 
-    console.log("My Courses:", myCourses);
-
     res.status(200).json({ data: myCourses, success: true });
   } catch (error) {
     console.error("GetMyCourses Error:", error);

@@ -134,51 +134,28 @@ exports.importQuestionsToStorage = async (req, res) => {
       });
     }
 
-    if (!req.file) {
+    const { questions, subjectId } = req.body;
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Vui lòng upload file Excel!",
+        message: "Danh sách câu hỏi không hợp lệ!",
       });
     }
 
-    // Đọc Excel buffer
-    const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet);
+    const mappedQuestions = questions.map(q => ({
+      tutorId: tutor._id,
+      subjectId,
+      topic: q.topic?.trim() || "Chung",
+      text: q.text,
+      options: q.options,
+      correctAnswer: Number(q.correctAnswer ?? 0),
+    }));
 
-    // Map dữ liệu từ file
-    const questions = rows
-      .filter((row) => row.text || row.question)
-      .map((row, index) => {
-        const options = [
-          row.optionA,
-          row.optionB,
-          row.optionC,
-          row.optionD,
-        ].filter(Boolean);
-
-        return {
-          tutorId: tutor._id,
-          subjectId: req.body.subjectId,
-          topic: row.topic?.trim() || "Chung",
-          text: row.text || row.question,
-          options,
-          correctAnswer: Number(row.correctAnswer) || 1,
-        };
-      });
-
-    if (!questions.length) {
-      return res.status(400).json({
-        success: false,
-        message: "File không có dữ liệu hợp lệ.",
-      });
-    }
-
-    await QuestionStorage.insertMany(questions);
+    await QuestionStorage.insertMany(mappedQuestions);
 
     res.status(200).json({
       success: true,
-      message: `✅ Import thành công ${questions.length} câu hỏi.`,
+      message: `✅ Import thành công ${mappedQuestions.length} câu hỏi.`,
     });
   } catch (error) {
     console.error("❌ ImportQuestionsToStorage Error:", error);

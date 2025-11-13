@@ -458,23 +458,20 @@ export const rejectChangeRequest = async (id) => {
   }
 };
 
-export const importQuestionsToStorage = async (file, subjectId) => {
+export const importQuestionsToStorage = async (payload) => {
   const token = Cookies.get("accessToken");
   if (!token) throw new Error("Unauthorized");
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("subjectId", subjectId);
-
-  const res = await axios.post(`/api/quizzes/import-question-storage`, formData, {
+  const res = await axios.post(`/api/quizzes/import-question-storage`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
     },
   });
 
   return res;
 };
+
 export const getQuestionStorage = async (subjectId, topic) => {
   try {
     // Nếu topic không tồn tại hoặc rỗng thì bỏ qua trong params
