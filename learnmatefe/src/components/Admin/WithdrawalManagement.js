@@ -128,7 +128,7 @@ const WithdrawalManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination, filters]);
+  }, [filters, pagination.current, pagination.pageSize]);
 
 
   const calculateStatisticsFromWithdrawals = (withdrawalsList) => {
@@ -207,13 +207,10 @@ const WithdrawalManagement = () => {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      await fetchWithdrawals();
-      fetchStatistics();
-    };
-    loadData();
-  }, [fetchWithdrawals]);
-
+    fetchWithdrawals();
+    fetchStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
   };

@@ -110,7 +110,7 @@ const ReportManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination, filters]);
+}, [filters, pagination.current, pagination.pageSize]);
 
   const calculateStatisticsFromReports = (reportsList) => {
     const stats = {
@@ -156,12 +156,10 @@ const ReportManagement = () => {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      await fetchReports();
-      fetchStatistics();
-    };
-    loadData();
-  }, [fetchReports]);
+  fetchReports();
+  fetchStatistics();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const fetchReportDetails = async (reportId) => {
     try {
