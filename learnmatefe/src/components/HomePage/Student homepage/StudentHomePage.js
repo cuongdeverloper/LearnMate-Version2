@@ -76,6 +76,7 @@ const StudentHomePage = () => {
         </nav>
         <div className="right-section">
           <LangLogin />
+          <NotificationBell />
           <div className="profile-dropdown">
             <img
               src={user?.account?.image || "https://i.pravatar.cc/40"}

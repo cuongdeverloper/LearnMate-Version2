@@ -46,6 +46,7 @@ const { Title, Text } = Typography;
 
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
+  const { current, pageSize } = pagination;
   const [stats, setStats] = useState({
     totalReports: 0,
     pendingReports: 0,
@@ -82,35 +83,35 @@ const ReportManagement = () => {
 
 
   const fetchReports = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        page: pagination.current,
-        limit: pagination.pageSize,
-        status: filters.status !== 'all' ? filters.status : undefined,
-        targetType: filters.targetType !== 'all' ? filters.targetType : undefined,
-        startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
-        endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
-      };
+  setLoading(true);
+  try {
+    const params = {
+      page: current,
+      limit: pageSize,
+      status: filters.status !== 'all' ? filters.status : undefined,
+      targetType: filters.targetType !== 'all' ? filters.targetType : undefined,
+      startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
+      endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD')
+    };
 
-      const response = await AdminService.getReports(params);
-      if (response.success) {
-        const reportsList = response.data.reports || [];
-        setReports(reportsList);
-        setPagination(prev => ({
-          ...prev,
-          total: response.data.total,
-          current: response.data.page,
-          pageSize: response.data.limit
-        }));
-        calculateStatisticsFromReports(reportsList);
-      }
-    } catch (error) {
-      message.error('Không thể tải danh sách báo cáo');
-    } finally {
-      setLoading(false);
+    const response = await AdminService.getReports(params);
+    if (response.success) {
+      const reportsList = response.data.reports || [];
+      setReports(reportsList);
+      setPagination(prev => ({
+        ...prev,
+        total: response.data.total,
+        current: response.data.page,
+        pageSize: response.data.limit
+      }));
+      calculateStatisticsFromReports(reportsList);
     }
-}, [filters, pagination.current, pagination.pageSize]);
+  } catch {
+    message.error('Không thể tải danh sách báo cáo');
+  } finally {
+    setLoading(false);
+  }
+}, [filters, current, pageSize]);
 
   const calculateStatisticsFromReports = (reportsList) => {
     const stats = {

@@ -42,6 +42,7 @@ const { Title, Text } = Typography;
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
+  const { current, pageSize } = pagination;
   const [stats, setStats] = useState({
     totalWithdrawals: 0,
     pendingWithdrawals: 0,
@@ -128,8 +129,7 @@ const WithdrawalManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.current, pagination.pageSize]);
-
+  }, [filters, current, pageSize]);
 
   const calculateStatisticsFromWithdrawals = (withdrawalsList) => {
     //console.log('Raw withdrawals data:', withdrawalsList);
