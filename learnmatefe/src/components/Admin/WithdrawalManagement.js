@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   Card,
@@ -205,7 +205,7 @@ const WithdrawalManagement = () => {
       // Keep the statistics calculated from withdrawals data
     }
   };
-  
+
   useEffect(() => {
     const loadData = async () => {
       await fetchWithdrawals();
