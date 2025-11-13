@@ -128,7 +128,7 @@ const WithdrawalManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.current, pagination.pageSize, filters]);
+  }, [pagination, filters]);
 
 
   const calculateStatisticsFromWithdrawals = (withdrawalsList) => {

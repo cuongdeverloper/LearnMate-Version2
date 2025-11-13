@@ -29,7 +29,6 @@ import {
   ReloadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  ExclamationCircleOutlined,
   UserOutlined,
   FileTextOutlined,
   CalendarOutlined,
@@ -47,7 +46,6 @@ const { Title, Text } = Typography;
 
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
-  const [statistics, setStatistics] = useState({});
   const [stats, setStats] = useState({
     totalReports: 0,
     pendingReports: 0,
@@ -112,7 +110,7 @@ const ReportManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.current, pagination.pageSize, filters]);
+  }, [pagination, filters]);
 
   const calculateStatisticsFromReports = (reportsList) => {
     const stats = {
@@ -123,7 +121,6 @@ const ReportManagement = () => {
     };
 
     //console.log('Calculated statistics from reports:', stats);
-    setStatistics(stats);
     setStats({
       totalReports: stats.total,
       pendingReports: stats.pending,
@@ -141,7 +138,6 @@ const ReportManagement = () => {
         (response.data.total > 0 || response.data.pending > 0 ||
           response.data.resolved > 0 || response.data.rejected > 0)) {
         //console.log('Using API Statistics (has data):', response.data);
-        setStatistics(response.data);
         setStats({
           totalReports: response.data.total || 0,
           pendingReports: response.data.pending || 0,
