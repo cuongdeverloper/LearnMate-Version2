@@ -530,6 +530,18 @@ export default function BookingPage() {
               <div className="selected-info">
                 <strong>Đã chọn:</strong> {selectedSlots.length} khung giờ
               </div>
+              
+              <div className="schedule-legend">
+                <div className="legend-item">
+                  <span className="legend-box available"></span> Có thể đặt
+                </div>
+                <div className="legend-item">
+                  <span className="legend-box selected"></span> Đang chọn
+                </div>
+                <div className="legend-item">
+                  <span className="legend-box no-slot"></span> Đã được đặt / Không khả dụng
+                </div>
+              </div>
             </div>
 
             <div className="form-group">

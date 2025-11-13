@@ -68,13 +68,9 @@ exports.createQuizFromStorage = async (req, res) => {
     } = req.body;
     const tutor = await Tutor.findOne({ user: req.user.id });
     if (!tutor)
-      return res
-        .status(404)
-        .json({ success: false, message: "Không tìm thấy tutor." });
+      return res.status(404).json({ success: false, message: "Không tìm thấy tutor." });
 
-    const quizStorage = await QuizStorage.findById(quizStorageId).populate(
-      "questions"
-    );
+    const quizStorage = await QuizStorage.findById(quizStorageId).populate("questions");
     if (!quizStorage)
       return res
         .status(404)
@@ -89,8 +85,8 @@ exports.createQuizFromStorage = async (req, res) => {
       description: quizStorage.description || "",
       topic: topic || quizStorage.topic,
       duration: duration || 1800,
-      openTime: openTime || new Date(),
-      closeTime: closeTime || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      openTime: openTime ? new Date(openTime) : new Date(),
+      closeTime: closeTime ? new Date(closeTime) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     await quiz.save();
@@ -116,9 +112,10 @@ exports.createQuizFromStorage = async (req, res) => {
     });
   } catch (error) {
     console.error("CreateQuizFromStorage Error:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Lỗi khi tạo quiz từ QuizStorage." });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi tạo quiz từ QuizStorage.",
+    });
   }
 };
 

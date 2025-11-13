@@ -202,14 +202,14 @@ const TutorManageAvailability = () => {
                 );
 
                 let cls = "empty";
-                let label = "Trống";
+                let label = "Chưa thêm vào";
 
                 if (hasSchedule) {
                   cls = "busy";
                   label = "Đã có lịch dạy";
                 } else if (existing) {
                   cls = "available";
-                  label = "Đã mở (bấm để xoá)";
+                  label = "Đã mở lịch trống (bấm để xoá)";
                 } else if (selected) {
                   cls = "selected";
                   label = "Sẽ thêm";

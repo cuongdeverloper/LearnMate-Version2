@@ -1,5 +1,4 @@
 const Tutor = require('../../modal/Tutor');
-const User = require('../../modal/User');
 const SavedTutor = require('../../modal/SavedTutor');
 const Review = require('../../modal/Review')
 
@@ -7,33 +6,42 @@ const Subject = require('../../modal/Subject'); // import Subject model
 
 exports.getTutors = async (req, res) => {
   try {
-    const { name, subject, subjects, minPrice, maxPrice, minRating, class: classGrade, location } = req.query;
+    const {
+      name,
+      subject,
+      minPrice,
+      maxPrice,
+      minRating,
+      class: classGrade,
+      location,
+    } = req.query;
 
     let filter = {};
     let userFilter = {};
 
+    // Lọc theo tên tutor
     if (name) {
       userFilter.username = { $regex: name, $options: "i" };
     }
 
+    // Lọc theo khu vực (nếu location nằm trong user)
     if (location) {
-      // tìm theo từ khóa, không phân biệt hoa thường
-      filter.location = { $regex: location, $options: "i" };
+      userFilter.location = { $regex: location, $options: "i" };
     }
 
-    if (subjects) {
-      const subjectNames = decodeURIComponent(subjects).split(",").map(s => s.trim());
-      const subjectDocs = await Subject.find({ name: { $in: subjectNames } });
-      const subjectIds = subjectDocs.map(s => s._id);
+    // Lọc theo môn & lớp
+    if (subject) {
+      let subjectQuery = { name: { $regex: subject, $options: "i" } };
+      if (classGrade) subjectQuery.classLevel = Number(classGrade);
+      const subjectDocs = await Subject.find(subjectQuery);
+      if (subjectDocs.length === 0) {
+        return res.json({ success: true, tutors: [] });
+      }
+      const subjectIds = subjectDocs.map((s) => s._id);
       filter.subjects = { $in: subjectIds };
-    } else if (subject) {
-      const subjectDoc = await Subject.findOne({ name: { $regex: subject, $options: "i" } });
-      if (subjectDoc) filter.subjects = subjectDoc._id;
-      else return res.json({ success: true, tutors: [] });
     }
 
-    if (classGrade) filter.classes = Number(classGrade);
-
+    // Lọc giá
     if (minPrice || maxPrice) {
       filter.pricePerHour = {};
       if (minPrice) filter.pricePerHour.$gte = Number(minPrice);
@@ -44,33 +52,38 @@ exports.getTutors = async (req, res) => {
       .populate({
         path: "user",
         match: userFilter,
-        select: "username email image phoneNumber gender",
+        select: "username email image phoneNumber gender location",
       })
       .populate("subjects", "name classLevel");
 
-    tutors = tutors.filter(t => t.user !== null);
+    // Loại bỏ tutor không có user
+    tutors = tutors.filter((t) => t.user !== null);
 
-    const tutorIds = tutors.map(t => t._id);
+    // Tính rating trung bình
+    const tutorIds = tutors.map((t) => t._id);
     const reviews = await Review.aggregate([
       { $match: { tutor: { $in: tutorIds } } },
-      { $group: { _id: "$tutor", avgRating: { $avg: "$rating" } } }
+      { $group: { _id: "$tutor", avgRating: { $avg: "$rating" } } },
     ]);
 
     const ratingMap = {};
-    reviews.forEach(r => {
+    reviews.forEach((r) => {
       ratingMap[r._id.toString()] = r.avgRating;
     });
 
-    const resultTutors = tutors.map(tutor => {
+    let resultTutors = tutors.map((tutor) => {
       const avgRating = ratingMap[tutor._id.toString()] || 0;
       return { ...tutor.toObject(), rating: avgRating };
     });
 
-    const finalTutors = minRating
-      ? resultTutors.filter(t => t.rating >= Number(minRating))
-      : resultTutors;
+    // Lọc rating
+    if (minRating) {
+      resultTutors = resultTutors.filter(
+        (t) => t.rating >= Number(minRating)
+      );
+    }
 
-    res.json({ success: true, tutors: finalTutors });
+    res.json({ success: true, tutors: resultTutors });
   } catch (err) {
     console.error("Error in getTutors:", err);
     res.status(500).json({ success: false, message: err.message });

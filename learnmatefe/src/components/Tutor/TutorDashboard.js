@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -94,9 +94,8 @@ const TutorDashboard = () => {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               whileHover={{ scale: 1.05 }}
-              className={`flex items-center gap-3 p-3 cursor-pointer rounded-md mx-2 my-1 transition-colors ${
-                activeTab === item.id ? "bg-indigo-500" : "hover:bg-indigo-400"
-              }`}
+              className={`flex items-center gap-3 p-3 cursor-pointer rounded-md mx-2 my-1 transition-colors ${activeTab === item.id ? "bg-indigo-500" : "hover:bg-indigo-400"
+                }`}
             >
               <div className="text-lg">{item.icon}</div>
               {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
@@ -122,6 +121,19 @@ const TutorDashboard = () => {
         <header className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
           <h2 className="font-semibold text-xl">{menuItems.find((m) => m.id === activeTab)?.label}</h2>
           <div className="flex items-center gap-4 relative">
+            <Link
+              to="/"
+              className="px-3 py-2 rounded-md text-black dark:text-white no-underline h transition"
+            >
+              Trang chủ
+            </Link>
+
+            <Link
+              to="/tutor/chat"
+              className="px-3 py-2 rounded-md text-black dark:text-white no-underline transition"
+            >
+              Trò chuyện
+            </Link>
             {/* Dark mode toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -155,19 +167,19 @@ const TutorDashboard = () => {
                       onClick={() => navigate('/profile')}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
-                      Profile
+                      Trang cá nhân
                     </button>
                     <button
                       onClick={() => alert("Settings clicked")}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
-                      Settings
+                      Cài đặt
                     </button>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 transition-colors"
                     >
-                      Logout
+                      Đăng xuất
                     </button>
                   </motion.div>
                 )}

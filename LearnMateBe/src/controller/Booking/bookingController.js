@@ -41,6 +41,7 @@ exports.createBooking = async (req, res) => {
       availabilityIds,
       addressDetail,
       province,
+      startDate,
     } = req.body;
 
     if (!tutorId || !subjectId || !availabilityIds?.length || !numberOfMonths)
