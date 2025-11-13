@@ -48,7 +48,7 @@ const CreateQuizStorage = () => {
       setQuestionsByTopic(newData);
     };
     fetchQuestions();
-  }, [selectedTopics, selectedSubject]);
+  }, [selectedTopics, selectedSubject, questionsByTopic]);
 
   // 🔹 Random câu hỏi trong 1 topic cụ thể
   const handleRandomSelect = (topic) => {
