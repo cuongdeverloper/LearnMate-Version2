@@ -42,7 +42,6 @@ const { Title, Text } = Typography;
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
-  const { current, pageSize } = pagination;
   const [stats, setStats] = useState({
     totalWithdrawals: 0,
     pendingWithdrawals: 0,
@@ -57,7 +56,7 @@ const WithdrawalManagement = () => {
     pageSize: 10,
     total: 0
   });
-
+  const { current, pageSize } = pagination;
   // Filter states
   const [filters, setFilters] = useState({
     status: 'all',
