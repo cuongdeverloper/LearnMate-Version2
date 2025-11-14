@@ -57,13 +57,21 @@ app.use(passport.initialize());
 app.use(passport.session()); // Enable passport session support
 
 // Configure CORS
-app.use(
-  cors({
-    origin: "https://learnmatesystem.vercel.app",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  "https://learnmatesystem.vercel.app" 
+];
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+}));
 // Use your view engine configuration if rendering views
 configViewEngine(app);
 
