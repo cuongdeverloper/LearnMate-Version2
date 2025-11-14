@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!tutorId) return; // Nếu chưa login thì không connect
 
-    const newSocket = io("https://learnmate-version2-1.onrender.com", {
+    const newSocket = io("https://learnmate-version2.onrender.com", {
       transports: ["websocket", "polling"],
       withCredentials: true,
     });

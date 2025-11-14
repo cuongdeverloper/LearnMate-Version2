@@ -54,7 +54,7 @@ const Messenger = () => {
 
 
   useEffect(() => {
-    socket.current = io("https://learnmate-version2-1.onrender.com", {
+    socket.current = io("https://learnmate-version2.onrender.com", {
       transports: ["websocket", "polling"],
       withCredentials: true,
     });

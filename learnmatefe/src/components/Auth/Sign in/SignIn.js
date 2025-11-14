@@ -66,7 +66,7 @@ const SignIn = () => {
 
   const redirectGoogleLogin = () => {
     setIsLoadingLogin(true);
-    window.location.href = "https://learnmate-version2-1.onrender.com/auth/google";
+    window.location.href = "https://learnmate-version2.onrender.com/auth/google";
   };
 
   const handleImageChange = (e) => {

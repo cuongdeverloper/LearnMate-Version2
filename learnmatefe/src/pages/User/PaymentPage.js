@@ -41,7 +41,7 @@ export default function PaymentPage() {
         setError(null);
         try {
             // Fetch User Info
-            const infoRes = await fetch(`https://learnmate-version2-1.onrender.com/api/payment/me/info`, {
+            const infoRes = await fetch(`https://learnmate-version2.onrender.com/api/payment/me/info`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -51,7 +51,7 @@ export default function PaymentPage() {
 
             // Fetch Top-up History (payments)
             const historyRes = await fetch(
-                `https://learnmate-version2-1.onrender.com/api/payment/me/payments`,
+                `https://learnmate-version2.onrender.com/api/payment/me/payments`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ export default function PaymentPage() {
 
             // Fetch Withdrawal History
             const withdrawalRes = await fetch(
-                `https://learnmate-version2-1.onrender.com/api/payment/me/withdrawals`,
+                `https://learnmate-version2.onrender.com/api/payment/me/withdrawals`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -75,8 +75,8 @@ export default function PaymentPage() {
 
             // Fetch Financial Flow History - Dựa trên state `useCombinedFinancialFlow`
             let financialFlowEndpoint = useCombinedFinancialFlow
-                ? `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flowhistory`
-                : `https://learnmate-version2-1.onrender.com/api/payment/me/financial-flow`;
+                ? `https://learnmate-version2.onrender.com/api/payment/me/financial-flowhistory`
+                : `https://learnmate-version2.onrender.com/api/payment/me/financial-flow`;
 
             const financialFlowRes = await fetch(financialFlowEndpoint, {
                 headers: {
@@ -133,7 +133,7 @@ export default function PaymentPage() {
 
         try {
             const res = await fetch(
-                "https://learnmate-version2-1.onrender.com/api/payment/payment/create-vnpay",
+                "https://learnmate-version2.onrender.com/api/payment/payment/create-vnpay",
                 {
                     method: "POST",
                     headers: {
@@ -191,7 +191,7 @@ export default function PaymentPage() {
 
         try {
             const res = await fetch(
-                "https://learnmate-version2-1.onrender.com/api/payment/payment/withdraw",
+                "https://learnmate-version2.onrender.com/api/payment/payment/withdraw",
                 {
                     method: "POST",
                     headers: {
