@@ -86,7 +86,7 @@ const Header = () => {
           {accessToken && <Link to="/user/my-courses">Khóa học</Link>}
           {accessToken && <Link to="/user/bookinghistory">Lịch sử</Link>}
           {role === "tutor" && (
-            <Link to="/TutorDashboard">BookingManagement</Link>
+            <Link to="/TutorDashboard">Bảng điều khiển gia sư</Link>
           )}
           {role === "admin" && <Link to="/admin/dashboard">Admin</Link>}
         </nav>

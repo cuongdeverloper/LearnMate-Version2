@@ -12,11 +12,12 @@ const badgeVariants = cva(
         secondary: "bg-emerald-600 text-white hover:bg-secondary/80",
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
         upcoming: "bg-gray-500 text-white hover:bg-blue-600",
         active: "bg-emerald-600 text-white hover:bg-emerald-700",
         overdue: "bg-red-600 text-white hover:bg-red-700",
         completed: "bg-gray-500 text-white hover:bg-gray-600",
+        outline: "text-foreground",
+        pending: "bg-yellow-500 text-white hover:bg-yellow-600",
       },
     },
     defaultVariants: {

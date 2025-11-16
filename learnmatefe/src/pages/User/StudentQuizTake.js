@@ -39,30 +39,22 @@ const StudentQuizTake = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const storageKey = `quiz-${id}-state`;
+  const [violationList, setViolationList] = useState([]);
+  const [quizStarted, setQuizStarted] = useState(false);
+
+  const { selectedCourse, selectedQuiz, quizDetails, loading, error } =
+    useSelector((state) => state.courses);
+
   const [state, setState] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     if (saved) return JSON.parse(saved);
     return {
       currentIndex: 0,
       answers: {},
-      timer: 1800,
+      timer: quizDetails?.duration || 1800,
       startedAt: Date.now(),
     };
   });
-
-  const {
-    selectedCourse,
-    selectedQuiz,
-    quizDetails,
-    loading,
-    error,
-  } = useSelector((state) => state.courses);
-
-  useEffect(() => {
-    if (quizDetails?.duration) {
-      setState((s) => ({ ...s, timer: quizDetails.duration }));
-    }
-  }, [quizDetails]);
 
   useEffect(() => {
     if (id) dispatch(fetchQuizDetailsById(id));
@@ -71,9 +63,43 @@ const StudentQuizTake = () => {
   useEffect(() => {
     if (!quizDetails) return;
 
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setViolationList((v) => [
+          ...v,
+          `${new Date().toLocaleString()} - Thoát fullscreen`,
+        ]);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setViolationList((v) => [
+          ...v,
+          `${new Date().toLocaleString()} - Chuyển tab hoặc minimize`,
+        ]);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [quizDetails]);
+
+  useEffect(() => {
+    if (!quizDetails) return;
+
     const now = new Date();
-    const openTime = quizDetails.openTime ? new Date(quizDetails.openTime) : null;
-    const closeTime = quizDetails.closeTime ? new Date(quizDetails.closeTime) : null;
+    const openTime = quizDetails.openTime
+      ? new Date(quizDetails.openTime)
+      : null;
+    const closeTime = quizDetails.closeTime
+      ? new Date(quizDetails.closeTime)
+      : null;
 
     if (openTime && now < openTime) {
       toast.warning("Quiz has not opened yet!");
@@ -87,30 +113,64 @@ const StudentQuizTake = () => {
       return;
     }
   }, [quizDetails, navigate, selectedCourse]);
-  const handleSubmit = useCallback(async (fromAuto = false) => {
-    if (!fromAuto) {
-      setConfirmOpen(true);
-      return;
-    }
 
-    const startedAt = state.startedAt;
-    const finishedAt = startedAt + (quizDetails.duration - state.timer) * 1000;
-    try {
-      dispatch(submitQuiz(selectedQuiz, state.answers, startedAt, finishedAt));
-      if (!error) {
-        localStorage.removeItem(storageKey);
-        setState((s) => ({ currentIndex: 0, answers: {}, timer: 30 * 60 }));
-        toast.success("Submitted successfully!");
-        navigate(`/user/quizzes/${selectedQuiz}/result`);
-      } else {
-        toast.error(error);
+  const startQuiz = () => {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+
+    setQuizStarted(true);
+  };
+
+  const handleSubmit = useCallback(
+    async (fromAuto = false) => {
+      if (!fromAuto) {
+        setConfirmOpen(true);
+        return;
       }
-    } catch (e) {
-      toast.error(e.message);
-    }
-  }, [state, quizDetails, selectedQuiz, dispatch, navigate, error, storageKey]);
 
-
+      const startedAt = state.startedAt;
+      const finishedAt =
+        startedAt + (quizDetails.duration - state.timer) * 1000;
+      try {
+        dispatch(
+          submitQuiz(
+            selectedQuiz,
+            state.answers,
+            startedAt,
+            finishedAt,
+            violationList
+          )
+        );
+        if (!error) {
+          localStorage.removeItem(storageKey);
+          setState((s) => ({ currentIndex: 0, answers: {}, timer: 30 * 60 }));
+          setViolationList([]);
+          toast.success("Submitted successfully!");
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+          }
+          navigate(`/user/quizzes/${selectedQuiz}/result`);
+        } else {
+          toast.error(error);
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    },
+    [
+      state,
+      quizDetails,
+      selectedQuiz,
+      dispatch,
+      navigate,
+      error,
+      storageKey,
+      violationList,
+    ]
+  );
 
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -156,16 +216,25 @@ const StudentQuizTake = () => {
     setState((s) => ({ ...s, answers: { ...s.answers, [qid]: value } }));
 
     try {
-    } catch (e) { }
+    } catch (e) {}
   };
-
-
 
   if (loading || !quizDetails) {
     return <div className="p-6 text-center">Loading quiz details...</div>;
   }
-  return (
 
+  if (!quizStarted) {
+    return (
+      <div className="text-center mt-20 h-[calc(100vh-250px)]">
+        <h2 className="text-2xl font-semibold mb-4">{quizDetails?.title}</h2>
+        <Button onClick={startQuiz} className="text-white">
+          Start Quiz - Fullscreen Mode
+        </Button>
+      </div>
+    );
+  }
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <div className="sticky top-16 z-30 border-b bg-gray-50/95 backdrop-blur">
@@ -198,8 +267,8 @@ const StudentQuizTake = () => {
                   state.timer <= 60
                     ? "bg-red-50 text-red-700 animate-pulse"
                     : state.timer <= 300
-                      ? "bg-yellow-50 text-yellow-700"
-                      : "bg-emerald-50 text-emerald-700"
+                    ? "bg-yellow-50 text-yellow-700"
+                    : "bg-emerald-50 text-emerald-700"
                 )}
               >
                 <TimerIcon className="h-4 w-4" />
@@ -232,7 +301,7 @@ const StudentQuizTake = () => {
                     className={cn(
                       "flex items-center gap-3 rounded-md border p-3",
                       state.answers[currentQuestion?._id] === id &&
-                      "border-primary bg-blue-500/5 text-primary"
+                        "border-primary bg-blue-500/5 text-primary"
                     )}
                   >
                     <RadioGroupItem

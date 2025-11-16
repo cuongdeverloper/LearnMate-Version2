@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Card } from "../ui/Card";
-import {  Clock } from "lucide-react";
+import { CheckCircle2, Clock } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import {
@@ -30,17 +30,22 @@ const statusFor = (openTime, deadline, attempted, maxAttempts) => {
 };
 
 const formatDate = (date) =>
-  new Date(date).toLocaleDateString("vi-VN", {
+  new Date(date).toLocaleString("vi-VN", {
     weekday: "short",
     day: "numeric",
     month: "long",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Ho_Chi_Minh",
   });
 
 const QuizzesTab = () => {
+  const now = new Date();
   const dispatch = useDispatch();
 
-  const { selectedCourse, quizzes, submitting } = useSelector(
+  const { selectedCourse, quizzes, submitting, loading, error } = useSelector(
     (state) => state.courses
   );
 
@@ -80,7 +85,7 @@ const QuizzesTab = () => {
 
               const daysLeft = getDaysUntilDue(q.closeTime);
               const showOverdueWarning =
-                isOverdue(q.closeTime) && q.attempted === 0;
+                isOverdue(q.closeTime) && q.attempted == 0;
 
               return (
                 <TableRow key={q._id}>
@@ -93,7 +98,7 @@ const QuizzesTab = () => {
                     )}
                     {!showOverdueWarning &&
                       daysLeft > 0 &&
-                      q.attempted === 0 && (
+                      q.attempted == 0 && (
                         <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
@@ -108,7 +113,7 @@ const QuizzesTab = () => {
                   </TableCell>
                   <TableCell>
                     {status === "Upcoming" && (
-                      <Badge variant="secondary" className="text-white">
+                      <Badge variant="upcoming" className="text-white">
                         Upcoming
                       </Badge>
                     )}
@@ -143,6 +148,7 @@ const QuizzesTab = () => {
                         className="text-white"
                         asChild
                         onClick={() => handleSelectQuiz(q._id)}
+                        disabled={q.maxAttempts === q.attempted}
                       >
                         <Link to={`/user/quizzes/${q._id}/take`}>
                           {q.attempted > 0 && q.attempted < q.maxAttempts
@@ -150,27 +156,12 @@ const QuizzesTab = () => {
                               "(còn " +
                               (q.maxAttempts - q.attempted) +
                               " lần thử)"
-                            : q.attempted === 0
-                            ? "Bắt đầu"
-                            : "Xem kết quả"}
+                            : "Bắt đầu"}
                         </Link>
                       </Button>
                     )}
-                    {status === "Completed" && (
-                      <Button
-                        className="text-white"
-                        asChild
-                        variant="secondary"
-                        onClick={() => handleSelectQuiz(q._id)}
-                        disabled={q.attempted === q.maxAttempts}
-                      >
-                        <Link to={`/user/quizzes/${q._id}/result`}>
-                          {q.attempted < q.maxAttempts && "Thử lại"}
-                          {q.attempted >= q.maxAttempts && "Xem kết quả"}
-                        </Link>
-                      </Button>
-                    )}
-                    {(status === "Active" || status === "Completed") && (
+
+                    {(status == "Active" || status == "Completed") && (
                       <Button
                         asChild
                         variant="outline"

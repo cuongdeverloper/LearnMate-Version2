@@ -87,12 +87,13 @@ export const selectQuiz = (quizId) => ({
 });
 
 export const submitQuiz =
-  (quizId, answers, startedAt, finishedAt) => async (dispatch) => {
+  (quizId, answers, startedAt, finishedAt, violationList) =>
+  async (dispatch) => {
     dispatch({ type: "QUIZ_SUBMIT_REQUEST" });
     try {
       const res = await axios.post(
         `/api/quizzes/${quizId}/submit`,
-        { answers, startedAt, finishedAt },
+        { answers, startedAt, finishedAt, violationList },
         {
           headers: {
             "Content-Type": "application/json",

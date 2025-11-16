@@ -57,13 +57,13 @@ const CourseSchedule = () => {
   const dispatch = useDispatch();
 
   const {
-  myCourses = [],
-  selectedCourse,
-  quizzes = [],
-  assignments = [],
-  schedule = [],
-} = useSelector((state) => state.courses);
-
+    myCourses = [],
+    selectedCourse,
+    quizzes = [],
+    assignments = [],
+    schedule = [],
+    loading: error,
+  } = useSelector((state) => state.courses);
 
   useEffect(() => {
     dispatch(fetchAssignments(selectedCourse));
@@ -133,7 +133,7 @@ const CourseSchedule = () => {
   const hasClassOnDate = (day) => {
     return schedule.some((s) => {
       return (
-        new Date(s.date).getDate() - 1 === day &&
+        new Date(s.date).getDate() === day &&
         new Date(s.date).getMonth() === currentDate.getMonth() &&
         new Date(s.date).getFullYear() === currentDate.getFullYear()
       );
@@ -142,7 +142,6 @@ const CourseSchedule = () => {
 
   const upcomingTasksRaw = myCourses.filter((c) => c.id === selectedCourse)[0]
     .upcomingTasks;
-
 
   const upcomingTasks = getTasksList(
     upcomingTasksRaw?.assignments,
@@ -153,7 +152,6 @@ const CourseSchedule = () => {
     setSelectedTask(task);
     setIsModalOpen(true);
   };
-
 
   return (
     <div className="space-y-6">

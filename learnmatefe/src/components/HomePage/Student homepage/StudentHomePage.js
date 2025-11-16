@@ -71,7 +71,7 @@ const StudentHomePage = () => {
           <Link to="/tutor">Tìm gia sư</Link>
           <Link to="/tutor-application">Trở thành gia sư</Link>
           {isAuthenticated&& <Link to="/messenger">Trò chuyện</Link>}
-          {role === "tutor" && <Link to="/TutorDashboard">BookingManagement</Link>}
+          {role === "tutor" && <Link to="/TutorDashboard">Bảng điều khiển gia sư</Link>}
           {role === "admin" && <Link to="/admin/dashboard">Admin</Link>}
         </nav>
         <div className="right-section">
@@ -207,7 +207,7 @@ const StudentHomePage = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="site-footer" data-aos="fade-up">
+      <footer className="site-footer">
         <div className="footer-content">
           <div className="footer-logo">
             <h3>LearnMate</h3>

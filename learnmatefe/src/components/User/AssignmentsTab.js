@@ -24,11 +24,15 @@ import {
 } from "../../redux/action/courseActions";
 
 const formatDate = (date) =>
-  new Date(date).toLocaleDateString("vi-VN", {
+  new Date(date).toLocaleString("vi-VN", {
     weekday: "short",
     day: "numeric",
     month: "long",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Ho_Chi_Minh",
   });
 
 const AssignmentsTab = ({ courseTitle }) => {
@@ -36,8 +40,9 @@ const AssignmentsTab = ({ courseTitle }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { selectedCourse, assignments, submitting } =
-    useSelector((state) => state.courses);
+  const { selectedCourse, assignments, submitting } = useSelector(
+    (state) => state.courses
+  );
   useEffect(() => {
     dispatch(fetchAssignments(selectedCourse));
   }, [selectedCourse, dispatch, submitting]);
@@ -45,9 +50,13 @@ const AssignmentsTab = ({ courseTitle }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "Graded":
-        return <Badge variant="default" className="text-white">Graded</Badge>;
+        return (
+          <Badge variant="default" className="text-white">
+            Graded
+          </Badge>
+        );
       case "Submitted":
-        return <Badge variant="secondary">Submitted</Badge>;
+        return <Badge variant="pending">Submitted</Badge>;
       case "overdue":
         return (
           <Badge variant="overdue" className="gap-1">
@@ -55,14 +64,17 @@ const AssignmentsTab = ({ courseTitle }) => {
           </Badge>
         );
       case "Upcoming":
-        return <Badge variant="upcoming" className="gap-1">Upcoming</Badge>;
+        return (
+          <Badge variant="upcoming" className="gap-1">
+            Upcoming
+          </Badge>
+        );
       case "Active":
         return <Badge variant="active">Active</Badge>;
       default:
         return null;
     }
   };
-
 
   const handleSubmitAssignment = (assignmentId) => {
     dispatch(selectAssignment(assignmentId));
@@ -75,7 +87,6 @@ const AssignmentsTab = ({ courseTitle }) => {
   };
 
   if (!courseId) return null;
-
 
   return (
     <div className="space-y-4">

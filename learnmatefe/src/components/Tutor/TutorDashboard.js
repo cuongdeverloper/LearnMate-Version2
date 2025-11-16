@@ -24,12 +24,12 @@ import TutorChangeRequests from "./view/TutorChangeRequests";
 import TutorQuizManager from "./view/Tutor Quiz/TutorQuizManager";
 
 const menuItems = [
-  { id: "bookings", label: "Quản lý Booking", icon: <BookOpen />, component: <TutorBookingList /> },
+  { id: "bookings", label: "Quản lý đặt lịch", icon: <BookOpen />, component: <TutorBookingList /> },
   { id: "materials", label: "Tài liệu", icon: <FileText />, component: <MaterialUploader /> },
   { id: "availableSchedule", label: "Lịch trống", icon: <CalendarDays />, component: <AvailableSchedule /> },
   { id: "tutorschedule", label: "Lịch dạy", icon: <ClipboardList />, component: <TutorSchedule /> },
-  { id: "managequiz", label: "Quản lý Quiz", icon: <ClipboardCheck />, component: <TutorQuizManager /> },
-  { id: "createassignment", label: "Assignment", icon: <FileText />, component: <TutorAssignmentManager /> },
+  { id: "managequiz", label: "Quản lý bài trắc nghiệm", icon: <ClipboardCheck />, component: <TutorQuizManager /> },
+  { id: "createassignment", label: "Quản lý bài tự luận", icon: <FileText />, component: <TutorAssignmentManager /> },
   { id: "changerequestschedule", label: "Đổi lịch", icon: <RefreshCcw />, component: <TutorChangeRequests /> },
 ];
 

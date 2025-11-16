@@ -1,5 +1,6 @@
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/Dialog";
-import { Calendar} from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -17,14 +18,18 @@ export const TASK_LABELS = {
 };
 
 const formatDate = (date) =>
-  new Date(date).toLocaleDateString("vi-VN", {
+  new Date(date).toLocaleString("vi-VN", {
     weekday: "short",
     day: "numeric",
     month: "long",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Ho_Chi_Minh",
   });
 
-const TaskDetailModal = ({ task, isOpen, onClose, courseId }) => {
+const TaskDetailModal = ({ task, isOpen, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
