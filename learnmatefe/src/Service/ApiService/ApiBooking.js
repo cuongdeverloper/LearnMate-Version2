@@ -36,7 +36,7 @@ export const finishBooking = async (bookingId) => {
       });
   
       // ✅ Lấy trực tiếp mảng data từ API
-      return { success: true, data: Array.isArray(response.data.data) ? response.data.data : [] };
+      return { success: true, data: Array.isArray(response.data) ? response.data : [] };
     } catch (error) {
       console.error("Lỗi khi tải tài liệu học tập:", error);
       const message = error.response?.data?.message || "Không thể tải tài liệu học tập.";
