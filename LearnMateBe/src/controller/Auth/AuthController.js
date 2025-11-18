@@ -52,6 +52,8 @@ const apiLogin = async (req, res) => {
 };
 
 const apiRegister = async (req, res) => {
+  console.log("MAIL USER:", process.env.MAIL_SDN_USERNAME);
+console.log("MAIL PASS:", process.env.MAIL_SDN_PASSWORD ? "EXISTS" : "EMPTY");
   try {
     uploadCloud.single('image')(req, res, async (err) => {
       if (err) {
