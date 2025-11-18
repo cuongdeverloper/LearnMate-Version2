@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport(
         }
     }
 )
-const sendMail = (to, subject, otp) => {
+const sendMail = async(to, subject, otp) => {
   const htmlContent = `
   <div style="background-color: #f2f4f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -30,11 +30,19 @@ const sendMail = (to, subject, otp) => {
   </div>
   `;
 
-  transporter.sendMail({
-    from: `"SDN System" <${process.env.MAIL_SDN_USERNAME}>`,
-    to: to,
-    subject: subject,
-    html: htmlContent
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: `"SDN System" <${process.env.MAIL_SDN_USERNAME}>`,
+      to,
+      subject,
+      html: htmlContent,
+    });
+    console.log('✅ Email sent successfully! Message ID:', info.messageId);
+    return true; // gửi thành công
+  } catch (error) {
+    console.error('❌ Failed to send email:', error);
+    return false; // gửi thất bại
+  }
+  
 };
 module.exports ={sendMail}
