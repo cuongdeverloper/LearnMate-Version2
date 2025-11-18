@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../modal/User');
 require('dotenv').config();
 
 const createJWT = (payload) => {
@@ -53,27 +54,20 @@ const verifyToken = (token, key) => {
 const verifyAccessToken = (token) => verifyToken(token, process.env.JWT_SECRET);
 const verifyRefreshToken = (token) => verifyToken(token, process.env.REFRESH_TOKEN_SECRET);
 
-const checkAccessToken = (req, res, next) => {
-
-    
+const checkAccessToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
-
-    if (!token) {
-        console.log("No token found");
-        return res.status(401).json({
-            EC: -1,
-            data: '',
-            EM: 'Not authenticated user'
-        });
-    }
+    if (!token) return res.status(401).json({ EC: -1, data: '', EM: 'Not authenticated' });
 
     const verifiedToken = verifyAccessToken(token);
-    
-    if (!verifiedToken) {
-        console.log("Token verification failed");
-        return res.status(401).json({ message: 'Invalid or expired access token' });
+    if (!verifiedToken) return res.status(401).json({ message: 'Invalid or expired token' });
+
+    const userRecord = await User.findById(verifiedToken.id);
+    if (!userRecord) return res.status(401).json({ message: 'User not found' });
+
+    // ✅ Kiểm tra version
+    if (verifiedToken.tokenVersion !== userRecord.lastAccessTokenVersion) {
+        return res.status(401).json({ errorCode: -999, message: 'Token expired (logged in from another device)' });
     }
 
     req.user = verifiedToken;

@@ -11,47 +11,24 @@ const apiLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        errorCode: 1,
-        message: 'Email and password are required'
-      });
-    }
-
-    const userRecord = await user.findOne({ email });
-    if (!userRecord) {
-      return res.status(200).json({
-        errorCode: 2,
-        message: 'Email does not exist'
-      });
-    }
-
+    const userRecord = await User.findOne({ email });
+    if (!userRecord) return res.status(200).json({ errorCode: 2, message: 'Email does not exist' });
 
     const isPasswordValid = await bcrypt.compare(password, userRecord.password);
+    if (!isPasswordValid) return res.status(200).json({ errorCode: 3, message: 'Invalid password' });
 
-    
-    if (!isPasswordValid) {
-      return res.status(200).json({
-        errorCode: 3,
-        message: 'Invalid password'
-      });
-    }
+    userRecord.lastAccessTokenVersion += 1;
+    await userRecord.save();
 
     const payload = {
-      id:userRecord._id,
+      id: userRecord._id,
       email: userRecord.email,
       role: userRecord.role,
+      tokenVersion: userRecord.lastAccessTokenVersion // nhúng vào access token
     };
 
     const accessToken = createJWT(payload);
     const refreshToken = createRefreshToken(payload);
-
-    if (!accessToken || !refreshToken) {
-      return res.status(500).json({
-        errorCode: 4,
-        message: 'Failed to create tokens'
-      });
-    }  
 
     return res.status(200).json({
       errorCode: 0,
@@ -65,15 +42,12 @@ const apiLogin = async (req, res) => {
         email: userRecord.email,
         phoneNumber: userRecord.phoneNumber,
         gender: userRecord.gender,
-        image:userRecord.image
+        image: userRecord.image
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({
-      errorCode: 5,
-      message: 'An error occurred during login'
-    });
+    console.error(error);
+    return res.status(500).json({ errorCode: 5, message: 'Login error' });
   }
 };
 

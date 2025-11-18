@@ -36,7 +36,12 @@ const userSchema = new mongoose.Schema({
   },
   blockedAt: {
     type: Date
-  }
+  },
+  refreshToken: {
+    type: String,
+    default: null
+  },
+  lastAccessTokenVersion: { type: Number, default: 0 }
 }, { timestamps: true });
 
 
