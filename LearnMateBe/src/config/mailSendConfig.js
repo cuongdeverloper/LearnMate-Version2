@@ -1,16 +1,9 @@
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport(
-    {
-        secure:true,
-        host:'smtp.gmail.com',
-        port:465,
-        auth:{
-            user:process.env.MAIL_SDN_USERNAME,
-            pass:process.env.MAIL_SDN_PASSWORD
-        }
-    }
-)
-const sendMail = async(to, subject, otp) => {
+const sgMail = require('@sendgrid/mail');
+
+// Set API key từ biến môi trường
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const sendMail = async (to, subject, otp) => {
   const htmlContent = `
   <div style="background-color: #f2f4f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -31,18 +24,20 @@ const sendMail = async(to, subject, otp) => {
   `;
 
   try {
-    const info = await transporter.sendMail({
-      from: `"SDN System" <${process.env.MAIL_SDN_USERNAME}>`,
+    const msg = {
       to,
+      from: process.env.MAIL_SDN_USERNAME, 
       subject,
       html: htmlContent,
-    });
-    console.log('✅ Email sent successfully! Message ID:', info.messageId);
-    return true; // gửi thành công
+    };
+
+    const response = await sgMail.send(msg);
+    console.log('✅ Email sent successfully via SendGrid!');
+    return true;
   } catch (error) {
-    console.error('❌ Failed to send email:', error);
-    return false; // gửi thất bại
+    console.error('❌ Failed to send email via SendGrid:', error);
+    return false;
   }
-  
 };
-module.exports ={sendMail}
+
+module.exports = { sendMail };
