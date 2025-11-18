@@ -2,148 +2,46 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import './Messenger.scss'
 import Conversation from "../components/conversations";
-import { io } from "socket.io-client";
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom";
 import ChatBox from "./ChatBox";
-import { useParams } from "react-router-dom";
 import Header from "../../components/Layout/Header/Header";
 import { ApiGetUserByUserId } from "../../Service/ApiService/ApiUser";
 import { ApiGetMessageByConversationId, ApiSendMessage, getConversationApi } from "../../Service/ApiService/ApiMessage";
 import { toast } from "react-toastify";
+import { useSocket } from "../../SocketContext";
 
 const Messenger = () => {
   const { conversationId } = useParams();
+  const { socket } = useSocket();
 
   const user = useSelector(state => state.user);
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  // const [ setOnlineUsers] = useState([]);
-  const socket = useRef();
-  const scrollRef = useRef();
-  const isAuthenticated = useSelector(user => user.user.isAuthenticated);
   const [receiver, setReceiver] = useState(null);
+
+  const scrollRef = useRef();
+  const navigate = useNavigate();
+
+  // 🟦 Lấy receiver
   useEffect(() => {
     const fetchReceiver = async () => {
       if (currentChat) {
         const friendId = currentChat.members.find((m) => m !== user.account.id);
         if (friendId) {
-          try {
-            const res = await ApiGetUserByUserId(friendId);
-            setReceiver(res);
-          } catch (err) {
-            console.error("Failed to fetch receiver:", err);
-          }
+          const res = await ApiGetUserByUserId(friendId);
+          setReceiver(res);
         }
       }
     };
     fetchReceiver();
   }, [currentChat, user.account.id]);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!conversationId || conversations.length === 0) return;
 
-    const matched = conversations.find((c) => c._id === conversationId);
-    if (matched) {
-      setCurrentChat(matched);
-    }
-  }, [conversationId, conversations]);
-
-
-
-  useEffect(() => {
-    socket.current = io("https://learnmate-version2.onrender.com", {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-    });
-
-    socket.current.on("getMessage", (data) => {
-      setArrivalMessage({
-        sender: data.senderId,
-        text: data.text,
-        createdAt: Date.now(),
-        conversationId: data.conversationId,
-         textPreview: data.text
-      });
-    });
-
-    return () => {
-      socket.current.disconnect();
-    };
-  }, []);
-
-
-  useEffect(() => {
-    if (!arrivalMessage) return;
-
-    if (currentChat && arrivalMessage.conversationId === currentChat._id) {
-      setMessages((prev) => [...prev, arrivalMessage]);
-    } else {
-      console.log("Tin nhắn đến nhưng khác conversation:", arrivalMessage);
-    }
-  }, [arrivalMessage, currentChat]);
-
-  useEffect(() => {
-    if (!arrivalMessage) return;
-
-    if (!currentChat || arrivalMessage.conversationId !== currentChat._id) {
-      toast.info(`💬 Bạn có tin nhắn mới: "${arrivalMessage.textPreview}"`, {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
-    }
-  }, [arrivalMessage, currentChat]);
-
-  useEffect(() => {
-    socket.current.emit("addUser", user.account.id);
-    // socket.current.on("getUsers", (users) => {
-    //   if (Array.isArray(user.followings)) {
-    //     setOnlineUsers(
-    //       user.followings.filter((f) => users.some((u) => u.userId === f))
-    //     );
-    //   }
-    // });
-  }, [user]);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!newMessage || newMessage.trim() === "") {
-      return;
-    }
-
-    const receiverId = currentChat.members.find(
-      (member) => member !== user.account.id
-    );
-
-    socket.current.emit("sendMessage", {
-      senderId: user.account.id,
-      receiverId,
-      text: newMessage,
-      conversationId: currentChat._id,
-    });
-
-    try {
-      const data = await ApiSendMessage(receiverId, newMessage, currentChat._id);
-
-      const newMsg = {
-        ...data,
-        sender: { _id: user.account.id, image: user.account.image },
-      };
-
-      setMessages((prev) => [...prev, newMsg]);
-      setNewMessage("");
-    } catch (err) {
-      console.error("Lỗi khi gửi tin nhắn:", err);
-    }
-  };
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/signin");
-    }
-  }, [isAuthenticated, navigate]);
+  // 🟦 Lấy danh sách conversation
   useEffect(() => {
     const getConversations = async () => {
       try {
@@ -155,9 +53,13 @@ const Messenger = () => {
     };
     getConversations();
   }, []);
+
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!conversationId || conversations.length === 0) return;
+
+    const matched = conversations.find((c) => c._id === conversationId);
+    if (matched) setCurrentChat(matched);
+  }, [conversationId, conversations]);
 
   useEffect(() => {
     if (!currentChat) return;
@@ -170,41 +72,109 @@ const Messenger = () => {
         console.error("Error fetching messages:", err);
       }
     };
-
     getMessages();
   }, [currentChat]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("getMessage", (data) => {
+      setArrivalMessage({
+        sender: data.senderId,
+        text: data.text,
+        createdAt: Date.now(),
+        conversationId: data.conversationId,
+        textPreview: data.text
+      });
+    });
+
+    return () => socket.off("getMessage");
+  }, [socket]);
 
   useEffect(() => {
-    socket.current.on("messageSeen", ({ conversationId }) => {
+    if (!arrivalMessage) return;
+
+    if (currentChat && arrivalMessage.conversationId === currentChat._id) {
+      setMessages((prev) => [...prev, arrivalMessage]);
+    } else {
+      toast.info(`💬 Tin nhắn mới: "${arrivalMessage.textPreview}"`);
+    }
+  }, [arrivalMessage, currentChat]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("messageSeen", ({ conversationId }) => {
       if (currentChat && currentChat._id === conversationId) {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
-            msg.sender._id === user.account.id ? { ...msg, seen: true } : msg
+            msg.sender._id === user.account.id
+              ? { ...msg, seen: true }
+              : msg
           )
         );
       }
     });
-  }, [currentChat, user.account.id]);
 
+    return () => socket.off("messageSeen");
+  }, [socket, currentChat]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    const receiverId = currentChat.members.find(
+      (member) => member !== user.account.id
+    );
+
+    socket.emit("sendMessage", {
+      senderId: user.account.id,
+      receiverId,
+      text: newMessage,
+      conversationId: currentChat._id,
+    });
+
+    // 🔥 Gửi vào DB
+    try {
+      const data = await ApiSendMessage(receiverId, newMessage, currentChat._id);
+
+      const newMsg = {
+        ...data,
+        sender: { _id: user.account.id, image: user.account.image },
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+      setNewMessage("");
+    } catch (err) {
+      console.error("Lỗi gửi tin:", err);
+    }
+  };
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (!isAuthenticated) navigate("/signin");
+  }, [isAuthenticated]);
 
   return (
     <>
-      {/* <Topbar /> */}
       <Header />
-      <div className="messenger" >
+      <div className="messenger">
+        {/* LEFT */}
         <div className="chatMenu">
           <div className="chatMenuWrapper">
             <input placeholder="Search for friends" className="chatMenuInput" />
-            {conversations && Array.isArray(conversations) ? conversations.map((c) => (
+            {conversations.map((c) => (
               <div key={c._id} onClick={() => navigate(`/messenger/${c._id}`)}>
                 <Conversation conversation={c} currentUser={user.account} />
               </div>
-            )) : <p>Loading conversations...</p>}
-
-
+            ))}
           </div>
         </div>
+
+        {/* CENTER */}
         <ChatBox
           currentChat={currentChat}
           messages={messages}
@@ -214,13 +184,13 @@ const Messenger = () => {
           scrollRef={scrollRef}
           user={user}
           receiver={receiver}
-          socket={socket}
         />
 
-        <div className="chatOnline">
-        </div>
+        {/* RIGHT */}
+        <div className="chatOnline"></div>
       </div>
     </>
-  )
-}
-export default Messenger
+  );
+};
+
+export default Messenger;
