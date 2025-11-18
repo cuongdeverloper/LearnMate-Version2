@@ -38,7 +38,7 @@ const { Title, Text } = Typography;
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
-  const [allTransactions, setAllTransactions] = useState([]); 
+  const [allTransactions, setAllTransactions] = useState([]); // Tất cả transactions cho statistics
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -113,11 +113,8 @@ const TransactionHistory = () => {
   useEffect(() => {
     fetchTransactions();
     fetchAllTransactions();
-  }, [fetchTransactions, fetchAllTransactions]);
-
-  useEffect(() => {
-    fetchAllTransactions();
-  }, [fetchAllTransactions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
