@@ -55,3 +55,13 @@ export const resetPasswordApi = async (token, newPassword) => {
     console.log(error)
   }
 };
+
+export const verifyAccountApi = async (token) => {
+  try {
+    const response = await axios.get(`/verify-account?token=${token}`);
+    return response;
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    throw error;
+  }
+};

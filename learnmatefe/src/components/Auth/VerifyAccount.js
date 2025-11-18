@@ -4,7 +4,7 @@ import axios from "axios";
 import "./VerifyAccount.scss"; 
 import { ImSpinner9 } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
-import { verifyAccountApi } from "../../Service/ApiService";
+import { verifyAccountApi } from "../Auth/ApiAuth";
 
 const VerifyAccount = () => {
   const [searchParams] = useSearchParams();
