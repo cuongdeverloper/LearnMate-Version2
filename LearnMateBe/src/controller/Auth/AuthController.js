@@ -53,7 +53,7 @@ const apiLogin = async (req, res) => {
 
 const apiRegister = async (req, res) => {
   console.log("MAIL USER:", process.env.MAIL_SDN_USERNAME);
-console.log("MAIL PASS:", process.env.MAIL_SDN_PASSWORD ? "EXISTS" : "EMPTY");
+  console.log("MAIL PASS:", process.env.MAIL_SDN_PASSWORD ? "EXISTS" : "EMPTY");
   try {
     uploadCloud.single('image')(req, res, async (err) => {
       if (err) {
@@ -98,13 +98,32 @@ console.log("MAIL PASS:", process.env.MAIL_SDN_PASSWORD ? "EXISTS" : "EMPTY");
 
       const emailSubject = 'Verify Your Account';
       const emailContent = `
-        <div style="font-family:sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #eee;border-radius:8px;">
-          <h2 style="color:#333;">Welcome to Our App, ${username}!</h2>
-          <p>Click the button below to verify your account:</p>
-          <a href="${verifyLink}" style="display:inline-block;margin-top:12px;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;">Verify Account</a>
-          <p style="margin-top:20px;color:#888;font-size:13px;">This link will expire in 5 minutes.</p>
-        </div>
-      `;
+<div style="background-color:#f4f6f8;padding:40px 0;font-family: 'Helvetica Neue', Arial, sans-serif;">
+  <div style="max-width:500px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; text-align:center; padding:30px;">
+      <h1 style="margin:0;font-size:22px;">🎉 Chào mừng, ${username}!</h1>
+      <p style="margin-top:8px;font-size:16px;color:#e0e0e0;">Hãy xác thực tài khoản của bạn ngay bây giờ</p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding:40px;text-align:center;">
+      <p style="font-size:16px;color:#555;">Nhấn nút bên dưới để xác thực tài khoản của bạn:</p>
+      <a href="${verifyLink}" style="display:inline-block;margin-top:20px;padding:12px 25px;background: #2575fc;color:white;text-decoration:none;font-weight:bold;border-radius:8px;box-shadow:0 4px 12px rgba(37,117,252,0.3);transition: all 0.2s;">Xác thực ngay</a>
+      <p style="margin-top:25px;font-size:13px;color:#888;">Liên kết này sẽ hết hạn trong 5 phút.</p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f9fafb;text-align:center;padding:20px;font-size:12px;color:#aaaaaa;border-top:1px solid #eee;">
+      <p style="margin:5px 0;">Nếu bạn không yêu cầu, có thể bỏ qua email này.</p>
+      <p style="margin:5px 0;">&copy; 2025 Our App</p>
+    </div>
+
+  </div>
+</div>
+`;
+
       await sendMail(email, emailSubject, emailContent);
 
       // ✅ Schedule account deletion if not verified in 5 minutes
@@ -316,7 +335,7 @@ const resetPassword = async (req, res) => {
       });
     }
 
-   
+
     const isSamePassword = await bcrypt.compare(newPassword, userRecord.password);
     if (isSamePassword) {
       return res.status(400).json({
@@ -436,7 +455,7 @@ const verifyAccountByLink = async (req, res) => {
 
 
 module.exports = {
-  apiLogin,apiRegister,verifyOtp,resendOTPVerificationCode,
-  requestPasswordReset,resetPassword,changePassword,verifyAccountByLink
+  apiLogin, apiRegister, verifyOtp, resendOTPVerificationCode,
+  requestPasswordReset, resetPassword, changePassword, verifyAccountByLink
 };
 

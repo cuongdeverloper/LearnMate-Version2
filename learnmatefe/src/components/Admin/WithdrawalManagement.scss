@@ -239,6 +239,29 @@
                     }
                 }
             }
+
+            &.filter-actions {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+    
+                .ant-typography {
+                    margin-bottom: 12px;
+                }
+    
+                .filter-actions__buttons {
+                    display: flex;
+                    gap: 12px;
+                    width: 100%;
+    
+                    .ant-btn {
+                        flex: 1;
+                        height: 40px;
+                        border-radius: 8px;
+                    }
+                }
+            }
         }
     }
 
@@ -408,6 +431,18 @@
             .ant-row {
                 .ant-col {
                     margin-bottom: 16px;
+
+                    .filter-group {
+                        &.filter-actions {
+                            .filter-actions__buttons {
+                                flex-wrap: wrap;
+
+                                .ant-btn {
+                                    flex: 1 1 100%;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -543,35 +543,38 @@ const WithdrawalManagement = () => {
               />
             </div>
           </Col>
-          <Col>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => {
-                setFilters({
-                  status: 'all',
-                  search: '',
-                  dateRange: null
-                });
-                fetchWithdrawals();
-              }}
-            >
-              Làm mới
-            </Button>
+          <Col xs={24} sm={8} md={6}>
+            <div className="filter-group filter-actions">
+              <Text strong>&nbsp;</Text>
+              <div className="filter-actions__buttons">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={fetchWithdrawals}
+                  loading={loading}
+                >
+                  Tìm kiếm
+                </Button>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() => {
+                    setFilters({
+                      status: 'all',
+                      targetType: 'all',
+                      dateRange: null
+                    });
+                    fetchWithdrawals();
+                  }}
+                >
+                  Làm mới
+                </Button>
+              </div>
+            </div>
           </Col>
         </Row>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="action-buttons">
-        <Button
-          type="primary"
-          icon={<ReloadOutlined />}
-          onClick={fetchWithdrawals}
-          loading={loading}
-        >
-          Làm mới dữ liệu
-        </Button>
-      </div>
+
 
       {/* Withdrawals Table */}
       <Card className="table-card">

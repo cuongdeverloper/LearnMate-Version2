@@ -565,29 +565,32 @@ const ReportManagement = () => {
             </div>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={fetchReports}
-                loading={loading}
-              >
-                Tìm kiếm
-              </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() => {
-                  setFilters({
-                    status: 'all',
-                    targetType: 'all',
-                    dateRange: null
-                  });
-                  fetchReports();
-                }}
-              >
-                Làm mới
-              </Button>
-            </Space>
+            <div className="filter-group filter-actions">
+              <Text strong>&nbsp;</Text>
+              <div className="filter-actions__buttons">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={fetchReports}
+                  loading={loading}
+                >
+                  Tìm kiếm
+                </Button>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() => {
+                    setFilters({
+                      status: 'all',
+                      targetType: 'all',
+                      dateRange: null
+                    });
+                    fetchReports();
+                  }}
+                >
+                  Làm mới
+                </Button>
+              </div>
+            </div>
           </Col>
         </Row>
       </Card>

@@ -205,46 +205,47 @@
             }
 
             .filter-select {
+                width: 100%;
 
-                .ant-input,
                 .ant-select-selector,
-                .ant-picker {
+                .ant-picker,
+                .ant-input {
                     border-radius: 8px;
                     border: 1px solid #d9d9d9;
-                    padding: 8px 12px;
-                    font-size: 14px;
+                    transition: all 0.3s;
 
-                    &:hover,
-                    &:focus {
-                        border-color: #667eea;
-                        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+                    &:hover {
+                        border-color: #40a9ff;
+                    }
+
+                    &:focus,
+                    &.ant-select-focused,
+                    &.ant-picker-focused {
+                        border-color: #40a9ff;
+                        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
                     }
                 }
             }
-        }
-
-        .ant-btn {
-            border-radius: 8px;
-            font-weight: 500;
-            height: 40px;
-            padding: 0 20px;
-
-            &.ant-btn-primary {
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                border: none;
-
-                &:hover {
-                    background: linear-gradient(45deg, #5a6fd8, #6a4190);
-                    transform: translateY(-1px);
+            &.filter-actions {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+    
+                .ant-typography {
+                    margin-bottom: 12px;
                 }
-            }
-
-            &:not(.ant-btn-primary) {
-                border-color: #d9d9d9;
-
-                &:hover {
-                    border-color: #667eea;
-                    color: #667eea;
+    
+                .filter-actions__buttons {
+                    display: flex;
+                    gap: 12px;
+                    width: 100%;
+    
+                    .ant-btn {
+                        flex: 1;
+                        height: 40px;
+                        border-radius: 8px;
+                    }
                 }
             }
         }
@@ -563,6 +564,26 @@
 
                         .metric-title {
                             font-size: 12px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .filter-card {
+            .ant-row {
+                .ant-col {
+                    margin-bottom: 16px;
+
+                    .filter-group {
+                        &.filter-actions {
+                            .filter-actions__buttons {
+                                flex-wrap: wrap;
+
+                                .ant-btn {
+                                    flex: 1 1 100%;
+                                }
+                            }
                         }
                     }
                 }

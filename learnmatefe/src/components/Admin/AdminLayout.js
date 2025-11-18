@@ -13,6 +13,7 @@ import {
     DollarOutlined,
     HistoryOutlined,
     BellOutlined,
+    HomeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -167,6 +168,19 @@ const AdminLayout = ({ children }) => {
                     onClick={handleMenuClick}
                     className="modern-admin-menu"
                 />
+
+                <div className="sider-footer">
+                    <Tooltip title="Quay về trang chủ" placement="right">
+                        <Button
+                            type="primary"
+                            className="back-home-button"
+                            icon={<HomeOutlined />}
+                            onClick={() => navigate('/')}
+                        >
+                            {!collapsed && <span>Trang chủ</span>}
+                        </Button>
+                    </Tooltip>
+                </div>
             </Sider>
             
             <Layout className="modern-site-layout">
